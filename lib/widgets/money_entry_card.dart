@@ -79,7 +79,7 @@ class MoneyEntryCard extends StatelessWidget {
                 boxShadow: [
                   // 通常のふわっとした影
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     spreadRadius: 1,
                     blurRadius: 4,
                     offset: const Offset(1, 2),

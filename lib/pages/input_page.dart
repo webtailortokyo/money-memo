@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:intl/intl.dart';
 import 'dart:developer';
 import 'package:vibration/vibration.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -156,17 +155,12 @@ class _InputPageState extends State<InputPage> {
     }
 
     // 1. 振動と音を並列再生（待たなくてよいが、音は再生開始を確認したいのでawaitしても良い）
-    final vibrationFuture = Vibration.hasVibrator().then((hasVibrator) {
-      if (hasVibrator ?? false) {
-        Vibration.vibrate(duration: vibrationDuration);
-      }
-    });
+    Vibration.vibrate(duration: vibrationDuration);
 
     final soundFuture = AudioPlayer().play(AssetSource(soundFile));
 
     // エラーハンドリングのためFuture.waitで囲むが、失敗しても次へ進む
     await Future.wait([
-      vibrationFuture.catchError((_) {}), 
       soundFuture.catchError((_) {})
     ]);
 

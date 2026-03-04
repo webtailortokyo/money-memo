@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'models/money_entry.dart';
-import 'models/money_type.dart';
 import 'pages/main_page.dart';
 
 void main() async {

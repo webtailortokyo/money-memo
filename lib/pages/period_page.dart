@@ -8,7 +8,6 @@ import 'package:vibration/vibration.dart';
 import '../models/money_entry.dart';
 import '../theme.dart';
 import '../widgets/money_entry_card.dart';
-import '../widgets/money_amount_text.dart';
 import '../widgets/period_date_selector.dart';
 import '../widgets/total_amount_row.dart';
 import '../utils/format_utils.dart';
@@ -157,7 +156,7 @@ class _PeriodPageState extends State<PeriodPage> {
                   child: ElevatedButton(
                     onPressed: () async {
                       final text = StringBuffer()
-                        ..writeln('${periodLabel} の記録\n');
+                        ..writeln('$periodLabel の記録\n');
 
                       // 🔹 合計
                       text.writeln(AppStrings.totalSectionTitle);
@@ -197,7 +196,7 @@ class _PeriodPageState extends State<PeriodPage> {
 
                         text.writeln(
                           '${formatDate(e.date)}\t'
-                          '${e.memo ?? ''}\t'
+                          '${e.memo}\t'
                           '$typeLabel\t'
                           '$amountStr'
                         );
@@ -206,7 +205,7 @@ class _PeriodPageState extends State<PeriodPage> {
 
                       Clipboard.setData(ClipboardData(text: text.toString()));
 
-                      if (await Vibration.hasVibrator() ?? false) {
+                      if (context.mounted && (await Vibration.hasVibrator() ?? false)) {
                         Vibration.vibrate(duration: 200, amplitude: 128);
                       }
 

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 // アプリ全体で使う共通の文字列
 class AppStrings {
