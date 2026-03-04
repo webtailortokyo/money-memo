@@ -340,8 +340,11 @@ class _InputPageState extends State<InputPage> {
                 controller: memoController,
                 decoration: InputDecoration(
                   hintText: memoHint,
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
@@ -358,12 +361,19 @@ class _InputPageState extends State<InputPage> {
                   ThousandsSeparatorInputFormatter(),
                 ],
                 style: const TextStyle(
-                  fontSize: AppNumbers.amountTextFontSize,
                   height: 1.2,
                 ),
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                  
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: AppNumbers.defaultPadding,
+                    horizontal: 0,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                    borderSide: BorderSide.none,
+                  ),
                   // 1. prefix ではなく prefixIcon に変更（これで常に表示される）
                   prefixIcon: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -371,11 +381,10 @@ class _InputPageState extends State<InputPage> {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      const SizedBox(width: 0), // 左端の余白調整用
-                      Text(
+                      const SizedBox(width: AppNumbers.defaultPadding), // 左端の余白調整用
+                      const Text(
                         '¥ ',
                         style: TextStyle(
-                          fontSize: AppNumbers.amountTextFontSize, 
                           color: AppColors.mainText,
                           // 3. ここが重要：Rowの中でもTextFieldの文字と揃うように高さを微調整
                           height: 1.2, 
