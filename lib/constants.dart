@@ -32,8 +32,7 @@ class AppStrings {
   static const String dateSectionTitle = '■ 日付';
   static const String fromLabel = 'から';
   static const String toLabel = 'まで';
-  static const String copyButtonText = 'この期間の記録をコピー';
-  static const String copySuccessMessage = 'コピーしました！';
+  static const String copyButtonText = 'この期間の記録を共有';
   static const String totalSectionTitle = '■ 合計';
   static const String detailSectionTitle = '■ 内訳';
   static const String increaseTypeLabel = '増えた';

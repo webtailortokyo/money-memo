@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:vibration/vibration.dart';
 
 import '../models/money_entry.dart';
 import '../theme.dart';
@@ -172,8 +172,8 @@ class _PeriodPageState extends State<PeriodPage> {
                 /// 🔹 コピーボタン
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => _copyToClipboard(periodLabel, filtered, totalIncrease, totalDecrease),
+                  child: ElevatedButton.icon(
+                    onPressed: () => _shareRecord(periodLabel, filtered, totalIncrease, totalDecrease),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.pink,
                       foregroundColor: Colors.white,
@@ -182,7 +182,8 @@ class _PeriodPageState extends State<PeriodPage> {
                         borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
                       ),
                     ),
-                    child: const Text(AppStrings.copyButtonText),
+                    icon: const Icon(Icons.share, size: 20),
+                    label: const Text(AppStrings.copyButtonText),
                   ),
                 ),
 
@@ -310,9 +311,9 @@ class _PeriodPageState extends State<PeriodPage> {
     }).toList();
   }
 
-  Future<void> _copyToClipboard(String periodLabel, List<MoneyEntry> filtered, int totalIncrease, int totalDecrease) async {
+  Future<void> _shareRecord(String periodLabel, List<MoneyEntry> filtered, int totalIncrease, int totalDecrease) async {
     if (filtered.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('記録がない期間はコピーできません')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('記録がない期間は共有できません')));
       return;
     }
 
@@ -349,11 +350,8 @@ class _PeriodPageState extends State<PeriodPage> {
     }
 
     text.writeln('\n${AppStrings.clipboardNote}');
-    Clipboard.setData(ClipboardData(text: text.toString()));
-
-    if (context.mounted && (await Vibration.hasVibrator() ?? false)) {
-      Vibration.vibrate(duration: 200, amplitude: 128);
-    }
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppStrings.copySuccessMessage)));
+    
+    // OS標準の共有ダイアログを表示
+    await Share.share(text.toString());
   }
 }
