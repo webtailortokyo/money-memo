@@ -324,9 +324,9 @@ class _InputPageState extends State<InputPage> {
 
               Row(
                 children: [
-                  _typeButton(AppStrings.decreaseTypeLabel, MoneyType.decrease, AppColors.decrease),
-                  const SizedBox(width: AppNumbers.smallSpacing),
                   _typeButton(AppStrings.increaseTypeLabel, MoneyType.increase, AppColors.increase),
+                  const SizedBox(width: AppNumbers.smallSpacing),
+                  _typeButton(AppStrings.decreaseTypeLabel, MoneyType.decrease, AppColors.decrease),
                 ],
               ),
 
