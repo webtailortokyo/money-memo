@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   // 共通
   static const background = Color(0xFFFFFBF0);
-  static const accent = Color(0xFFE6D2AB);
+  static const accent = Color(0xFFFFB6D9);
   static const mainText = Color(0xFF4A4A4A);
 
   // 減った
@@ -17,8 +17,8 @@ class AppColors {
   static const increaseAmount = Color(0xFF008236);
 
   // メモのみ
-  static const memo = Color(0xFF4CB5FF);
-  static const memoBg = Color(0xFFE5F5FF);
+  static const memo = Color(0xFF757575);
+  static const memoBg = Color(0xFFE0E0E0);
 
   // period_pageセクション背景
   static const sectionBg = Color(0xFFFFF2D9);

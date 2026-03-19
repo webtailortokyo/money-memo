@@ -424,7 +424,7 @@ class _MainPageState extends State<MainPage> {
 
                     LayoutBuilder(
                       builder: (context, constraints) {
-                        final isWide = constraints.maxWidth > 340;
+                        final isWide = constraints.maxWidth > 300;
 
                         if (isWide) {
                           return Row(
