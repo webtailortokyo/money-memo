@@ -72,18 +72,18 @@ class _PeriodPageState extends State<PeriodPage> {
         backgroundColor: AppColors.background,
         elevation: AppNumbers.appBarElevation,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.pink),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.accent),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           AppStrings.periodPageTitle,
           style: TextStyle(
-            color: AppColors.pink,
+            color: AppColors.accent,
             fontWeight: FontWeight.bold,
             fontSize: AppNumbers.subPageTitleFontSize,
           ),
         ),
-        iconTheme: const IconThemeData(color: AppColors.pink),
+        iconTheme: const IconThemeData(color: AppColors.accent),
       ),
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
@@ -145,7 +145,7 @@ class _PeriodPageState extends State<PeriodPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.chevron_left, color: AppColors.pink, size: 32),
+                        icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 32),
                         onPressed: () => _changePeriod(-1),
                       ),
                       GestureDetector(
@@ -160,7 +160,7 @@ class _PeriodPageState extends State<PeriodPage> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.chevron_right, color: AppColors.pink, size: 32),
+                        icon: const Icon(Icons.chevron_right, color: AppColors.accent, size: 32),
                         onPressed: () => _changePeriod(1),
                       ),
                     ],
@@ -175,7 +175,7 @@ class _PeriodPageState extends State<PeriodPage> {
                   child: ElevatedButton.icon(
                     onPressed: () => _shareRecord(periodLabel, filtered, totalIncrease, totalDecrease),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.pink,
+                      backgroundColor: AppColors.accent,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing),
                       shape: RoundedRectangleBorder(
@@ -252,7 +252,7 @@ class _PeriodPageState extends State<PeriodPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.pink : AppColors.sectionBg,
+            color: isSelected ? AppColors.accent : AppColors.sectionBg,
             borderRadius: BorderRadius.circular(20),
           ),
           alignment: Alignment.center,

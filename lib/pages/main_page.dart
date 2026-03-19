@@ -332,7 +332,7 @@ class _MainPageState extends State<MainPage> {
     return ElevatedButton(
       onPressed: _save,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.pink,
+        backgroundColor: AppColors.accent,
         foregroundColor: Colors.white,
         shape: const StadiumBorder(),
         padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 22), // 以前の 16 から 22 に増やして高さを出す
@@ -355,11 +355,26 @@ class _MainPageState extends State<MainPage> {
         title: const Text(
           AppStrings.appTitle,
           style: TextStyle(
-            color: AppColors.pink,
+            color: AppColors.accent,
             fontWeight: FontWeight.bold,
             fontSize: AppNumbers.titleFontSize,
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const PeriodPage()),
+          );
+        },
+        label: const Text(
+          AppStrings.periodPageTitle,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        icon: const Icon(Icons.history, color: Colors.white),
+        backgroundColor: AppColors.accent,
+        foregroundColor: Colors.white,
       ),
 
       body: SafeArea(
@@ -476,57 +491,6 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
 
-            // 「期間で見る」ボタン
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  top: 24, // 余白を拡大
-                  left: AppNumbers.listViewHorizontalPadding,
-                  right: AppNumbers.listViewHorizontalPadding,
-                  bottom: 12,
-                ),
-                child: Material(
-                  color: AppColors.pink.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const PeriodPage()),
-                      );
-                    },
-                    borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppNumbers.defaultPadding,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.pink.withOpacity(0.2)),
-                        borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.history, size: 20, color: AppColors.pink),
-                          SizedBox(width: 12),
-                          Text(
-                            '期間で見る',
-                            style: TextStyle(
-                              color: AppColors.pink,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          Icon(Icons.chevron_right, size: 20, color: AppColors.pink),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
             // 記録リスト
@@ -596,7 +560,7 @@ class _MainPageState extends State<MainPage> {
             ),
             // 下部の余白
             const SliverToBoxAdapter(
-              child: SizedBox(height: AppNumbers.largeSpacing),
+              child: SizedBox(height: 80.0), // FABと重ならないように余白を多めに確保
             ),
           ],
         ),

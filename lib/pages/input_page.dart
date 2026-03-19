@@ -357,11 +357,11 @@ class _InputPageState extends State<InputPage> {
           style: const TextStyle(
             fontSize: AppNumbers.subPageTitleFontSize,
             fontWeight: FontWeight.bold,
-            color: AppColors.pink,
+            color: AppColors.accent,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.pink),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.accent),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -536,7 +536,7 @@ class _InputPageState extends State<InputPage> {
                       onPressed: _save,
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: AppColors.pink,
+                        backgroundColor: AppColors.accent,
                         minimumSize: const Size(0, 50),
                       ),
                       child: Text(isEdit ? AppStrings.updateButtonText : AppStrings.recordButtonText),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   // 共通
   static const background = Color(0xFFFFFBF0);
-  static const pink = Color(0xFFFFB6D9);
+  static const accent = Color(0xFFE6D2AB);
   static const mainText = Color(0xFF4A4A4A);
 
   // 減った
