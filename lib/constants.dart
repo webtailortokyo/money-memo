@@ -64,7 +64,7 @@ class AppNumbers {
 
   // input_page.dart
   static const int minInputDatePickerYear = 2020; // input_pageの日付選択の最小年
-  static const double typeButtonBorderRadius = 24.0;
+  static const double typeButtonBorderRadius = 12.0;
   static const double calendarIconSize = 20.0;
   static const double calendarFontSize = 18.0;
   

@@ -334,10 +334,8 @@ class _MainPageState extends State<MainPage> {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.pink,
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16), // 少し高さを出す
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 22), // 以前の 16 から 22 に増やして高さを出す
       ),
       child: const Text(
         AppStrings.recordButtonText,
@@ -411,7 +409,7 @@ class _MainPageState extends State<MainPage> {
 
                     LayoutBuilder(
                       builder: (context, constraints) {
-                        final isWide = constraints.maxWidth > 400;
+                        final isWide = constraints.maxWidth > 340;
 
                         if (isWide) {
                           return Row(
@@ -467,8 +465,8 @@ class _MainPageState extends State<MainPage> {
                       children: [
                         _amountTextField(),
                         const SizedBox(height: AppNumbers.smallSpacing),
-                        SizedBox(
-                          width: double.infinity,
+                        Align(
+                          alignment: Alignment.center,
                           child: _recordButton(),
                         ),
                       ],
@@ -483,8 +481,8 @@ class _MainPageState extends State<MainPage> {
               child: Padding(
                 padding: const EdgeInsets.only(
                   top: 24, // 余白を拡大
-                  left: AppNumbers.defaultPadding + AppNumbers.smallSpacing,
-                  right: AppNumbers.defaultPadding + AppNumbers.smallSpacing,
+                  left: AppNumbers.listViewHorizontalPadding,
+                  right: AppNumbers.listViewHorizontalPadding,
                   bottom: 12,
                 ),
                 child: Material(
