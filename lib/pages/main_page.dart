@@ -36,17 +36,23 @@ class _MainPageState extends State<MainPage> {
   DateTime selectedDate = DateTime.now();
   final amountController = TextEditingController();
   final memoController = TextEditingController();
+  final amountFocusNode = FocusNode();
+  final memoFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     box = Hive.box<MoneyEntry>(HiveConstants.moneyBoxName);
+    amountFocusNode.addListener(() => setState(() {}));
+    memoFocusNode.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     amountController.dispose();
     memoController.dispose();
+    amountFocusNode.dispose();
+    memoFocusNode.dispose();
     super.dispose();
   }
 
@@ -188,9 +194,12 @@ class _MainPageState extends State<MainPage> {
                     width: size * 0.7,
                   ),
                 )
-              : type == MoneyType.decrease
-                  ? _ShockAnimationWrapper(width: size * 0.7)
-                  : _ShockAnimationWrapper(width: size * 0.7), // memoもとりあえずjoy
+              : PiggyCharacter(
+                  width: size * 0.7,
+                  pose: PiggyPose.joy,
+                  eyes: PiggyEyes.smile,
+                  isBlinking: true,
+                ),
         );
 
         return Center(
@@ -268,16 +277,17 @@ class _MainPageState extends State<MainPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing, horizontal: AppNumbers.defaultPadding),
         decoration: BoxDecoration(
-          color: selected
-              ? color
-              : type == MoneyType.decrease
-                  ? AppColors.decreaseBg
-                  : type == MoneyType.increase
-                      ? AppColors.increaseBg
-                      : type == MoneyType.memo
-                          ? AppColors.memoBg
-                          : Colors.transparent,
+          color: type == MoneyType.decrease
+              ? AppColors.decreaseBg
+              : type == MoneyType.increase
+                  ? AppColors.increaseBg
+                  : type == MoneyType.memo
+                      ? AppColors.memoBg
+                      : Colors.transparent,
           borderRadius: BorderRadius.circular(AppNumbers.typeButtonBorderRadius),
+          border: selected
+              ? Border.all(color: color, width: 2)
+              : Border.all(color: Colors.transparent, width: 2),
         ),
         child: Align(
           alignment: Alignment.centerLeft,
@@ -285,9 +295,9 @@ class _MainPageState extends State<MainPage> {
             label,
             maxLines: 1, // ボタンの中で改行されないようにする
             overflow: TextOverflow.visible, // はみ出してもボタン自体を広げる
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
-              color: selected ? Colors.white : AppColors.mainText,
+              color: AppColors.mainText,
             ),
           ),
         ),
@@ -296,33 +306,50 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _amountTextField() {
-    return TextField(
-      controller: amountController,
-      enabled: selectedType != MoneyType.memo,
-      keyboardType: TextInputType.number,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-        ThousandsSeparatorInputFormatter(),
-      ],
-      decoration: InputDecoration(
-        hintText: '0',
-        filled: true,
-        fillColor: selectedType == MoneyType.memo ? Colors.grey.shade200 : Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
-        prefixIcon: Padding(
-          padding: const EdgeInsets.only(left: AppNumbers.defaultPadding, right: 4),
-          child: Text(
-            '¥',
-            style: TextStyle(
-              height: 1.5,
-              color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      decoration: BoxDecoration(
+        color: selectedType == MoneyType.memo ? Colors.grey.shade200 : Colors.white,
+        borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+        border: Border.all(
+          color: amountFocusNode.hasFocus ? AppColors.accent : Colors.grey.shade300,
+          width: 1.5,
+        ),
+        boxShadow: amountFocusNode.hasFocus
+            ? [
+                BoxShadow(
+                  color: AppColors.accent.withOpacity(0.3),
+                  blurRadius: 6,
+                  spreadRadius: 0,
+                )
+              ]
+            : [],
+      ),
+      child: TextField(
+        focusNode: amountFocusNode,
+        controller: amountController,
+        enabled: selectedType != MoneyType.memo,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          ThousandsSeparatorInputFormatter(),
+        ],
+        decoration: InputDecoration(
+          hintText: '0',
+          filled: false,
+          contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: AppNumbers.defaultPadding, right: 4),
+            child: Text(
+              '¥',
+              style: TextStyle(
+                height: 1.5,
+                color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
+              ),
             ),
           ),
-        ),
-        prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-          borderSide: BorderSide.none,
+          prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+          border: InputBorder.none,
         ),
       ),
     );
@@ -459,17 +486,34 @@ class _MainPageState extends State<MainPage> {
 
                     const SizedBox(height: AppNumbers.smallSpacing),
 
-                    TextField(
-                      controller: memoController,
-                      maxLines: null,
-                      decoration: InputDecoration(
-                        hintText: memoHint,
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                          borderSide: BorderSide.none,
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                        border: Border.all(
+                          color: memoFocusNode.hasFocus ? AppColors.accent : Colors.grey.shade300,
+                          width: 1.5,
+                        ),
+                        boxShadow: memoFocusNode.hasFocus
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.accent.withOpacity(0.3),
+                                  blurRadius: 6,
+                                  spreadRadius: 0,
+                                )
+                              ]
+                            : [],
+                      ),
+                      child: TextField(
+                        focusNode: memoFocusNode,
+                        controller: memoController,
+                        maxLines: null,
+                        decoration: InputDecoration(
+                          hintText: memoHint,
+                          filled: false,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
@@ -565,66 +609,6 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _ShockAnimationWrapper extends StatefulWidget {
-  final double width;
-  const _ShockAnimationWrapper({required this.width});
-
-  @override
-  State<_ShockAnimationWrapper> createState() => _ShockAnimationWrapperState();
-}
-
-class _ShockAnimationWrapperState extends State<_ShockAnimationWrapper> {
-  PiggyEyes _eyes = PiggyEyes.smile;
-  PiggyMouth _mouth = PiggyMouth.normal;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startAnim();
-  }
-
-  void _startAnim() async {
-    // 1回目瞬き
-    await Future.delayed(const Duration(milliseconds: 400));
-    if (mounted) setState(() => _eyes = PiggyEyes.dot);
-    await Future.delayed(const Duration(milliseconds: 150));
-    if (mounted) setState(() => _eyes = PiggyEyes.smile);
-
-    // 2回目瞬き
-    await Future.delayed(const Duration(milliseconds: 650));
-    if (mounted) setState(() => _eyes = PiggyEyes.dot);
-    await Future.delayed(const Duration(milliseconds: 150));
-    if (mounted) setState(() => _eyes = PiggyEyes.smile);
-
-    // ショック顔
-    _timer = Timer(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _eyes = PiggyEyes.shocked;
-          _mouth = PiggyMouth.shocked;
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return PiggyCharacter(
-      width: widget.width,
-      pose: PiggyPose.joy,
-      eyes: _eyes,
-      mouth: _mouth,
     );
   }
 }

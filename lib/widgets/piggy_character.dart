@@ -59,13 +59,22 @@ class _PiggyCharacterState extends State<PiggyCharacter> {
 
   void _startBlinking() {
     _blinkTimer?.cancel();
-    _blinkTimer = Timer.periodic(const Duration(milliseconds: 2000), (timer) async {
-      if (!mounted) return;
-      setState(() => _isEyeClosedLocal = true);
-      await Future.delayed(const Duration(milliseconds: 150));
-      if (!mounted) return;
-      setState(() => _isEyeClosedLocal = false);
+    // 周期的な瞬き (1.8秒おき)
+    _blinkTimer = Timer.periodic(const Duration(milliseconds: 1800), (timer) {
+      _blinkOnce();
     });
+    // 初回の瞬きを早めに行う (600ms後)
+    Timer(const Duration(milliseconds: 600), () {
+      _blinkOnce();
+    });
+  }
+
+  void _blinkOnce() async {
+    if (!mounted || !widget.isBlinking) return;
+    setState(() => _isEyeClosedLocal = true);
+    await Future.delayed(const Duration(milliseconds: 150));
+    if (!mounted) return;
+    setState(() => _isEyeClosedLocal = false);
   }
 
   @override

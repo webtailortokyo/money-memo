@@ -231,13 +231,11 @@ class _InputPageState extends State<InputPage> {
                     width: size * 0.7,
                   ),
                 )
-              : StatefulBuilder(
-                  builder: (context, setDialogState) {
-                    // 減った時の特別アニメーションロジック
-                    return _ShockAnimationWrapper(
-                      width: size * 0.7,
-                    );
-                  },
+              : PiggyCharacter(
+                  width: size * 0.7,
+                  pose: PiggyPose.joy,
+                  eyes: PiggyEyes.smile,
+                  isBlinking: true,
                 ),
         );
 
@@ -566,63 +564,4 @@ class _InputPageState extends State<InputPage> {
   }
 }
 
-class _ShockAnimationWrapper extends StatefulWidget {
-  final double width;
-  const _ShockAnimationWrapper({required this.width});
-
-  @override
-  State<_ShockAnimationWrapper> createState() => _ShockAnimationWrapperState();
-}
-
-class _ShockAnimationWrapperState extends State<_ShockAnimationWrapper> {
-  PiggyEyes _eyes = PiggyEyes.smile;
-  PiggyMouth _mouth = PiggyMouth.normal;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startAnim();
-  }
-
-  void _startAnim() async {
-    // 1回目瞬き
-    await Future.delayed(const Duration(milliseconds: 400));
-    if (mounted) setState(() => _eyes = PiggyEyes.dot);
-    await Future.delayed(const Duration(milliseconds: 150));
-    if (mounted) setState(() => _eyes = PiggyEyes.smile);
-
-    // 2回目瞬き
-    await Future.delayed(const Duration(milliseconds: 650));
-    if (mounted) setState(() => _eyes = PiggyEyes.dot);
-    await Future.delayed(const Duration(milliseconds: 150));
-    if (mounted) setState(() => _eyes = PiggyEyes.smile);
-
-    // ショック顔
-    _timer = Timer(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _eyes = PiggyEyes.shocked;
-          _mouth = PiggyMouth.shocked;
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return PiggyCharacter(
-      width: widget.width,
-      pose: PiggyPose.joy,
-      eyes: _eyes,
-      mouth: _mouth,
-    );
-  }
-}
 
