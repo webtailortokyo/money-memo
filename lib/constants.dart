@@ -16,7 +16,9 @@ class AppStrings {
   static const String memoLabelIncrease = '何で？';
   static const String memoHintDecrease = '例：アイス、ゲーム';
   static const String memoHintIncrease = '例：お小遣い、プレゼント';
-  static const String typeSelectionTitle = '減った？ 増えた？';
+  static const String memoLabelMemo = '内容は？';
+  static const String memoHintMemo = '例：日記、わすれないこと';
+  static const String typeSelectionTitle = '減った？ 増えた？ メモ？';
   static const String amountLabel = 'いくら？';
   static const String amountHint = '0';
   static const String updateButtonText = '更新する';
@@ -37,6 +39,7 @@ class AppStrings {
   static const String detailSectionTitle = '■ 内訳';
   static const String increaseTypeLabel = '増えた';
   static const String decreaseTypeLabel = '減った';
+  static const String memoTypeLabel = 'メモのみ';
   static const String clipboardHeader = '日付\t内容\t種別\t金額';
   static const String clipboardNote = '※タブ区切りテキスト形式のため、Excel等の表計算ソフトへの貼り付けが可能です\n';
 
@@ -84,4 +87,5 @@ class HiveConstants {
 class MoneyEntryTypes {
   static const String increase = 'increase';
   static const String decrease = 'decrease';
+  static const String memo = 'memo';
 }

@@ -24,7 +24,8 @@ class MoneyEntryCard extends StatelessWidget {
         return AppColors.decrease;
       case 'increase':
         return AppColors.increase;
-
+      case 'memo':
+        return AppColors.memo;
       default:
         return Colors.grey;
     }
@@ -38,6 +39,8 @@ class MoneyEntryCard extends StatelessWidget {
       case 'increase':
         return AppColors.increaseBg;
 
+      case 'memo':
+        return AppColors.memoBg;
       default:
         return AppColors.sectionBg;
     }
@@ -94,8 +97,8 @@ class MoneyEntryCard extends StatelessWidget {
                 ],
               ),
               padding: const EdgeInsets.only(left: 18),
-              child: SizedBox(
-                height: 82,
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 82),
                 child: Row(
                   children: [
                     /// メイン内容

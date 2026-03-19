@@ -16,7 +16,9 @@ class AppColors {
   static const increaseBg = Color(0xFFDBFCE7);
   static const increaseAmount = Color(0xFF008236);
 
-
+  // メモのみ
+  static const memo = Color(0xFF4CB5FF);
+  static const memoBg = Color(0xFFE5F5FF);
 
   // period_pageセクション背景
   static const sectionBg = Color(0xFFFFF2D9);
