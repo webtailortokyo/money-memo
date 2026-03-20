@@ -379,10 +379,14 @@ class _InputPageState extends State<InputPage> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: AppNumbers.appBarElevation,
+        centerTitle: false,
+        titleSpacing: 0,
+        leadingWidth: 40,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.check, color: AppColors.accent, size: 24),
+            const Icon(Icons.check, color: AppColors.accent, size: 28),
+
             const SizedBox(width: 8),
             Text(
               isEdit ? AppStrings.editRecordTitle : AppStrings.newRecordTitle,
@@ -394,11 +398,14 @@ class _InputPageState extends State<InputPage> {
             ),
           ],
         ),
-
         leading: IconButton(
+
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.accent),
           onPressed: () => Navigator.pop(context),
         ),
+
       ),
       body: SafeArea(
         child: SingleChildScrollView(

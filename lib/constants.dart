@@ -24,7 +24,8 @@ class AppStrings {
   static const String updateButtonText = '更新する';
   static const String recordButtonText = '記録する';
   static const String deleteButtonTextInput = '削除する'; // 削除ボタンのテキストがmain_pageと重複するが、input_page用として分けておく
-  static const String editRecordTitle = '記録を編集する';
+  static const String editRecordTitle = '編集する';
+
   static const String newRecordTitle = '新しく記録する';
 
 

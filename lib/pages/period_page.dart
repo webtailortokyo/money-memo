@@ -71,14 +71,21 @@ class _PeriodPageState extends State<PeriodPage> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: AppNumbers.appBarElevation,
+        centerTitle: false,
+        titleSpacing: 0,
+        leadingWidth: 40,
         leading: IconButton(
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.accent),
           onPressed: () => Navigator.pop(context),
         ),
+
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.history, color: AppColors.accent, size: 24),
+            const Icon(Icons.history, color: AppColors.accent, size: 28),
+
             const SizedBox(width: 8),
             Text(
               AppStrings.periodPageTitle,
