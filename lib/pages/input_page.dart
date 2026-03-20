@@ -406,7 +406,7 @@ class _InputPageState extends State<InputPage> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.check, color: AppColors.accent, size: 28),
+            const Icon(Icons.check_circle, color: AppColors.accent, size: 28),
 
             const SizedBox(width: 8),
             Text(
@@ -575,18 +575,19 @@ class _InputPageState extends State<InputPage> {
                   decoration: InputDecoration(
                     hintText: '0',
                     filled: false,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.only(left: AppNumbers.defaultPadding, right: 4),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppNumbers.defaultPadding,
+                      vertical: AppNumbers.defaultPadding,
+                    ),
+                    prefix: Padding(
+                      padding: const EdgeInsets.only(right: 4),
                       child: Text(
                         '¥',
                         style: TextStyle(
-                          height: 1.5,
                           color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
                         ),
                       ),
                     ),
-                    prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
                     border: InputBorder.none,
                   ),
                 ),
@@ -617,7 +618,7 @@ class _InputPageState extends State<InputPage> {
                         backgroundColor: AppColors.accent,
                         minimumSize: const Size(0, 50),
                       ),
-                      icon: const Icon(Icons.check),
+                      icon: const Icon(Icons.check_circle),
                       label: Text(isEdit ? AppStrings.updateButtonText : AppStrings.recordButtonText),
                     ),
                   ),

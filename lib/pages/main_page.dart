@@ -360,32 +360,42 @@ class _MainPageState extends State<MainPage> {
               ]
             : [],
       ),
-      child: TextField(
-        focusNode: amountFocusNode,
-        controller: amountController,
-        enabled: selectedType != MoneyType.memo,
-        keyboardType: TextInputType.number,
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-          ThousandsSeparatorInputFormatter(),
-        ],
-        decoration: InputDecoration(
-          hintText: '0',
-          filled: false,
-          contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
-          prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: AppNumbers.defaultPadding, right: 4),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              left: AppNumbers.defaultPadding,
+              right: 4,
+            ),
             child: Text(
               '¥',
               style: TextStyle(
-                height: 1.5,
                 color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
               ),
             ),
           ),
-          prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-          border: InputBorder.none,
-        ),
+          Expanded(
+            child: TextField(
+              focusNode: amountFocusNode,
+              controller: amountController,
+              enabled: selectedType != MoneyType.memo,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                ThousandsSeparatorInputFormatter(),
+              ],
+              decoration: const InputDecoration(
+                hintText: '0',
+                filled: false,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 0,
+                  vertical: AppNumbers.defaultPadding,
+                ),
+                border: InputBorder.none,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -400,7 +410,7 @@ class _MainPageState extends State<MainPage> {
         padding: const EdgeInsets.only(left: 28, right: 44, top: 22, bottom: 22),
       ),
 
-      icon: const Icon(Icons.check),
+      icon: const Icon(Icons.check_circle),
       label: const Text(
         AppStrings.recordButtonText,
         style: TextStyle(fontWeight: FontWeight.bold),

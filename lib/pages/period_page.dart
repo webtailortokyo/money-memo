@@ -154,8 +154,9 @@ class _PeriodPageState extends State<PeriodPage> {
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.sectionBg,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                    border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -206,18 +207,27 @@ class _PeriodPageState extends State<PeriodPage> {
                 const SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
 
                 /// 🔹 合計
+                Row(
+                  children: [
+                    const Icon(Icons.analytics_rounded, color: AppColors.accent, size: 24),
+                    const SizedBox(width: 8),
+                    Text(
+                      AppStrings.totalSectionTitle,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppNumbers.smallSpacing),
                 Container(
                   padding: const EdgeInsets.all(AppNumbers.defaultPadding),
                   decoration: BoxDecoration(
-                    color: AppColors.sectionBg,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
+                    border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(AppStrings.totalSectionTitle,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize)),
-                      const SizedBox(height: AppNumbers.defaultPadding),
                       TotalAmountRow(
                         label: AppStrings.increaseTypeLabel,
                         value: totalIncrease,
@@ -238,9 +248,19 @@ class _PeriodPageState extends State<PeriodPage> {
                 const SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
 
                 /// 🔹 内訳 / 月別リスト
-                Text(
-                  viewMode == PeriodViewMode.monthly ? AppStrings.detailSectionTitle : '■ 月別集計',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
+                Row(
+                  children: [
+                    Icon(
+                      viewMode == PeriodViewMode.monthly ? Icons.list_alt_rounded : Icons.calendar_month_rounded,
+                      color: AppColors.accent,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      viewMode == PeriodViewMode.monthly ? AppStrings.detailSectionTitle : '月別集計',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: AppNumbers.smallSpacing),
                 if (filtered.isEmpty)
@@ -304,8 +324,9 @@ class _PeriodPageState extends State<PeriodPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.accent : AppColors.sectionBg,
+            color: isSelected ? AppColors.accent : Colors.white,
             borderRadius: BorderRadius.circular(20),
+            border: isSelected ? null : Border.all(color: Colors.grey.shade300, width: 1.5),
           ),
           alignment: Alignment.center,
           child: Text(
@@ -343,6 +364,7 @@ class _PeriodPageState extends State<PeriodPage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
+          border: Border.all(color: Colors.grey.shade300, width: 1.5),
         ),
         child: Row(
           children: [
@@ -384,7 +406,7 @@ class _PeriodPageState extends State<PeriodPage> {
         text.writeln('${formatDate(e.date)}\t${e.memo}\t$label\t$signedAmount');
       }
     } else {
-      text.writeln('■ 月別集計');
+      text.writeln('月別集計');
       text.writeln('月\t${AppStrings.increaseTypeLabel}\t${AppStrings.decreaseTypeLabel}');
       final Map<int, Map<String, int>> monthlySums = {};
       for (final e in filtered) {
