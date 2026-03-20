@@ -20,6 +20,7 @@ import '../widgets/piggy_character.dart';
 import '../utils/sort_entries.dart';
 import '../utils/input_formatter.dart';
 import '../constants.dart';
+import '../utils/milestone_manager.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -114,6 +115,11 @@ class _MainPageState extends State<MainPage> {
     try {
       final feedbackType = selectedType == MoneyType.memo ? MoneyType.memo : (newEntry.type == MoneyType.increase.name ? MoneyType.increase : MoneyType.decrease);
       await _playFeedback(feedbackType);
+      
+      // 保存完了後にマイルストーン判定を行う
+      if (context.mounted) {
+        await MilestoneManager.checkAndShow(context);
+      }
     } catch (e) {
       log('Feedback error: $e');
     }
@@ -414,7 +420,6 @@ class _MainPageState extends State<MainPage> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-
             SvgPicture.asset(
               'assets/img/app_icon.svg',
               width: 28,
@@ -431,7 +436,6 @@ class _MainPageState extends State<MainPage> {
             ),
           ],
         ),
-
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {

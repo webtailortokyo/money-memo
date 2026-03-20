@@ -11,6 +11,8 @@ void main() async {
 
   Hive.registerAdapter(MoneyEntryAdapter());
   await Hive.openBox<MoneyEntry>('moneyBox');
+  // 統計情報（マイルストーン達成状況など）を保存するBox
+  await Hive.openBox('statsBox');
 
   runApp(const MyApp());
 }

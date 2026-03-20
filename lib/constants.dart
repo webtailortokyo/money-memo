@@ -44,6 +44,28 @@ class AppStrings {
   static const String clipboardHeader = '日付\t内容\t種別\t金額';
   static const String clipboardNote = '※タブ区切りテキスト形式のため、Excel等の表計算ソフトへの貼り付けが可能です\n';
 
+  // マイルストーンお祝いメッセージ
+  static const String milestoneCount1 = 'はじめのいっぽ！\nおかねの記録をはじめたね';
+  static const String milestoneCount10 = 'すごーい！\n10回も記録できたね。慣れてきたかな？';
+  static const String milestoneCount30 = '記録の達人！\n30回達成おめでとう！';
+  static const String milestoneCount50 = 'キラキラの50回！\nお金と仲良くなってきたね';
+  
+  static const List<String> milestoneCountEvery50 = [
+    'さらに50回！\n累計{count}回達成、すごい継続力だね！',
+    '記録の達人！\nついに{count}回。自分を褒めてあげよう！',
+    'チャリン！\n{count}回達成。おかねの管理が身についてるね！',
+  ];
+
+  static const String milestoneDay3 = '通算3日の記録達成！\n3日坊主を卒業して、さらなる一歩だね！';
+  static const String milestoneDay7 = '通算7日の記録達成！\n1週間、よくがんばりました！';
+  static const String milestoneDay30 = '通算30日の継続中！\n1ヶ月の記念だね、その調子！';
+  static const String milestoneDay100 = '通算100日の記録達成！\nもうプロの域だね、すばらしい！';
+
+  static const List<String> milestoneDayEvery100 = [
+    '通算{days}日達成！\n伝説はまだまだ続くね。すごい！',
+    '祝・{days}日！\nコツコツ続ける天才だね。これからも一緒に！',
+    'もう{days}日だね！\n記録が当たり前になってて素晴らしいよ！',
+  ];
 }
 
 // アプリ全体で使う共通の数値

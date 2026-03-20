@@ -16,6 +16,7 @@ import '../theme.dart';
 import '../constants.dart';
 import '../utils/input_formatter.dart';
 import '../widgets/piggy_character.dart';
+import '../utils/milestone_manager.dart';
 
 class InputPage extends StatefulWidget {
   final MoneyEntry? entry; // nullなら新規、あれば編集
@@ -140,6 +141,11 @@ class _InputPageState extends State<InputPage> {
     // フィードバック再生（エラーがあっても画面は閉じるようにtry-finallyまたはcatchで保護）
     try {
       await _playFeedback(selectedType);
+      
+      // 新規記録の場合のみマイルストーン判定を行う
+      if (context.mounted && !isEdit) {
+        await MilestoneManager.checkAndShow(context);
+      }
     } catch (e) {
       log('Feedback error: $e');
     }
