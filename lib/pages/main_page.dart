@@ -271,11 +271,28 @@ class _MainPageState extends State<MainPage> {
   Widget _typeButtonInner(String label, MoneyType type, Color color) {
     final selected = selectedType == type;
 
+    IconData iconData;
+    Color iconColor;
+    switch (type) {
+      case MoneyType.increase:
+        iconData = Icons.arrow_upward;
+        iconColor = AppColors.increaseAmount;
+        break;
+      case MoneyType.decrease:
+        iconData = Icons.arrow_downward;
+        iconColor = AppColors.decreaseAmount;
+        break;
+      case MoneyType.memo:
+        iconData = Icons.edit_note;
+        iconColor = AppColors.memo;
+        break;
+    }
+
     return InkWell(
       onTap: () => _onTypeChanged(type),
       borderRadius: BorderRadius.circular(AppNumbers.typeButtonBorderRadius),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing, horizontal: AppNumbers.defaultPadding),
+        padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing, horizontal: AppNumbers.smallSpacing),
         decoration: BoxDecoration(
           color: type == MoneyType.decrease
               ? AppColors.decreaseBg
@@ -289,21 +306,33 @@ class _MainPageState extends State<MainPage> {
               ? Border.all(color: color, width: 2)
               : Border.all(color: Colors.transparent, width: 2),
         ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            label,
-            maxLines: 1, // ボタンの中で改行されないようにする
-            overflow: TextOverflow.visible, // はみ出してもボタン自体を広げる
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: AppColors.mainText,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              iconData,
+              color: iconColor,
+              size: 28,
             ),
-          ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              maxLines: 1, // ボタンの中で改行されないようにする
+              overflow: TextOverflow.visible, // はみ出してもボタン自体を広げる
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.mainText,
+                fontSize: 12, // アイコンが入るため少し小さめに調整
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+
 
   Widget _amountTextField() {
     return AnimatedContainer(
@@ -356,20 +385,23 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _recordButton() {
-    return ElevatedButton(
+    return ElevatedButton.icon(
       onPressed: _save,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.accent,
         foregroundColor: Colors.white,
         shape: const StadiumBorder(),
-        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 22), // 以前の 16 から 22 に増やして高さを出す
+        padding: const EdgeInsets.only(left: 28, right: 44, top: 22, bottom: 22),
       ),
-      child: const Text(
+
+      icon: const Icon(Icons.check),
+      label: const Text(
         AppStrings.recordButtonText,
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -379,14 +411,27 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: AppNumbers.appBarElevation,
-        title: const Text(
-          AppStrings.appTitle,
-          style: TextStyle(
-            color: AppColors.accent,
-            fontWeight: FontWeight.bold,
-            fontSize: AppNumbers.titleFontSize,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            SvgPicture.asset(
+              'assets/img/app_icon.svg',
+              width: 28,
+              height: 28,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              AppStrings.appTitle,
+              style: TextStyle(
+                color: AppColors.accent,
+                fontWeight: FontWeight.bold,
+                fontSize: AppNumbers.titleFontSize,
+              ),
+            ),
+          ],
         ),
+
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {

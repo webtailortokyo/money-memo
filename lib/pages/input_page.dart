@@ -307,11 +307,28 @@ class _InputPageState extends State<InputPage> {
   Widget _typeButtonInner(String label, MoneyType type, Color color) {
     final selected = selectedType == type;
 
+    IconData iconData;
+    Color iconColor;
+    switch (type) {
+      case MoneyType.increase:
+        iconData = Icons.arrow_upward;
+        iconColor = AppColors.increaseAmount;
+        break;
+      case MoneyType.decrease:
+        iconData = Icons.arrow_downward;
+        iconColor = AppColors.decreaseAmount;
+        break;
+      case MoneyType.memo:
+        iconData = Icons.edit_note;
+        iconColor = AppColors.memo;
+        break;
+    }
+
     return InkWell(
       onTap: () => _onTypeChanged(type),
       borderRadius: BorderRadius.circular(AppNumbers.typeButtonBorderRadius),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing, horizontal: AppNumbers.defaultPadding),
+        padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing, horizontal: AppNumbers.smallSpacing),
         decoration: BoxDecoration(
           color: selected
               ? color
@@ -324,21 +341,33 @@ class _InputPageState extends State<InputPage> {
                           : Colors.transparent,
           borderRadius: BorderRadius.circular(AppNumbers.typeButtonBorderRadius),
         ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            label,
-            maxLines: 1, // ボタンの中で改行されないようにする
-            overflow: TextOverflow.visible, // はみ出してもボタン自体を広げる
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: selected ? Colors.white : AppColors.mainText,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              iconData,
+              color: selected ? Colors.white : iconColor,
+              size: 28,
             ),
-          ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              maxLines: 1, // ボタンの中で改行されないようにする
+              overflow: TextOverflow.visible, // はみ出してもボタン自体を広げる
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: selected ? Colors.white : AppColors.mainText,
+                fontSize: 12, // アイコンが入るため少し小さめに調整
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -350,14 +379,22 @@ class _InputPageState extends State<InputPage> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: AppNumbers.appBarElevation,
-        title: Text(
-          isEdit ? AppStrings.editRecordTitle : AppStrings.newRecordTitle,
-          style: const TextStyle(
-            fontSize: AppNumbers.subPageTitleFontSize,
-            fontWeight: FontWeight.bold,
-            color: AppColors.accent,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.check, color: AppColors.accent, size: 24),
+            const SizedBox(width: 8),
+            Text(
+              isEdit ? AppStrings.editRecordTitle : AppStrings.newRecordTitle,
+              style: const TextStyle(
+                fontSize: AppNumbers.subPageTitleFontSize,
+                fontWeight: FontWeight.bold,
+                color: AppColors.accent,
+              ),
+            ),
+          ],
         ),
+
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.accent),
           onPressed: () => Navigator.pop(context),
@@ -530,16 +567,18 @@ class _InputPageState extends State<InputPage> {
                   ),
                   const SizedBox(width: AppNumbers.mediumSpacing),
                   Expanded(
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
                       onPressed: _save,
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: AppColors.accent,
                         minimumSize: const Size(0, 50),
                       ),
-                      child: Text(isEdit ? AppStrings.updateButtonText : AppStrings.recordButtonText),
+                      icon: const Icon(Icons.check),
+                      label: Text(isEdit ? AppStrings.updateButtonText : AppStrings.recordButtonText),
                     ),
                   ),
+
                 ],
               ),
 
