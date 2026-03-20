@@ -35,12 +35,17 @@ class _InputPageState extends State<InputPage> {
 
   final amountController = TextEditingController();
   final memoController = TextEditingController();
+  final amountFocusNode = FocusNode();
+  final memoFocusNode = FocusNode();
 
   bool get isEdit => widget.entry != null;
 
   @override
   void initState() {
     super.initState();
+
+    amountFocusNode.addListener(() => setState(() {}));
+    memoFocusNode.addListener(() => setState(() {}));
 
     if (isEdit) {
       final entry = widget.entry!;
@@ -51,6 +56,15 @@ class _InputPageState extends State<InputPage> {
       );
       selectedDate = entry.date;
     }
+  }
+
+  @override
+  void dispose() {
+    amountFocusNode.dispose();
+    memoFocusNode.dispose();
+    amountController.dispose();
+    memoController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickDate() async {
@@ -330,16 +344,17 @@ class _InputPageState extends State<InputPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing, horizontal: AppNumbers.smallSpacing),
         decoration: BoxDecoration(
-          color: selected
-              ? color
-              : type == MoneyType.decrease
-                  ? AppColors.decreaseBg
-                  : type == MoneyType.increase
-                      ? AppColors.increaseBg
-                      : type == MoneyType.memo
-                          ? AppColors.memoBg
-                          : Colors.transparent,
+          color: type == MoneyType.decrease
+              ? AppColors.decreaseBg
+              : type == MoneyType.increase
+                  ? AppColors.increaseBg
+                  : type == MoneyType.memo
+                      ? AppColors.memoBg
+                      : Colors.transparent,
           borderRadius: BorderRadius.circular(AppNumbers.typeButtonBorderRadius),
+          border: selected
+              ? Border.all(color: color, width: 2)
+              : Border.all(color: Colors.transparent, width: 2),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -347,7 +362,7 @@ class _InputPageState extends State<InputPage> {
           children: [
             Icon(
               iconData,
-              color: selected ? Colors.white : iconColor,
+              color: iconColor,
               size: 28,
             ),
             const SizedBox(height: 4),
@@ -355,9 +370,9 @@ class _InputPageState extends State<InputPage> {
               label,
               maxLines: 1, // ボタンの中で改行されないようにする
               overflow: TextOverflow.visible, // はみ出してもボタン自体を広げる
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                color: selected ? Colors.white : AppColors.mainText,
+                color: AppColors.mainText,
                 fontSize: 12, // アイコンが入るため少し小さめに調整
               ),
             ),
@@ -422,8 +437,8 @@ class _InputPageState extends State<InputPage> {
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white, // 背景色を白に
-                    borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
-                    // border: Border.all(color: Colors.grey.shade300), // 必要なら薄い枠線
+                    borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                    border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   ),
                   child: Row(
                     children: [
@@ -452,7 +467,7 @@ class _InputPageState extends State<InputPage> {
 
               LayoutBuilder(
                 builder: (context, constraints) {
-                  final isWide = constraints.maxWidth > 400;
+                  final isWide = constraints.maxWidth > 300;
 
                   if (isWide) {
                     return Row(
@@ -487,72 +502,87 @@ class _InputPageState extends State<InputPage> {
 
 
 
-              const SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
+              const SizedBox(height: AppNumbers.smallSpacing),
 
-              Text(memoLabel, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize)),
-              const SizedBox(height: AppNumbers.smallSpacing + 0),
-              TextField(
-                controller: memoController,
-                maxLines: null,
-                decoration: InputDecoration(
-                  hintText: memoHint,
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                    borderSide: BorderSide.none,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                  border: Border.all(
+                    color: memoFocusNode.hasFocus ? AppColors.accent : Colors.grey.shade300,
+                    width: 1.5,
+                  ),
+                  boxShadow: memoFocusNode.hasFocus
+                      ? [
+                          BoxShadow(
+                            color: AppColors.accent.withOpacity(0.3),
+                            blurRadius: 6,
+                            spreadRadius: 0,
+                          )
+                        ]
+                      : [],
+                ),
+                child: TextField(
+                  focusNode: memoFocusNode,
+                  controller: memoController,
+                  maxLines: null,
+                  decoration: InputDecoration(
+                    hintText: memoHint,
+                    filled: false,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
+                    border: InputBorder.none,
                   ),
                 ),
               ),
 
               const SizedBox(height: AppNumbers.defaultPadding),
 
-              const Text(AppStrings.amountLabel, style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize)),
-              const SizedBox(height: AppNumbers.smallSpacing + 0),
-              TextField(
-                controller: amountController,
-                enabled: selectedType != MoneyType.memo,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  ThousandsSeparatorInputFormatter(),
-                ],
-                style: const TextStyle(
-                  height: 1.2,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                decoration: BoxDecoration(
+                  color: selectedType == MoneyType.memo ? Colors.grey.shade200 : Colors.white,
+                  borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                  border: Border.all(
+                    color: amountFocusNode.hasFocus ? AppColors.accent : Colors.grey.shade300,
+                    width: 1.5,
+                  ),
+                  boxShadow: amountFocusNode.hasFocus
+                      ? [
+                          BoxShadow(
+                            color: AppColors.accent.withOpacity(0.3),
+                            blurRadius: 6,
+                            spreadRadius: 0,
+                          )
+                        ]
+                      : [],
                 ),
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: AppNumbers.defaultPadding,
-                    horizontal: 0,
-                  ),
-                  filled: true,
-                  fillColor: selectedType == MoneyType.memo ? Colors.grey.shade200 : Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                    borderSide: BorderSide.none,
-                  ),
-                  // 1. prefix ではなく prefixIcon に変更（これで常に表示される）
-                  prefixIcon: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    // 2. 数字（TextFieldの文字）の底辺に合わせるための設定
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      const SizedBox(width: AppNumbers.defaultPadding), // 左端の余白調整用
-                      Text(
-                        '¥ ',
+                child: TextField(
+                  focusNode: amountFocusNode,
+                  controller: amountController,
+                  enabled: selectedType != MoneyType.memo,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                  decoration: InputDecoration(
+                    hintText: '0',
+                    filled: false,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.only(left: AppNumbers.defaultPadding, right: 4),
+                      child: Text(
+                        '¥',
                         style: TextStyle(
+                          height: 1.5,
                           color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
-                          // 3. ここが重要：Rowの中でもTextFieldの文字と揃うように高さを微調整
-                          height: 1.2, 
                         ),
                       ),
-                    ],
+                    ),
+                    prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                    border: InputBorder.none,
                   ),
-                  // 4. prefixIconの余計な余白を消して、文字に近づける
-                  prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-                  
-                  hintText: '0', // AppStrings.amountHint は '0' に戻してOK
                 ),
               ),
 

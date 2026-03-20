@@ -12,6 +12,7 @@ import '../widgets/total_amount_row.dart';
 import '../utils/format_utils.dart';
 import '../utils/sort_entries.dart';
 import '../constants.dart';
+import 'input_page.dart';
 
 enum PeriodViewMode { monthly, yearly }
 
@@ -248,7 +249,43 @@ class _PeriodPageState extends State<PeriodPage> {
                     child: Center(child: Text('記録はありません')),
                   )
                 else if (viewMode == PeriodViewMode.monthly)
-                  ...filtered.map((e) => MoneyEntryCard(entry: e))
+                  ...filtered.map((e) => MoneyEntryCard(
+                        entry: e,
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => InputPage(entry: e),
+                            ),
+                          );
+                        },
+                        onLongPress: () async {
+                          final result = await showDialog<bool>(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              title: const Text(AppStrings.deleteDialogTitle),
+                              content: const Text(AppStrings.deleteDialogContent),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text(AppStrings.cancelButtonText),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text(
+                                    AppStrings.deleteButtonText,
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (result == true) {
+                            box.delete(e.key);
+                          }
+                        },
+                      ))
                 else
                   ..._buildYearlyMonthlyList(filtered),
               ],

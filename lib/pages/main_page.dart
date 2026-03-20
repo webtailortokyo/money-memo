@@ -471,7 +471,8 @@ class _MainPageState extends State<MainPage> {
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
+                          borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                          border: Border.all(color: Colors.grey.shade300, width: 1.5),
                         ),
                         child: Row(
                           children: [

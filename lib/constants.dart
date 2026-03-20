@@ -17,7 +17,7 @@ class AppStrings {
   static const String memoHintDecrease = '例：アイス、ゲーム';
   static const String memoHintIncrease = '例：お小遣い、プレゼント';
   static const String memoLabelMemo = '内容は？';
-  static const String memoHintMemo = '例：日記、わすれないこと';
+  static const String memoHintMemo = '例：なんでもメモ';
   static const String typeSelectionTitle = '減った？ 増えた？ メモ？';
   static const String amountLabel = 'いくら？';
   static const String amountHint = '0';
