@@ -11,6 +11,9 @@ final currencyNotifier = ValueNotifier<String>('¥');
 // 小数点以下の桁数（Jpyは0, Usd/Eurは2など）
 final decimalDigitsNotifier = ValueNotifier<int>(0);
 
+// 言語設定 ('ja' または 'en')
+final languageNotifier = ValueNotifier<String>('ja');
+
 /// 二つの ValueListenable を同時に監視するためのヘルパークラス
 class ValueListenableBuilder2<A, B> extends StatelessWidget {
   final ValueListenable<A> valueListenable1;

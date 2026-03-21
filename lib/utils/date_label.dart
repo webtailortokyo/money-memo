@@ -1,3 +1,6 @@
+import '../constants.dart';
+import 'format_utils.dart';
+
 String dateLabel(DateTime date) {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
@@ -5,8 +8,8 @@ String dateLabel(DateTime date) {
 
   final diff = today.difference(target).inDays;
 
-  if (diff == 0) return '今日';
-  if (diff == 1) return '昨日';
+  if (diff == 0) return AppStrings.today;
+  if (diff == 1) return AppStrings.yesterday;
 
-  return '${date.year}/${date.month}/${date.day}';
+  return formatDate(date);
 }

@@ -16,6 +16,7 @@ import '../models/money_entry.dart';
 import '../theme.dart';
 import '../constants.dart';
 import '../utils/input_formatter.dart';
+import '../utils/format_utils.dart';
 import '../widgets/piggy_character.dart';
 import '../utils/milestone_manager.dart';
 import '../app_state.dart';
@@ -106,7 +107,7 @@ class _InputPageState extends State<InputPage> {
     widget.entry!.delete();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppStrings.deleteSuccessMessage)),
+      SnackBar(content: Text(AppStrings.deleteSuccessMessage)),
     );
 
     Navigator.pop(context);
@@ -122,7 +123,7 @@ class _InputPageState extends State<InputPage> {
     // メモのみの場合は金額不要
     if (memo.isEmpty || (selectedType != MoneyType.memo && amountText.isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.inputErrorSnackbarMessage)),
+        SnackBar(content: Text(AppStrings.inputErrorSnackbarMessage)),
       );
       return;
     }
@@ -377,8 +378,7 @@ class _InputPageState extends State<InputPage> {
 
   @override
   Widget build(BuildContext context) {
-    final dateText =
-        '${selectedDate.year}/${selectedDate.month}/${selectedDate.day}';
+    final dateText = formatDate(selectedDate);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -452,7 +452,7 @@ class _InputPageState extends State<InputPage> {
               ),
 
               const SizedBox(height: AppNumbers.smallSpacing),
-              const Text(AppStrings.typeSelectionTitle, style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize)),
+              Text(AppStrings.typeSelectionTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize)),
 
               const SizedBox(height: AppNumbers.defaultPadding),
 
@@ -598,7 +598,7 @@ class _InputPageState extends State<InputPage> {
                         side: const BorderSide(color: Colors.grey), // 枠線の色も変えたい場合はここ
                         minimumSize: const Size(0, 50),
                       ),
-                      child: const Text(AppStrings.cancelButtonText),
+                      child: Text(AppStrings.cancelButtonText),
                     ),
                   ),
                   const SizedBox(width: AppNumbers.mediumSpacing),
@@ -623,9 +623,9 @@ class _InputPageState extends State<InputPage> {
                 Center(
                   child: TextButton.icon(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    label: const Text(
+                    label: Text(
                       AppStrings.deleteButtonTextInput,
-                      style: TextStyle(color: Colors.red),
+                      style: const TextStyle(color: Colors.red),
                     ),
                     onPressed: _delete,
                   ),

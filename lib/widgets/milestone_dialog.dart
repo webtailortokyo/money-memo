@@ -182,9 +182,9 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    'とじる',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  child: Text(
+                    AppStrings.closeButtonText,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
               ],

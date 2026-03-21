@@ -46,16 +46,16 @@ class _SettingsPageState extends State<SettingsPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(AppStrings.resetConfirmTitle),
-        content: const Text(AppStrings.resetConfirmContent),
+        title: Text(AppStrings.resetConfirmTitle),
+        content: Text(AppStrings.resetConfirmContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text(AppStrings.cancelButtonText),
+            child: Text(AppStrings.cancelButtonText),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(AppStrings.deleteButtonText, style: TextStyle(color: Colors.red)),
+            child: Text(AppStrings.deleteButtonText, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -80,7 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.resetSuccess)),
+          SnackBar(content: Text(AppStrings.resetSuccess)),
         );
       }
     }
@@ -95,9 +95,9 @@ class _SettingsPageState extends State<SettingsPage> {
         elevation: 0,
         centerTitle: false,
         titleSpacing: 40, // 以前の調整に合わせる
-        title: const Text(
+        title: Text(
           AppStrings.settingsTitle,
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.accent,
             fontWeight: FontWeight.bold,
           ),
@@ -169,15 +169,46 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
 
+          // 言語設定
+          _SectionHeader(title: AppStrings.languageSettingTitle),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: ValueListenableBuilder<String>(
+              valueListenable: languageNotifier,
+              builder: (context, lang, child) {
+                return SegmentedButton<String>(
+                  segments: [
+                    ButtonSegment(value: 'ja', label: Text(AppStrings.languageJa)),
+                    ButtonSegment(value: 'en', label: Text(AppStrings.languageEn)),
+                  ],
+                  selected: {lang},
+                  onSelectionChanged: (Set<String> newSelection) {
+                    final newLang = newSelection.first;
+                    languageNotifier.value = newLang;
+                    
+                    final box = Hive.box(HiveConstants.settingsBoxName);
+                    box.put(HiveConstants.keyLanguage, newLang);
+                  },
+                  showSelectedIcon: false,
+                  style: SegmentedButton.styleFrom(
+                    selectedBackgroundColor: AppColors.accent,
+                    selectedForegroundColor: Colors.white,
+                    side: const BorderSide(color: AppColors.accent),
+                  ),
+                );
+              },
+            ),
+          ),
+
           // データ管理
           _SectionHeader(title: AppStrings.dataManagementTitle),
           ListTile(
             leading: const Icon(Icons.refresh, color: AppColors.accent),
-            title: const Text(
+            title: Text(
               AppStrings.resetAllData,
-              style: TextStyle(color: AppColors.mainText, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: AppColors.mainText, fontWeight: FontWeight.bold),
             ),
-            subtitle: const Text(AppStrings.resetAllDataSubtitle),
+            subtitle: Text(AppStrings.resetAllDataSubtitle),
             onTap: _resetAllData,
           ),
 
@@ -186,7 +217,7 @@ class _SettingsPageState extends State<SettingsPage> {
           // アプリについて
           _SectionHeader(title: AppStrings.appInfoTitle),
           ListTile(
-            title: const Text(AppStrings.versionLabel),
+            title: Text(AppStrings.versionLabel),
             trailing: const Text(AppStrings.appVersion),
           ),
           const SizedBox(height: 32),

@@ -1,90 +1,257 @@
+import 'app_state.dart';
 
 // アプリ全体で使う共通の文字列
 class AppStrings {
-  // main_page.dart
-  static const String appTitle = 'おかねメモ';
-  static const String noRecordMessage = 'まだ記録がありません';
-  static const String deleteDialogTitle = '削除しますか？';
-  static const String deleteDialogContent = 'この記録を削除します。';
-  static const String cancelButtonText = 'キャンセル';
-  static const String deleteButtonText = '削除';
+  static String _get(String key) {
+    final lang = languageNotifier.value;
+    return _translations[lang]?[key] ?? _translations['ja']![key]!;
+  }
 
-  // input_page.dart
-  static const String deleteSuccessMessage = '削除しました';
-  static const String inputErrorSnackbarMessage = '項目と金額を入力してください';
-  static const String memoLabelDecrease = '何に？';
-  static const String memoLabelIncrease = '何で？';
-  static const String memoHintDecrease = '例：アイス、ゲーム';
-  static const String memoHintIncrease = '例：お小遣い、プレゼント';
-  static const String memoLabelMemo = '内容は？';
-  static const String memoHintMemo = '例：なんでもメモ';
-  static const String typeSelectionTitle = '減った？ 増えた？ メモ？';
-  static const String amountLabel = 'いくら？';
-  static const String amountHint = '0';
-  static const String updateButtonText = '更新する';
-  static const String recordButtonText = '記録する';
-  static const String deleteButtonTextInput = '削除する'; // 削除ボタンのテキストがmain_pageと重複するが、input_page用として分けておく
-  static const String editRecordTitle = '編集する';
+  static List<String> _getList(String key) {
+    final lang = languageNotifier.value;
+    return _listTranslations[lang]?[key] ?? _listTranslations['ja']![key]!;
+  }
 
-  static const String newRecordTitle = '新しく記録する';
+  static const Map<String, Map<String, String>> _translations = {
+    'ja': {
+      'appTitle': 'おかねメモ',
+      'noRecordMessage': 'まだ記録がありません',
+      'deleteDialogTitle': '削除しますか？',
+      'deleteDialogContent': 'この記録を削除します。',
+      'cancelButtonText': 'キャンセル',
+      'deleteButtonText': '削除',
+      'deleteSuccessMessage': '削除しました',
+      'inputErrorSnackbarMessage': '項目と金額を入力してください',
+      'memoLabelDecrease': '何に？',
+      'memoLabelIncrease': '何で？',
+      'memoHintDecrease': '例：アイス、ゲーム',
+      'memoHintIncrease': '例：お小遣い、プレゼント',
+      'memoLabelMemo': '内容は？',
+      'memoHintMemo': '例：なんでもメモ',
+      'typeSelectionTitle': '減った？ 増えた？ メモ？',
+      'amountLabel': 'いくら？',
+      'amountHint': '0',
+      'updateButtonText': '更新する',
+      'recordButtonText': '記録する',
+      'deleteButtonTextInput': '削除する',
+      'editRecordTitle': '編集する',
+      'newRecordTitle': '新しく記録する',
+      'periodPageTitle': '期間で見る',
+      'dateSectionTitle': '■ 日付',
+      'fromLabel': 'から',
+      'toLabel': 'まで',
+      'copyButtonText': 'この期間の記録を共有',
+      'totalSectionTitle': '合計',
+      'detailSectionTitle': '内訳',
+      'increaseTypeLabel': '増えた',
+      'decreaseTypeLabel': '減った',
+      'memoTypeLabel': 'メモのみ',
+      'clipboardHeader': '日付\t内容\t種別\t金額',
+      'clipboardNote': '※タブ区切りテキスト形式のため、Excel等の表計算ソフトへの貼り付けが可能です\n',
+      'milestoneCount1': 'はじめのいっぽ！\nおかねの記録をはじめたね',
+      'milestoneCount10': 'すごーい！\n10回も記録できたね。慣れてきたかな？',
+      'milestoneCount30': '記録の達人！\n30回達成おめでとう！',
+      'milestoneCount50': 'キラキラの50回！\nお金と仲良くなってきたね',
+      'milestoneDay3': '通算3日の記録達成！\n3日坊主を卒業して、さらなる一歩だね！',
+      'milestoneDay7': '通算7日の記録達成！\n1週間、よくがんばりました！',
+      'milestoneDay30': '通算30日の継続中！\n1ヶ月の記念だね、その調子！',
+      'milestoneDay100': '通算100日の記録達成！\nもうプロの域だね、すばらしい！',
+      'settingsTitle': '設定',
+      'titleSetting': 'メイン画面のタイトル',
+      'dataManagementTitle': 'データ管理',
+      'resetAllData': '初期化',
+      'resetAllDataSubtitle': 'すべての記録と達成記録を消去します',
+      'resetConfirmTitle': 'すべてリセットしますか？',
+      'resetConfirmContent': 'すべての記録を削除し、1日目からやり直します。この操作は取り消せません。',
+      'resetSuccess': 'すべてリセットしました',
+      'appInfoTitle': 'アプリについて',
+      'versionLabel': 'バージョン',
+      'currencySettingTitle': '通貨の設定',
+      'languageSettingTitle': '言語の設定',
+      'languageJa': '日本語',
+      'languageEn': 'English',
+      'yearLabel': '年',
+      'monthLabel': '月',
+      'yearlySummaryTitle': '年別集計',
+      'monthHeader': '月',
+      'monthlySummaryTitle': '月別集計',
+      'noRecordInPeriod': '記録はありません',
+      'shareMessage': 'の記録',
+      'shareNoRecordError': '記録がない期間は共有できません',
+      'closeButtonText': 'とじる',
+      'today': '今日',
+      'yesterday': '昨日',
+    },
+    'en': {
+      'appTitle': 'Money Memo',
+      'noRecordMessage': 'No records yet',
+      'deleteDialogTitle': 'Delete?',
+      'deleteDialogContent': 'This record will be deleted.',
+      'cancelButtonText': 'Cancel',
+      'deleteButtonText': 'Delete',
+      'deleteSuccessMessage': 'Deleted',
+      'inputErrorSnackbarMessage': 'Please enter both item and amount',
+      'memoLabelDecrease': 'What for?',
+      'memoLabelIncrease': 'From where?',
+      'memoHintDecrease': 'e.g., Ice cream, Lunch',
+      'memoHintIncrease': 'e.g., Pocket money, Gift',
+      'memoLabelMemo': 'What content?',
+      'memoHintMemo': 'e.g., Any notes',
+      'typeSelectionTitle': 'Income? Expense? Memo?',
+      'amountLabel': 'How much?',
+      'amountHint': '0',
+      'updateButtonText': 'Update',
+      'recordButtonText': 'Record',
+      'deleteButtonTextInput': 'Delete',
+      'editRecordTitle': 'Edit',
+      'newRecordTitle': 'New Record',
+      'periodPageTitle': 'History',
+      'dateSectionTitle': '■ Date',
+      'fromLabel': 'From',
+      'toLabel': 'To',
+      'copyButtonText': 'Share records',
+      'totalSectionTitle': 'Total',
+      'detailSectionTitle': 'Breakdown',
+      'increaseTypeLabel': 'Income',
+      'decreaseTypeLabel': 'Expense',
+      'memoTypeLabel': 'Memo',
+      'clipboardHeader': 'Date\tContent\tType\tAmount',
+      'clipboardNote': '*Tab-separated text format, suitable for spreadsheets like Excel.\n',
+      'milestoneCount1': 'First step!\nYou started recording your money',
+      'milestoneCount10': 'Amazing!\nYou recorded 10 times. Getting used to it?',
+      'milestoneCount30': 'Record Master!\nCongrats on 30 records!',
+      'milestoneCount50': 'Sparkling 50!\nYou\'re becoming friends with money',
+      'milestoneDay3': 'Total 3 days!\nYou\'re no longer a three-day wonder!',
+      'milestoneDay7': 'Total 7 days!\nYou did great for a week!',
+      'milestoneDay30': '30 days persistence!\nA one-month anniversary, keep it up!',
+      'milestoneDay100': 'Total 100 days!\nYou\'re a pro now, wonderful!',
+      'settingsTitle': 'Settings',
+      'titleSetting': 'Main screen title',
+      'dataManagementTitle': 'Data Management',
+      'resetAllData': 'Reset',
+      'resetAllDataSubtitle': 'Erase all records and milestones',
+      'resetConfirmTitle': 'Reset everything?',
+      'resetConfirmContent': 'All records will be deleted. This cannot be undone.',
+      'resetSuccess': 'Successfully reset everything',
+      'appInfoTitle': 'About App',
+      'versionLabel': 'Version',
+      'currencySettingTitle': 'Currency',
+      'languageSettingTitle': 'Language',
+      'languageJa': 'Japanese',
+      'languageEn': 'English',
+      'yearLabel': '/',
+      'monthLabel': '',
+      'yearlySummaryTitle': 'Yearly Summary',
+      'monthHeader': 'Month',
+      'monthlySummaryTitle': 'Monthly Summary',
+      'noRecordInPeriod': 'No records',
+      'shareMessage': 'Records for ',
+      'shareNoRecordError': 'Cannot share period with no records',
+      'closeButtonText': 'Close',
+      'today': 'Today',
+      'yesterday': 'Yesterday',
+    }
+  };
 
+  static const Map<String, Map<String, List<String>>> _listTranslations = {
+    'ja': {
+      'milestoneCountEvery50': [
+        'さらに50回！\n累計{count}回達成、すごい継続力だね！',
+        '記録の達人！\nついに{count}回。自分を褒めてあげよう！',
+        'チャリン！\n{count}回達成。おかねの管理が身についてるね！',
+      ],
+      'milestoneDayEvery100': [
+        '通算{days}日達成！\n伝説はまだまだ続くね。すごい！',
+        '祝・{days}日！\nコツコツ続ける天才だね。これからも一緒に！',
+        'もう{days}日だね！\n記録が当たり前になってて素晴らしいよ！',
+      ],
+    },
+    'en': {
+      'milestoneCountEvery50': [
+        'Another 50!\nTotal {count} records, what persistence!',
+        'Record Master!\n{count} records. Give yourself a hand!',
+        'Ka-ching!\n{count} records. You\'ve got money management down!',
+      ],
+      'milestoneDayEvery100': [
+        'Total {days} days!\nThe legend continues. Amazing!',
+        'Congrats on {days} days!\nYou\'re a steady genius. Let\'s keep it up!',
+        'Already {days} days!\nRecording has become second nature for you!',
+      ],
+    }
+  };
 
+  static String get appTitle => _get('appTitle');
+  static String get noRecordMessage => _get('noRecordMessage');
+  static String get deleteDialogTitle => _get('deleteDialogTitle');
+  static String get deleteDialogContent => _get('deleteDialogContent');
+  static String get cancelButtonText => _get('cancelButtonText');
+  static String get deleteButtonText => _get('deleteButtonText');
+  static String get deleteSuccessMessage => _get('deleteSuccessMessage');
+  static String get inputErrorSnackbarMessage => _get('inputErrorSnackbarMessage');
+  static String get memoLabelDecrease => _get('memoLabelDecrease');
+  static String get memoLabelIncrease => _get('memoLabelIncrease');
+  static String get memoHintDecrease => _get('memoHintDecrease');
+  static String get memoHintIncrease => _get('memoHintIncrease');
+  static String get memoLabelMemo => _get('memoLabelMemo');
+  static String get memoHintMemo => _get('memoHintMemo');
+  static String get typeSelectionTitle => _get('typeSelectionTitle');
+  static String get amountLabel => _get('amountLabel');
+  static String get amountHint => _get('amountHint');
+  static String get updateButtonText => _get('updateButtonText');
+  static String get recordButtonText => _get('recordButtonText');
+  static String get deleteButtonTextInput => _get('deleteButtonTextInput');
+  static String get editRecordTitle => _get('editRecordTitle');
+  static String get newRecordTitle => _get('newRecordTitle');
+  static String get periodPageTitle => _get('periodPageTitle');
+  static String get dateSectionTitle => _get('dateSectionTitle');
+  static String get fromLabel => _get('fromLabel');
+  static String get toLabel => _get('toLabel');
+  static String get copyButtonText => _get('copyButtonText');
+  static String get totalSectionTitle => _get('totalSectionTitle');
+  static String get detailSectionTitle => _get('detailSectionTitle');
+  static String get increaseTypeLabel => _get('increaseTypeLabel');
+  static String get decreaseTypeLabel => _get('decreaseTypeLabel');
+  static String get memoTypeLabel => _get('memoTypeLabel');
+  static String get clipboardHeader => _get('clipboardHeader');
+  static String get clipboardNote => _get('clipboardNote');
+  static String get milestoneCount1 => _get('milestoneCount1');
+  static String get milestoneCount10 => _get('milestoneCount10');
+  static String get milestoneCount30 => _get('milestoneCount30');
+  static String get milestoneCount50 => _get('milestoneCount50');
+  static String get milestoneDay3 => _get('milestoneDay3');
+  static String get milestoneDay7 => _get('milestoneDay7');
+  static String get milestoneDay30 => _get('milestoneDay30');
+  static String get milestoneDay100 => _get('milestoneDay100');
+  static String get settingsTitle => _get('settingsTitle');
+  static String get titleSetting => _get('titleSetting');
+  static String get dataManagementTitle => _get('dataManagementTitle');
+  static String get resetAllData => _get('resetAllData');
+  static String get resetAllDataSubtitle => _get('resetAllDataSubtitle');
+  static String get resetConfirmTitle => _get('resetConfirmTitle');
+  static String get resetConfirmContent => _get('resetConfirmContent');
+  static String get resetSuccess => _get('resetSuccess');
+  static String get appInfoTitle => _get('appInfoTitle');
+  static String get versionLabel => _get('versionLabel');
+  static String get currencySettingTitle => _get('currencySettingTitle');
+  static String get languageSettingTitle => _get('languageSettingTitle');
+  static String get languageJa => _get('languageJa');
+  static String get languageEn => _get('languageEn');
+  static String get yearLabel => _get('yearLabel');
+  static String get monthLabel => _get('monthLabel');
+  static String get yearlySummaryTitle => _get('yearlySummaryTitle');
+  static String get monthHeader => _get('monthHeader');
+  static String get monthlySummaryTitle => _get('monthlySummaryTitle');
+  static String get noRecordInPeriod => _get('noRecordInPeriod');
+  static String get shareMessage => _get('shareMessage');
+  static String get shareNoRecordError => _get('shareNoRecordError');
+  static String get closeButtonText => _get('closeButtonText');
+  static String get today => _get('today');
+  static String get yesterday => _get('yesterday');
 
-  // period_page.dart
-  static const String periodPageTitle = '期間で見る';
-  static const String dateSectionTitle = '■ 日付';
-  static const String fromLabel = 'から';
-  static const String toLabel = 'まで';
-  static const String copyButtonText = 'この期間の記録を共有';
-  static const String totalSectionTitle = '合計';
-  static const String detailSectionTitle = '内訳';
-  static const String increaseTypeLabel = '増えた';
-  static const String decreaseTypeLabel = '減った';
-  static const String memoTypeLabel = 'メモのみ';
-  static const String clipboardHeader = '日付\t内容\t種別\t金額';
-  static const String clipboardNote = '※タブ区切りテキスト形式のため、Excel等の表計算ソフトへの貼り付けが可能です\n';
+  static const String appVersion = '1.0.0';
 
-  // マイルストーンお祝いメッセージ
-  static const String milestoneCount1 = 'はじめのいっぽ！\nおかねの記録をはじめたね';
-  static const String milestoneCount10 = 'すごーい！\n10回も記録できたね。慣れてきたかな？';
-  static const String milestoneCount30 = '記録の達人！\n30回達成おめでとう！';
-  static const String milestoneCount50 = 'キラキラの50回！\nお金と仲良くなってきたね';
-  
-  static const List<String> milestoneCountEvery50 = [
-    'さらに50回！\n累計{count}回達成、すごい継続力だね！',
-    '記録の達人！\nついに{count}回。自分を褒めてあげよう！',
-    'チャリン！\n{count}回達成。おかねの管理が身についてるね！',
-  ];
-
-  static const String milestoneDay3 = '通算3日の記録達成！\n3日坊主を卒業して、さらなる一歩だね！';
-  static const String milestoneDay7 = '通算7日の記録達成！\n1週間、よくがんばりました！';
-  static const String milestoneDay30 = '通算30日の継続中！\n1ヶ月の記念だね、その調子！';
-  static const String milestoneDay100 = '通算100日の記録達成！\nもうプロの域だね、すばらしい！';
-
-  static const List<String> milestoneDayEvery100 = [
-    '通算{days}日達成！\n伝説はまだまだ続くね。すごい！',
-    '祝・{days}日！\nコツコツ続ける天才だね。これからも一緒に！',
-    'もう{days}日だね！\n記録が当たり前になってて素晴らしいよ！',
-  ];
-
-  // settings_page.dart
-  static const String settingsTitle = '設定';
-  static const String titleSetting = 'メイン画面のタイトル';
-  static const String dataManagementTitle = 'データ管理';
-  static const String resetAllData = '初期化';
-  static const String resetAllDataSubtitle = 'すべての記録と達成記録を消去します';
-  static const String resetConfirmTitle = 'すべてリセットしますか？';
-  static const String resetConfirmContent = 'すべての記録を削除し、1日目からやり直します。この操作は取り消せません。';
-  static const String resetSuccess = 'すべてリセットしました';
-  static const String appInfoTitle = 'アプリについて';
-  static const String versionLabel = 'バージョン';
-  static const String appVersion = '1.0.0'; // ここでバージョン管理
-
-  // 通貨設定
-  static const String currencySettingTitle = '通貨の設定';
-  static const String currencyJpy = '日本円 (¥)';
-  static const String currencyUsd = '米ドル (\$)';
-  static const String currencyEur = 'ユーロ (€)';
+  static List<String> get milestoneCountEvery50 => _getList('milestoneCountEvery50');
+  static List<String> get milestoneDayEvery100 => _getList('milestoneDayEvery100');
 }
 
 // アプリ全体で使う共通の数値
@@ -110,7 +277,6 @@ class AppNumbers {
   static const double calendarIconSize = 20.0;
   static const double calendarFontSize = 18.0;
   
-
   // period_page.dart
   static const int initialPeriodDays = 30;
   static const int minDatePickerYear = 2000;
@@ -130,6 +296,7 @@ class HiveConstants {
   static const String keyAppTitle = 'appTitle';
   static const String keyCurrency = 'currency';
   static const String keyDecimalDigits = 'decimalDigits';
+  static const String keyLanguage = 'language';
 }
 
 // MoneyEntryのtypeを表す文字列 (これはmodels/money_entry.dartのextensionで使うことを想定)

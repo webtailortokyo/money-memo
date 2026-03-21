@@ -34,6 +34,20 @@ void main() async {
     decimalDigitsNotifier.value = savedDecimalDigits;
   }
 
+  final savedLanguage = settingsBox.get(HiveConstants.keyLanguage) as String?;
+  if (savedLanguage != null) {
+    languageNotifier.value = savedLanguage;
+  }
+
+  // 言語が変わったとき、タイトルがデフォルト（空）なら AppStrings.appTitle に更新する
+  languageNotifier.addListener(() {
+    final box = Hive.box(HiveConstants.settingsBoxName);
+    final customTitle = box.get(HiveConstants.keyAppTitle, defaultValue: '') as String;
+    if (customTitle.isEmpty) {
+      appTitleNotifier.value = AppStrings.appTitle;
+    }
+  });
+
   runApp(const MyApp());
 }
 
@@ -42,16 +56,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<String>(
-      valueListenable: appTitleNotifier,
-      builder: (context, title, child) {
+    return ValueListenableBuilder2<String, String>(
+      valueListenable1: appTitleNotifier,
+      valueListenable2: languageNotifier,
+      builder: (context, title, lang, child) {
         return MaterialApp(
           title: title,
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             useMaterial3: true,
             fontFamily: 'Rounded Mplus 1c',
           ),
-          home: const MainPage(),
+          home: MainPage(),
         );
       },
     );

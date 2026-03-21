@@ -23,6 +23,7 @@ import '../utils/sort_entries.dart';
 import '../utils/input_formatter.dart';
 import '../constants.dart';
 import '../utils/milestone_manager.dart';
+import '../utils/format_utils.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -89,7 +90,7 @@ class _MainPageState extends State<MainPage> {
 
     if (memo.isEmpty || (selectedType != MoneyType.memo && amountText.isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.inputErrorSnackbarMessage)),
+        SnackBar(content: Text(AppStrings.inputErrorSnackbarMessage)),
       );
       return;
     }
@@ -403,9 +404,9 @@ class _MainPageState extends State<MainPage> {
       ),
 
       icon: const Icon(Icons.check_circle),
-      label: const Text(
+      label: Text(
         AppStrings.recordButtonText,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -464,9 +465,9 @@ class _MainPageState extends State<MainPage> {
             MaterialPageRoute(builder: (_) => const PeriodPage()),
           );
         },
-        label: const Text(
+        label: Text(
           AppStrings.periodPageTitle,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         icon: const Icon(Icons.history, color: Colors.white),
         backgroundColor: AppColors.accent,
@@ -506,7 +507,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                             const SizedBox(width: AppNumbers.smallSpacing),
                             Text(
-                              '${selectedDate.year}/${selectedDate.month}/${selectedDate.day}',
+                              formatDate(selectedDate),
                               style: const TextStyle(
                                 fontSize: AppNumbers.calendarFontSize,
                                 color: AppColors.mainText,
@@ -642,18 +643,18 @@ class _MainPageState extends State<MainPage> {
                             final result = await showDialog<bool>(
                               context: context,
                               builder: (_) => AlertDialog(
-                                title: const Text(AppStrings.deleteDialogTitle),
-                                content: const Text(AppStrings.deleteDialogContent),
+                                title: Text(AppStrings.deleteDialogTitle),
+                                content: Text(AppStrings.deleteDialogContent),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context, false),
-                                    child: const Text(AppStrings.cancelButtonText),
+                                    child: Text(AppStrings.cancelButtonText),
                                   ),
                                   TextButton(
                                     onPressed: () => Navigator.pop(context, true),
-                                    child: const Text(
+                                    child: Text(
                                       AppStrings.deleteButtonText,
-                                      style: TextStyle(color: Colors.red),
+                                      style: const TextStyle(color: Colors.red),
                                     ),
                                   ),
                                 ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
 import '../models/money_entry.dart';
 import '../theme.dart';
@@ -106,7 +107,7 @@ class _PeriodPageState extends State<PeriodPage> {
         valueListenable: box.listenable(),
         builder: (context, Box<MoneyEntry> box, _) {
           if (box.isEmpty) {
-            return const Center(child: Text(AppStrings.noRecordMessage));
+            return Center(child: Text(AppStrings.noRecordMessage));
           }
 
           final entries = sortedEntries(box);
@@ -117,12 +118,20 @@ class _PeriodPageState extends State<PeriodPage> {
             filtered = entries.where((e) {
               return e.date.year == targetDate.year && e.date.month == targetDate.month;
             }).toList();
-            periodLabel = '${targetDate.year}年${targetDate.month}月';
+            if (languageNotifier.value == 'en') {
+              periodLabel = DateFormat.yMMM('en_US').format(targetDate);
+            } else {
+              periodLabel = '${targetDate.year}${AppStrings.yearLabel}${targetDate.month}${AppStrings.monthLabel}';
+            }
           } else {
             filtered = entries.where((e) {
               return e.date.year == targetDate.year;
             }).toList();
-            periodLabel = '${targetDate.year}年';
+            if (languageNotifier.value == 'en') {
+              periodLabel = targetDate.year.toString();
+            } else {
+              periodLabel = '${targetDate.year}${AppStrings.yearLabel}';
+            }
           }
 
           double totalIncrease = 0;
@@ -144,9 +153,9 @@ class _PeriodPageState extends State<PeriodPage> {
                 /// 🔹 モード切替
                 Row(
                   children: [
-                    _buildModeButton(PeriodViewMode.monthly, '月間'),
+                    _buildModeButton(PeriodViewMode.monthly, AppStrings.monthlySummaryTitle),
                     const SizedBox(width: 8),
-                    _buildModeButton(PeriodViewMode.yearly, '年間'),
+                    _buildModeButton(PeriodViewMode.yearly, AppStrings.yearlySummaryTitle),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -201,7 +210,7 @@ class _PeriodPageState extends State<PeriodPage> {
                       ),
                     ),
                     icon: const Icon(Icons.share, size: 20),
-                    label: const Text(AppStrings.copyButtonText),
+                    label: Text(AppStrings.copyButtonText),
                   ),
                 ),
 
@@ -258,16 +267,16 @@ class _PeriodPageState extends State<PeriodPage> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      viewMode == PeriodViewMode.monthly ? AppStrings.detailSectionTitle : '月別集計',
+                      viewMode == PeriodViewMode.monthly ? AppStrings.detailSectionTitle : AppStrings.monthlySummaryTitle,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
                     ),
                   ],
                 ),
                 const SizedBox(height: AppNumbers.smallSpacing),
                 if (filtered.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 32),
-                    child: Center(child: Text('記録はありません')),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Center(child: Text(AppStrings.noRecordInPeriod)),
                   )
                 else if (viewMode == PeriodViewMode.monthly)
                   ...filtered.map((e) => MoneyEntryCard(
@@ -284,18 +293,18 @@ class _PeriodPageState extends State<PeriodPage> {
                           final result = await showDialog<bool>(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: const Text(AppStrings.deleteDialogTitle),
-                              content: const Text(AppStrings.deleteDialogContent),
+                              title: Text(AppStrings.deleteDialogTitle),
+                              content: Text(AppStrings.deleteDialogContent),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, false),
-                                  child: const Text(AppStrings.cancelButtonText),
+                                  child: Text(AppStrings.cancelButtonText),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: const Text(
+                                  child: Text(
                                     AppStrings.deleteButtonText,
-                                    style: TextStyle(color: Colors.red),
+                                    style: const TextStyle(color: Colors.red),
                                   ),
                                 ),
                               ],
@@ -342,6 +351,13 @@ class _PeriodPageState extends State<PeriodPage> {
     );
   }
 
+  String _formatMonth(int month) {
+    if (languageNotifier.value == 'en') {
+      return DateFormat.MMM('en_US').format(DateTime(2024, month));
+    }
+    return '${month}${AppStrings.monthLabel}';
+  }
+
   List<Widget> _buildYearlyMonthlyList(List<MoneyEntry> yearlyEntries) {
     final Map<int, Map<String, double>> monthlySums = {};
     for (int i = 1; i <= 12; i++) {
@@ -369,7 +385,7 @@ class _PeriodPageState extends State<PeriodPage> {
         ),
         child: Row(
           children: [
-            Text('${month}月', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(_formatMonth(month), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const Spacer(),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -388,11 +404,11 @@ class _PeriodPageState extends State<PeriodPage> {
 
   Future<void> _shareRecord(String periodLabel, List<MoneyEntry> filtered, double totalIncrease, double totalDecrease) async {
     if (filtered.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('記録がない期間は共有できません')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.shareNoRecordError)));
       return;
     }
 
-    final text = StringBuffer()..writeln('$periodLabel の記録\n');
+    final text = StringBuffer()..writeln('$periodLabel ${AppStrings.shareMessage}\n');
     text.writeln(AppStrings.totalSectionTitle);
     text.writeln('${AppStrings.increaseTypeLabel}\t${formatAmount(totalIncrease)}');
     text.writeln('${AppStrings.decreaseTypeLabel}\t${formatAmount(totalDecrease)}');
@@ -407,8 +423,8 @@ class _PeriodPageState extends State<PeriodPage> {
         text.writeln('${formatDate(e.date)}\t${e.memo}\t$label\t$signedAmount');
       }
     } else {
-      text.writeln('月別集計');
-      text.writeln('月\t${AppStrings.increaseTypeLabel}\t${AppStrings.decreaseTypeLabel}');
+      text.writeln(AppStrings.monthlySummaryTitle);
+      text.writeln('${AppStrings.monthHeader}\t${AppStrings.increaseTypeLabel}\t${AppStrings.decreaseTypeLabel}');
       final Map<int, Map<String, double>> monthlySums = {};
       for (final e in filtered) {
         monthlySums.putIfAbsent(e.date.month, () => {'in': 0, 'out': 0});
@@ -420,7 +436,7 @@ class _PeriodPageState extends State<PeriodPage> {
       }
       final sortedMonths = monthlySums.keys.toList()..sort();
       for (final m in sortedMonths) {
-        text.writeln('${m}月\t${formatAmount(monthlySums[m]!['in']!)}\t${formatAmount(monthlySums[m]!['out']!)}');
+        text.writeln('${_formatMonth(m)}\t${formatAmount(monthlySums[m]!['in']!)}\t${formatAmount(monthlySums[m]!['out']!)}');
       }
     }
 

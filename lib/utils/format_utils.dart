@@ -2,6 +2,10 @@ import 'package:intl/intl.dart';
 import '../app_state.dart';
 
 String formatDate(DateTime d) {
+  if (languageNotifier.value == 'en') {
+    // e.g. Mar 21, 2026
+    return DateFormat.yMMMd('en_US').format(d);
+  }
   return '${d.year}/${d.month}/${d.day}';
 }
 
