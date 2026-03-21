@@ -12,11 +12,13 @@ class TotalAmountRow extends StatelessWidget {
     required this.color,
 
     required this.formatAmount,
+    this.symbol,
     });
 
     final String label;
     final num value;
     final Color color;
+    final String? symbol;
 
     final String Function(num) formatAmount;
 
@@ -28,7 +30,7 @@ class TotalAmountRow extends StatelessWidget {
         textBaseline: TextBaseline.alphabetic,
         children: [
             Text(
-                currencyNotifier.value,
+                symbol ?? currencyNotifier.value,
                 style: TextStyle(
                 color: color,
                 fontSize: AppNumbers.totalAmountSize,

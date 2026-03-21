@@ -25,6 +25,15 @@ class PeriodPage extends StatefulWidget {
   State<PeriodPage> createState() => _PeriodPageState();
 }
 
+class CurrencySummary {
+  final String symbol;
+  final int decimalDigits;
+  double increase = 0;
+  double decrease = 0;
+
+  CurrencySummary(this.symbol, this.decimalDigits);
+}
+
 class _PeriodPageState extends State<PeriodPage> {
   late Box<MoneyEntry> box;
 
@@ -134,14 +143,17 @@ class _PeriodPageState extends State<PeriodPage> {
             }
           }
 
-          double totalIncrease = 0;
-          double totalDecrease = 0;
-
+          final Map<String, CurrencySummary> totals = {};
           for (final e in filtered) {
+            final sym = e.currency ?? '¥';
+            final digits = e.decimalDigits ?? 0;
+            final key = '$sym-$digits';
+            
+            totals.putIfAbsent(key, () => CurrencySummary(sym, digits));
             if (e.type == MoneyEntryTypes.increase) {
-              totalIncrease += e.amount;
+              totals[key]!.increase += e.amount;
             } else if (e.type == MoneyEntryTypes.decrease) {
-              totalDecrease += e.amount;
+              totals[key]!.decrease += e.amount;
             }
           }
 
@@ -200,7 +212,7 @@ class _PeriodPageState extends State<PeriodPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () => _shareRecord(periodLabel, filtered, totalIncrease, totalDecrease),
+                    onPressed: () => _shareRecord(periodLabel, filtered, totals),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.accent,
                       foregroundColor: Colors.white,
@@ -238,19 +250,34 @@ class _PeriodPageState extends State<PeriodPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      TotalAmountRow(
-                        label: AppStrings.increaseTypeLabel,
-                        value: totalIncrease,
-                        color: AppColors.increaseAmount,
-                        formatAmount: (val) => formatAmount(val),
-                      ),
-                      const SizedBox(height: AppNumbers.smallSpacing),
-                      TotalAmountRow(
-                        label: AppStrings.decreaseTypeLabel,
-                        value: totalDecrease,
-                        color: AppColors.decreaseAmount,
-                        formatAmount: (val) => formatAmount(val),
-                      ),
+                      if (totals.isEmpty)
+                        const Center(child: Text('-'))
+                      else
+                        ..._sortSummaries(totals.values).map((summary) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Column(
+                            key: ValueKey('${summary.symbol}-${summary.decimalDigits}'),
+                            children: [
+                              TotalAmountRow(
+                                label: AppStrings.increaseTypeLabel,
+                                value: summary.increase,
+                                color: AppColors.increaseAmount,
+                                symbol: summary.symbol,
+                                formatAmount: (val) => formatAmount(val, decimalDigits: summary.decimalDigits),
+                              ),
+                              const SizedBox(height: 4),
+                              TotalAmountRow(
+                                label: AppStrings.decreaseTypeLabel,
+                                value: summary.decrease,
+                                color: AppColors.decreaseAmount,
+                                symbol: summary.symbol,
+                                formatAmount: (val) => formatAmount(val, decimalDigits: summary.decimalDigits),
+                              ),
+                              if (summary != _sortSummaries(totals.values).last)
+                                const Divider(height: 16),
+                            ],
+                          ),
+                        )),
                     ],
                   ),
                 ),
@@ -326,6 +353,17 @@ class _PeriodPageState extends State<PeriodPage> {
     );
   }
 
+  /// 🔽 追加：通貨の表示順序を定義（円 -> ドル -> ユーロ）
+  List<CurrencySummary> _sortSummaries(Iterable<CurrencySummary> summaries) {
+    return summaries.toList()
+      ..sort((a, b) {
+        final order = {'¥': 0, '\$': 1, '€': 2};
+        final aOrder = order[a.symbol] ?? 99;
+        final bOrder = order[b.symbol] ?? 99;
+        return aOrder.compareTo(bOrder);
+      });
+  }
+
   Widget _buildModeButton(PeriodViewMode mode, String label) {
     final isSelected = viewMode == mode;
     return Expanded(
@@ -359,22 +397,31 @@ class _PeriodPageState extends State<PeriodPage> {
   }
 
   List<Widget> _buildYearlyMonthlyList(List<MoneyEntry> yearlyEntries) {
-    final Map<int, Map<String, double>> monthlySums = {};
+    final Map<int, Map<String, CurrencySummary>> monthlyCurrencySums = {};
     for (int i = 1; i <= 12; i++) {
-      monthlySums[i] = {'increase': 0.0, 'decrease': 0.0};
+      monthlyCurrencySums[i] = {};
     }
 
     for (final e in yearlyEntries) {
+      final sym = e.currency ?? '¥';
+      final digits = e.decimalDigits ?? 0;
+      final key = '$sym-$digits';
+      
+      final monthMap = monthlyCurrencySums[e.date.month]!;
+      monthMap.putIfAbsent(key, () => CurrencySummary(sym, digits));
+      
       if (e.type == MoneyEntryTypes.increase) {
-        monthlySums[e.date.month]!['increase'] = monthlySums[e.date.month]!['increase']! + e.amount;
+        monthMap[key]!.increase += e.amount;
       } else if (e.type == MoneyEntryTypes.decrease) {
-        monthlySums[e.date.month]!['decrease'] = monthlySums[e.date.month]!['decrease']! + e.amount;
+        monthMap[key]!.decrease += e.amount;
       }
     }
 
-    return monthlySums.entries.where((entry) => entry.value['increase']! > 0 || entry.value['decrease']! > 0).map((entry) {
+    return monthlyCurrencySums.entries
+        .where((entry) => entry.value.isNotEmpty)
+        .map((entry) {
       final month = entry.key;
-      final sums = entry.value;
+      final summaries = _sortSummaries(entry.value.values);
       return Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),
@@ -389,12 +436,17 @@ class _PeriodPageState extends State<PeriodPage> {
             const Spacer(),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (sums['increase']! > 0)
-                  Text('+${formatAmount(sums['increase']!)}', style: const TextStyle(color: AppColors.increaseAmount, fontSize: 13)),
-                if (sums['decrease']! > 0)
-                  Text('-${formatAmount(sums['decrease']!)}', style: const TextStyle(color: AppColors.decreaseAmount, fontSize: 13)),
-              ],
+              children: summaries.map((s) => Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (s.increase > 0)
+                    Text('+${s.symbol}${formatAmount(s.increase, decimalDigits: s.decimalDigits)}', 
+                        style: const TextStyle(color: AppColors.increaseAmount, fontSize: 13)),
+                  if (s.decrease > 0)
+                    Text('-${s.symbol}${formatAmount(s.decrease, decimalDigits: s.decimalDigits)}', 
+                        style: const TextStyle(color: AppColors.decreaseAmount, fontSize: 13)),
+                ],
+              )).toList(),
             ),
           ],
         ),
@@ -402,7 +454,7 @@ class _PeriodPageState extends State<PeriodPage> {
     }).toList();
   }
 
-  Future<void> _shareRecord(String periodLabel, List<MoneyEntry> filtered, double totalIncrease, double totalDecrease) async {
+  Future<void> _shareRecord(String periodLabel, List<MoneyEntry> filtered, Map<String, CurrencySummary> totals) async {
     if (filtered.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.shareNoRecordError)));
       return;
@@ -410,8 +462,13 @@ class _PeriodPageState extends State<PeriodPage> {
 
     final text = StringBuffer()..writeln('$periodLabel ${AppStrings.shareMessage}\n');
     text.writeln(AppStrings.totalSectionTitle);
-    text.writeln('${AppStrings.increaseTypeLabel}\t${formatAmount(totalIncrease)}');
-    text.writeln('${AppStrings.decreaseTypeLabel}\t${formatAmount(totalDecrease)}');
+    
+    for (final summary in _sortSummaries(totals.values)) {
+      final inc = formatAmount(summary.increase, decimalDigits: summary.decimalDigits);
+      final dec = formatAmount(summary.decrease, decimalDigits: summary.decimalDigits);
+      text.writeln('${AppStrings.increaseTypeLabel}\t${summary.symbol}$inc');
+      text.writeln('${AppStrings.decreaseTypeLabel}\t${summary.symbol}$dec');
+    }
     text.writeln('');
 
     if (viewMode == PeriodViewMode.monthly) {
@@ -419,24 +476,39 @@ class _PeriodPageState extends State<PeriodPage> {
       text.writeln(AppStrings.clipboardHeader);
       for (final e in filtered) {
         final label = e.type == MoneyEntryTypes.increase ? AppStrings.increaseTypeLabel : AppStrings.decreaseTypeLabel;
-        final signedAmount = e.type == MoneyEntryTypes.increase ? e.amount : -e.amount;
+        final sym = e.currency ?? '¥';
+        final digits = e.decimalDigits ?? 0;
+        final amountText = formatAmount(e.amount, decimalDigits: digits);
+        final signedAmount = e.type == MoneyEntryTypes.increase ? '+$sym$amountText' : '-$sym$amountText';
         text.writeln('${formatDate(e.date)}\t${e.memo}\t$label\t$signedAmount');
       }
     } else {
       text.writeln(AppStrings.monthlySummaryTitle);
       text.writeln('${AppStrings.monthHeader}\t${AppStrings.increaseTypeLabel}\t${AppStrings.decreaseTypeLabel}');
-      final Map<int, Map<String, double>> monthlySums = {};
+      
+      final Map<int, Map<String, CurrencySummary>> monthlyCurrencySums = {};
       for (final e in filtered) {
-        monthlySums.putIfAbsent(e.date.month, () => {'in': 0, 'out': 0});
+        final sym = e.currency ?? '¥';
+        final digits = e.decimalDigits ?? 0;
+        final key = '$sym-$digits';
+        monthlyCurrencySums.putIfAbsent(e.date.month, () => {});
+        monthlyCurrencySums[e.date.month]!.putIfAbsent(key, () => CurrencySummary(sym, digits));
+        
         if (e.type == MoneyEntryTypes.increase) {
-          monthlySums[e.date.month]!['in'] = monthlySums[e.date.month]!['in']! + e.amount;
+          monthlyCurrencySums[e.date.month]![key]!.increase += e.amount;
         } else {
-          monthlySums[e.date.month]!['out'] = monthlySums[e.date.month]!['out']! + e.amount;
+          monthlyCurrencySums[e.date.month]![key]!.decrease += e.amount;
         }
       }
-      final sortedMonths = monthlySums.keys.toList()..sort();
+      
+      final sortedMonths = monthlyCurrencySums.keys.toList()..sort();
       for (final m in sortedMonths) {
-        text.writeln('${_formatMonth(m)}\t${formatAmount(monthlySums[m]!['in']!)}\t${formatAmount(monthlySums[m]!['out']!)}');
+        final summaries = _sortSummaries(monthlyCurrencySums[m]!.values);
+        for (final s in summaries) {
+          final inc = formatAmount(s.increase, decimalDigits: s.decimalDigits);
+          final dec = formatAmount(s.decrease, decimalDigits: s.decimalDigits);
+          text.writeln('${_formatMonth(m)}\t${s.symbol}$inc\t${s.symbol}$dec');
+        }
       }
     }
 
