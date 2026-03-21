@@ -12,6 +12,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'period_page.dart';
 import 'input_page.dart';
+import 'settings_page.dart';
+import '../app_state.dart';
 import '../theme.dart';
 import '../models/money_entry.dart';
 import '../models/money_type.dart';
@@ -255,25 +257,6 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
-  Widget _typeButton(String label, MoneyType type, Color color) {
-    return Expanded(
-      child: _typeButtonInner(label, type, color),
-    );
-  }
-
-  Widget _typeButtonWrapper(BuildContext context, String label, MoneyType type, Color color) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final horizontalPadding = (AppNumbers.defaultPadding + AppNumbers.smallSpacing) * 2;
-    final totalSpacing = AppNumbers.smallSpacing * 2;
-    // 基本の幅を3等分にするが、最小幅を下回らないようにする
-    final buttonWidth = (screenWidth - horizontalPadding - totalSpacing) / 3.05;
-
-    return Container(
-      constraints: BoxConstraints(minWidth: buttonWidth),
-      child: _typeButtonInner(label, type, color),
-    );
-  }
-
   Widget _typeButtonInner(String label, MoneyType type, Color color) {
     final selected = selectedType == type;
 
@@ -427,25 +410,42 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: AppNumbers.appBarElevation,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              'assets/img/app_icon.svg',
-              width: 28,
-              height: 28,
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              AppStrings.appTitle,
-              style: TextStyle(
-                color: AppColors.accent,
-                fontWeight: FontWeight.bold,
-                fontSize: AppNumbers.titleFontSize,
-              ),
-            ),
-          ],
+        title: ValueListenableBuilder<String>(
+          valueListenable: appTitleNotifier,
+          builder: (context, title, child) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(
+                  'assets/img/app_icon.svg',
+                  width: 28,
+                  height: 28,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.accent,
+                    fontWeight: FontWeight.bold,
+                    fontSize: AppNumbers.titleFontSize,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: AppColors.accent),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsPage()),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {

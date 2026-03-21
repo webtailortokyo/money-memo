@@ -203,13 +203,6 @@ class _InputPageState extends State<InputPage> {
         final screenHeight = MediaQuery.of(context).size.height;
         final size = (screenWidth * 0.8 < 300) ? screenWidth * 0.8 : 300.0;
 
-        // タイプごとに画像を出し分け
-        final imageFile = type == MoneyType.increase
-            ? 'assets/img/piggy_bank.png'
-            : type == MoneyType.decrease
-                ? 'assets/img/joy_pose.png'
-                : 'assets/img/joy_pose.png'; // memoもとりあえずjoy
-
         final lottieWidget = Lottie.asset(
           lottieFile,
           width: type == MoneyType.increase ? size * 1.5 : size,
@@ -304,24 +297,6 @@ class _InputPageState extends State<InputPage> {
       case MoneyType.memo:
         return AppStrings.memoHintMemo;
     }
-  }
-
-  Widget _typeButton(String label, MoneyType type, Color color) {
-    return Expanded(
-      child: _typeButtonInner(label, type, color),
-    );
-  }
-
-  Widget _typeButtonWrapper(BuildContext context, String label, MoneyType type, Color color) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final horizontalPadding = (AppNumbers.defaultPadding + AppNumbers.smallSpacing) * 2;
-    final totalSpacing = AppNumbers.smallSpacing * 2;
-    final buttonWidth = (screenWidth - horizontalPadding - totalSpacing) / 3.05;
-
-    return Container(
-      constraints: BoxConstraints(minWidth: buttonWidth),
-      child: _typeButtonInner(label, type, color),
-    );
   }
 
   Widget _typeButtonInner(String label, MoneyType type, Color color) {

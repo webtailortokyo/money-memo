@@ -1,0 +1,24 @@
+﻿Analyzing money_memo...                                         
+
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\pages\input_page.dart:147:45 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\pages\input_page.dart:154:21 - use_build_context_synchronously
+warning - The value of the local variable 'imageFile' isn't used - lib\pages\input_page.dart:207:15 - unused_local_variable
+warning - The declaration '_typeButton' isn't referenced - lib\pages\input_page.dart:309:10 - unused_element
+warning - The declaration '_typeButtonWrapper' isn't referenced - lib\pages\input_page.dart:315:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\input_page.dart:525:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\input_page.dart:559:53 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\pages\main_page.dart:123:45 - use_build_context_synchronously
+warning - The declaration '_typeButton' isn't referenced - lib\pages\main_page.dart:260:10 - unused_element
+warning - The declaration '_typeButtonWrapper' isn't referenced - lib\pages\main_page.dart:266:10 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\main_page.dart:358:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\pages\main_page.dart:580:59 - deprecated_member_use
+   info - The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\pages\period_page.dart:4:8 - unnecessary_import
+   info - Unnecessary braces in a string interpolation - lib\pages\period_page.dart:371:19 - unnecessary_brace_in_string_interps
+   info - Unnecessary braces in a string interpolation - lib\pages\period_page.dart:422:23 - unnecessary_brace_in_string_interps
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\pages\period_page.dart:429:11 - deprecated_member_use
+   info - 'share' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\pages\period_page.dart:429:17 - deprecated_member_use
+warning - Unused import: 'package:flutter_svg/flutter_svg.dart' - lib\widgets\milestone_dialog.dart:4:8 - unused_import
+warning - Unused import: '../constants.dart' - lib\widgets\milestone_dialog.dart:7:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\milestone_dialog.dart:154:39 - deprecated_member_use
+warning - This default clause is covered by the previous cases - lib\widgets\milestone_dialog.dart:259:7 - unreachable_switch_default
+

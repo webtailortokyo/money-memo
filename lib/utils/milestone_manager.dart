@@ -7,14 +7,13 @@ import '../widgets/milestone_dialog.dart';
 import '../widgets/piggy_character.dart';
 
 class MilestoneManager {
-  static const String _statsBoxName = 'statsBox';
   static const String _keyLastCount = 'lastShownCountMilestone';
   static const String _keyLastDays = 'lastShownDaysMilestone';
 
   /// 記録保存直後に呼び出し、必要ならお祝いを表示する
   static Future<void> checkAndShow(BuildContext context) async {
     final moneyBox = Hive.box<MoneyEntry>(HiveConstants.moneyBoxName);
-    final statsBox = Hive.box(_statsBoxName);
+    final statsBox = Hive.box(HiveConstants.statsBoxName);
 
     // 1. 回数・日数の計算
     final totalCount = moneyBox.length;

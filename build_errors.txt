@@ -1,0 +1,332 @@
+﻿
+  build_windows_verbose.txt:198:[  
++15 ms] executing: C:\Program Files
+\Microsoft Visual Studio\18\Communi
+ty\Common7\IDE\CommonExtensions\Mic
+rosoft\CMake\CMake\bin\cmake.exe --
+build C:\works\money_memo\build\win
+dows\x64 --config Release --target 
+INSTALL --verbose
+  build_windows_verbose.txt:199:[  
++44 ms] Change Dir: 'C:/works/money
+_memo/build/windows/x64'
+  build_windows_verbose.txt:200:[  
+      ] Run Build Command(s): "C:/P
+rogram Files/Microsoft Visual Studi
+o/18/Community/MSBuild/Current/Bin/
+amd64/MSBuild.exe" INSTALL.vcxproj 
+/p:Configuration=Release /p:Platfor
+m=x64 /p:VisualStudioVersion=18.0 /
+v:n
+  build_windows_verbose.txt:201:[  
++45 ms] MSBuild 縺ｮ繝舌・繧ｸ繝ｧ繝ｳ 18.0.5+
+e22287bf1 (.NET Framework)
+  build_windows_verbose.txt:202:[  
++38 ms] 2026/03/21 10:34:18 縺ｫ繝薙Ν繝峨
+ｒ髢句ｧ九＠縺ｾ縺励◆縲・[ +109 ms] 繝弱・繝・1 荳翫・繝
+励Ο繧ｸ繧ｧ繧ｯ繝・"C:\works\money_memo\buil
+d\windows\x64\INSTALL.vcxproj" (譌｢螳
+壹・繧ｿ繝ｼ繧ｲ繝・ヨ)縲・[        ] 繝励Ο繧ｸ繧ｧ繧ｯ繝
+・"C:\works\money_memo\build\windows
+\x64\INSTALL.vcxproj" (1) 縺ｯ縲√ヮ繝ｼ繝・
+1 荳翫↓ "C:\works\money_memo\build\wi
+ndows\x64\ZERO_CHECK.vcxproj" (2) 繧
+偵ン繝ｫ繝峨＠縺ｦ縺・∪縺・(譌｢螳壹・繧ｿ繝ｼ繧ｲ繝・ヨ)縲・[  
+      ] PrepareForBuild:
+> build_windows_verbose.txt:203:[  
+      ]   Structured output is enab
+led. The formatting of compiler dia
+gnostics will reflect the error hie
+rarchy. See https://aka.ms/cpp/stru
+ctured-output for more details.
+  build_windows_verbose.txt:204:[  
+ +3 ms] InitializeBuildStatus:
+  build_windows_verbose.txt:205:[  
+      ]   "AlwaysCreate" 縺梧欠螳壹＆繧後◆縺
+溘ａ "x64\Release\ZERO_CHECK\ZERO_CHE
+CK.tlog\unsuccessfulbuild" 繧剃ｽ懈・縺励※
+縺・∪縺吶・[        ]   "x64\Release\ZE
+RO_CHECK\ZERO_CHECK.tlog\unsuccessf
+ulbuild" 縺ｮ繧ｿ繝・メ 繧ｿ繧ｹ繧ｯ繧貞ｮ溯｡後＠縺ｦ縺・∪
+縺吶・[   +8 ms] CustomBuild:
+  build_windows_verbose.txt:206:[  
+      ]   縺吶∋縺ｦ縺ｮ蜃ｺ蜉帙′譛譁ｰ縺ｮ繧ゅ・縺ｧ縺吶
+・[  +20 ms] FinalizeBuildStatus:
+  build_windows_verbose.txt:207:[  
+      ]   繝輔ぃ繧､繝ｫ "x64\Release\ZERO
+_CHECK\ZERO_CHECK.tlog\unsuccessful
+build" 繧貞炎髯､縺励※縺・∪縺吶・[        ]   
+"x64\Release\ZERO_CHECK\ZERO_CHECK.
+tlog\ZERO_CHECK.lastbuildstate" 縺ｮ繧
+ｿ繝・メ 繧ｿ繧ｹ繧ｯ繧貞ｮ溯｡後＠縺ｦ縺・∪縺吶・[       
+ ] 繝励Ο繧ｸ繧ｧ繧ｯ繝・"C:\works\money_memo\
+build\windows\x64\ZERO_CHECK.vcxpro
+j" (譌｢螳壹・繧ｿ繝ｼ繧ｲ繝・ヨ) 縺ｮ繝薙Ν繝峨′螳御ｺ・＠縺ｾ
+縺励◆縲・[  +41 ms] 繝励Ο繧ｸ繧ｧ繧ｯ繝・"C:\work
+s\money_memo\build\windows\x64\INST
+ALL.vcxproj" (1) 縺ｯ縲√ヮ繝ｼ繝・1 荳翫↓ "C:
+\works\money_memo\build\windows\x64
+\ALL_BUILD.vcxproj" (3) 繧偵ン繝ｫ繝峨＠縺ｦ縺
+・∪縺・(譌｢螳壹・繧ｿ繝ｼ繧ｲ繝・ヨ)縲・[        ] 繝励
+Ο繧ｸ繧ｧ繧ｯ繝・"C:\works\money_memo\build
+\windows\x64\ALL_BUILD.vcxproj" (3)
+ 縺ｯ縲√ヮ繝ｼ繝・1 荳翫↓ "C:\works\money_mem
+o\build\windows\x64\plugins\audiopl
+ayers_windows\audioplayers_windows_
+plugin.vcxproj" (4) 繧偵ン繝ｫ繝峨＠縺ｦ縺・∪縺・
+(譌｢螳壹・繧ｿ繝ｼ繧ｲ繝・ヨ)縲・[        ] 繝励Ο繧ｸ繧
+ｧ繧ｯ繝・"C:\works\money_memo\build\win
+dows\x64\plugins\audioplayers_windo
+ws\audioplayers_windows_plugin.vcxp
+roj" (4) 縺ｯ縲√ヮ繝ｼ繝・1 荳翫↓ "C:\works\m
+oney_memo\build\windows\x64\flutter
+\flutter_assemble.vcxproj" (5) 繧偵ン繝
+ｫ繝峨＠縺ｦ縺・∪縺・(譌｢螳壹・繧ｿ繝ｼ繧ｲ繝・ヨ)縲・[     
+   ] PrepareForBuild:
+> build_windows_verbose.txt:208:[  
+      ]   Structured output is enab
+led. The formatting of compiler dia
+gnostics will reflect the error hie
+rarchy. See https://aka.ms/cpp/stru
+ctured-output for more details.
+  build_windows_verbose.txt:209:[  
+      ] InitializeBuildStatus:
+  build_windows_verbose.txt:210:[  
+      ]   "x64\Release\flutter_asse
+mble\flutter_assemble.tlog\unsucces
+sfulbuild" 縺ｮ繧ｿ繝・メ 繧ｿ繧ｹ繧ｯ繧貞ｮ溯｡後＠縺ｦ縺
+・∪縺吶・[   +6 ms] CustomBuild:
+  build_windows_verbose.txt:211:[  
+      ]   "The build of 'C:\works\m
+oney_memo\build\windows\x64\CMakeFi
+les\056d856c3b8f7fe069c2c7b77fedf15
+a\flutter_assemble.rule' depends on
+ 'C:\WORKS\MONEY_MEMO\WINDOWS\FLUTT
+ER\EPHEMERAL\FLUTTER_WINDOWS.DLL' w
+hich is produced by the build of 'C
+:\works\money_memo\build\windows\x6
+4\CMakeFiles\e04a23a601f27b8cf21bcc
+a9328da9a7\flutter_windows.dll.rule
+'. The items cannot be built in par
+allel."
+  build_windows_verbose.txt:212:[  
++72 ms]   Generating C:/works/money
+_memo/windows/flutter/ephemeral/flu
+tter_windows.dll, C:/works/money_me
+mo/windows/flutter/ephemeral/flutte
+r_export.h, C:/works/money_memo/win
+dows/flutter/ephemeral/flutter_wind
+ows.h, C:/works/money_memo/windows/
+flutter/ephemeral/flutter_messenger
+.h, C:/works/money_memo/windows/flu
+tter/ephemeral/flutter_plugin_regis
+trar.h, C:/works/money_memo/windows
+/flutter/ephemeral/flutter_texture_
+registrar.h, C:/works/money_memo/wi
+ndows/flutter/ephemeral/cpp_client_
+wrapper/core_implementations.cc, C:
+/works/money_memo/windows/flutter/e
+phemeral/cpp_client_wrapper/standar
+d_codec.cc, C:/works/money_memo/win
+dows/flutter/ephemeral/cpp_client_w
+rapper/plugin_registrar.cc, C:/work
+s/money_memo/windows/flutter/epheme
+ral/cpp_client_wrapper/flutter_engi
+ne.cc, C:/works/money_memo/windows/
+flutter/ephemeral/cpp_client_wrappe
+r/flutter_view_controller.cc, _phon
+y_
+  build_windows_verbose.txt:213:[ +
+947 ms]   [ +281 ms] Artifact Insta
+nce of 'MaterialFonts' is not requi
+red, skipping update.
+  build_windows_verbose.txt:276:[+2
+872 ms]   [+2871 ms] Skipping targe
+t: install_code_assets
+  build_windows_verbose.txt:277:[  
+      ]   [        ] Skipping targe
+t: gen_localizations
+  build_windows_verbose.txt:278:[  
+ +2 ms]   [   +2 ms] unpack_windows
+: Starting due to {InvalidatedReaso
+nKind.inputChanged: The following i
+nputs have updated contents: C:\wor
+ks\money_memo\windows\flutter\ephem
+eral\flutter_windows.dll,C:\works\m
+oney_memo\windows\flutter\ephemeral
+\flutter_windows.dll.exp,C:\works\m
+oney_memo\windows\flutter\ephemeral
+\flutter_windows.dll.pdb}
+  build_windows_verbose.txt:279:[ +
+482 ms]   [ +482 ms] unpack_windows
+: Complete
+  build_windows_verbose.txt:280:[+2
+263 ms]   [+2263 ms] kernel_snapsho
+t_program: Starting due to {Invalid
+atedReasonKind.outputSetAddition: T
+he following outputs were added to 
+the output set: C:\works\money_memo
+\.dart_tool\flutter_build\9afdfe0e5
+dfd206c4a7006149dfd564f\app.dill, I
+nvalidatedReasonKind.inputChanged: 
+The following inputs have updated c
+ontents: C:\works\money_memo\lib\ma
+in.dart,C:\works\money_memo\lib\pag
+es\main_page.dart,C:\works\money_me
+mo\lib\theme.dart,C:\works\money_me
+mo\lib\constants.dart,C:\works\mone
+y_memo\lib\pages\period_page.dart,C
+:\works\money_memo\lib\pages\input_
+page.dart,C:\works\money_memo\lib\p
+ages\settings_page.dart,C:\works\mo
+ney_memo\lib\widgets\money_entry_ca
+rd.dart,C:\works\money_memo\lib\uti
+ls\milestone_manager.dart,C:\works\
+money_memo\lib\widgets\milestone_di
+alog.dart}
+> build_windows_verbose.txt:281:[  
+ +7 ms]   [   +7 ms] C:\dev\flutter
+\bin\cache\dart-sdk\bin\dartaotrunt
+ime.exe C:\dev\flutter\bin\cache\da
+rt-sdk\bin\snapshots\frontend_serve
+r_aot.dart.snapshot --sdk-root C:\d
+ev\flutter\bin\cache\artifacts\engi
+ne\common\flutter_patched_sdk_produ
+ct/ --target=flutter --no-print-inc
+remental-dependencies -DFLUTTER_VER
+SION=3.38.6 -DFLUTTER_CHANNEL=stabl
+e -DFLUTTER_GIT_URL=https://github.
+com/flutter/flutter.git -DFLUTTER_F
+RAMEWORK_REVISION=8b87286849 -DFLUT
+TER_ENGINE_REVISION=78fc3012e4 -DFL
+UTTER_DART_VERSION=3.10.7 -Ddart.vm
+.profile=false -Ddart.vm.product=tr
+ue --delete-tostring-package-uri=da
+rt:ui --delete-tostring-package-uri
+=package:flutter --aot --tfa --targ
+et-os windows --packages C:\works\m
+oney_memo\.dart_tool\package_config
+.json --output-dill C:\works\money_
+memo\.dart_tool\flutter_build\9afdf
+e0e5dfd206c4a7006149dfd564f\app.dil
+l --depfile C:\works\money_memo\.da
+rt_tool\flutter_build\9afdfe0e5dfd2
+06c4a7006149dfd564f\kernel_snapshot
+_program.d --source file:///C:/work
+s/money_memo/.dart_tool/flutter_bui
+ld/dart_plugin_registrant.dart --so
+urce package:flutter/src/dart_plugi
+n_registrant.dart -Dflutter.dart_pl
+ugin_registrant=file:///C:/works/mo
+ney_memo/.dart_tool/flutter_build/d
+art_plugin_registrant.dart --verbos
+ity=error package:money_memo/main.d
+art
+  build_windows_verbose.txt:282:flu
+tter : [+2131 ms] [+2130 ms] lib
+  build_windows_verbose.txt:283:/pa
+ges/input_page.dart(207,17): err
+  build_windows_verbose.txt:284:or 
+G25387D61: Expected an identifie
+  build_windows_verbose.txt:285:r, 
+but got '?'. [C:\works\money_mem
+  build_windows_verbose.txt:286:o\b
+uild\windows\x64\flutter\flutter
+  build_windows_verbose.txt:292:~~~
+~~~~~~~~~~~~~~~~~~~~~
+  build_windows_verbose.txt:293:   
+ + CategoryInfo          : NotSp
+  build_windows_verbose.txt:294:e  
+  cified: ([+2131 ms] [+21...sem
+  build_windows_verbose.txt:295:bl 
+   e.vcxproj]:String) [], Remote
+  build_windows_verbose.txt:296:Exc
+    eption
+> build_windows_verbose.txt:297:   
+ + FullyQualifiedErrorId : Nativ
+> build_windows_verbose.txt:298:e  
+  CommandError
+  build_windows_verbose.txt:299: 
+  build_windows_verbose.txt:300:[  
+ +5 ms]   [        ] Try inserting 
+an identifier before '?'.
+  build_windows_verbose.txt:301:[  
+      ]   [        ]               
+  ? 'assets/img/piggy_bank.png'
+  build_windows_verbose.txt:302:[  
+      ]   [        ]               
+  ^
+  build_windows_verbose.txt:303:[+3
+132 ms]   [+3138 ms] Persisting fil
+e store
+  build_windows_verbose.txt:368:[  
+      ]   [        ] Shutdown hooks
+ complete
+  build_windows_verbose.txt:369:[  
++64 ms]   [  +64 ms] exiting with c
+ode 1
+  build_windows_verbose.txt:370:[  
++48 ms] C:\Program Files\Microso
+  build_windows_verbose.txt:371:ft 
+Visual Studio\18\Community\MSBui
+  build_windows_verbose.txt:372:ld\
+Microsoft\VC\v180\Microsoft.CppC
+> build_windows_verbose.txt:373:omm
+on.targets(254,5): error MSB8066
+  build_windows_verbose.txt:374:: C
+ustom build for 'C:\works\money_
+  build_windows_verbose.txt:375:mem
+o\build\windows\x64\CMakeFiles\e
+  build_windows_verbose.txt:376:04a
+23a601f27b8cf21bcca9328da9a7\flu
+  build_windows_verbose.txt:377:tte
+r_windows.dll.rule;C:\works\mone
+  build_windows_verbose.txt:378:y_m
+emo\build\windows\x64\CMakeFiles
+  build_windows_verbose.txt:385:[  
+      ] "C:\works\money_memo\build\
+windows\x64\ALL_BUILD.vcxproj" (譌｢螳
+壹・繧ｿ繝ｼ繧ｲ繝・ヨ) (3) ->
+  build_windows_verbose.txt:386:[  
+      ] "C:\works\money_memo\build\
+windows\x64\plugins\audioplayers_wi
+ndows\audioplayers_windows_plugin.v
+cxproj" (譌｢螳壹・繧ｿ繝ｼ繧ｲ繝・ヨ) (4) ->
+  build_windows_verbose.txt:387:[  
+      ] "C:\works\money_memo\build\
+windows\x64\flutter\flutter_assembl
+e.vcxproj" (譌｢螳壹・繧ｿ繝ｼ繧ｲ繝・ヨ) (5) ->
+  build_windows_verbose.txt:388:[  
+      ] (CustomBuild 繧ｿ繝ｼ繧ｲ繝・ヨ) -> 
+  build_windows_verbose.txt:389:[  
+      ]   [+2130 ms] lib/pages/i
+> build_windows_verbose.txt:390:npu
+t_page.dart(207,17): error G2538
+  build_windows_verbose.txt:391:7D6
+1: Expected an identifier, but g
+  build_windows_verbose.txt:392:ot 
+'?'. [C:\works\money_memo\build\
+  build_windows_verbose.txt:393:win
+dows\x64\flutter\flutter_assembl
+  build_windows_verbose.txt:394:e.v
+cxproj]
+  build_windows_verbose.txt:395:[  
+      ]   C:\Program Files\Micro
+  build_windows_verbose.txt:396:sof
+t Visual Studio\18\Community\MSB
+  build_windows_verbose.txt:397:uil
+d\Microsoft\VC\v180\Microsoft.Cp
+> build_windows_verbose.txt:398:pCo
+mmon.targets(254,5): error MSB80
+  build_windows_verbose.txt:399:66:
+ Custom build for 'C:\works\mone
+  build_windows_verbose.txt:400:y_m
+emo\build\windows\x64\CMakeFiles
+  build_windows_verbose.txt:401:\e0
+4a23a601f27b8cf21bcca9328da9a7\f
+  build_windows_verbose.txt:402:lut
+ter_windows.dll.rule;C:\works\mo
+  build_windows_verbose.txt:403:ney
+_memo\build\windows\x64\CMakeFil
+
+

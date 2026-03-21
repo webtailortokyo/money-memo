@@ -66,6 +66,19 @@ class AppStrings {
     '祝・{days}日！\nコツコツ続ける天才だね。これからも一緒に！',
     'もう{days}日だね！\n記録が当たり前になってて素晴らしいよ！',
   ];
+
+  // settings_page.dart
+  static const String settingsTitle = '設定';
+  static const String titleSetting = 'メイン画面のタイトル';
+  static const String dataManagementTitle = 'データ管理';
+  static const String resetAllData = '初期化';
+  static const String resetAllDataSubtitle = 'すべての記録と達成記録を消去します';
+  static const String resetConfirmTitle = 'すべてリセットしますか？';
+  static const String resetConfirmContent = 'すべての記録を削除し、1日目からやり直します。この操作は取り消せません。';
+  static const String resetSuccess = 'すべてリセットしました';
+  static const String appInfoTitle = 'アプリについて';
+  static const String versionLabel = 'バージョン';
+  static const String appVersion = '1.0.0'; // ここでバージョン管理
 }
 
 // アプリ全体で使う共通の数値
@@ -104,6 +117,11 @@ class AppNumbers {
 // HiveのBox名
 class HiveConstants {
   static const String moneyBoxName = 'moneyBox';
+  static const String settingsBoxName = 'settingsBox';
+  static const String statsBoxName = 'statsBox';
+
+  // Settings keys
+  static const String keyAppTitle = 'appTitle';
 }
 
 // MoneyEntryのtypeを表す文字列 (これはmodels/money_entry.dartのextensionで使うことを想定)
