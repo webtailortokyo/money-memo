@@ -79,6 +79,12 @@ class AppStrings {
   static const String appInfoTitle = 'アプリについて';
   static const String versionLabel = 'バージョン';
   static const String appVersion = '1.0.0'; // ここでバージョン管理
+
+  // 通貨設定
+  static const String currencySettingTitle = '通貨の設定';
+  static const String currencyJpy = '日本円 (¥)';
+  static const String currencyUsd = '米ドル (\$)';
+  static const String currencyEur = 'ユーロ (€)';
 }
 
 // アプリ全体で使う共通の数値
@@ -122,6 +128,8 @@ class HiveConstants {
 
   // Settings keys
   static const String keyAppTitle = 'appTitle';
+  static const String keyCurrency = 'currency';
+  static const String keyDecimalDigits = 'decimalDigits';
 }
 
 // MoneyEntryのtypeを表す文字列 (これはmodels/money_entry.dartのextensionで使うことを想定)

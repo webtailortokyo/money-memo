@@ -8,6 +8,7 @@ import 'package:vibration/vibration.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'dart:async'; // Timerを使うためのimport
 
 import '../models/money_type.dart';
@@ -17,6 +18,7 @@ import '../constants.dart';
 import '../utils/input_formatter.dart';
 import '../widgets/piggy_character.dart';
 import '../utils/milestone_manager.dart';
+import '../app_state.dart';
 
 class InputPage extends StatefulWidget {
   final MoneyEntry? entry; // nullなら新規、あれば編集
@@ -51,7 +53,12 @@ class _InputPageState extends State<InputPage> {
     if (isEdit) {
       final entry = widget.entry!;
       memoController.text = entry.memo;
-      amountController.text = entry.amount.toString();
+      
+      // 保存時の通貨設定を使って初期値をフォーマット
+      final digits = entry.decimalDigits ?? decimalDigitsNotifier.value;
+      final formatter = NumberFormat.currency(symbol: '', decimalDigits: digits);
+      amountController.text = formatter.format(entry.amount);
+
       selectedType = MoneyType.values.firstWhere(
         (e) => e.name == entry.type,
       );
@@ -120,7 +127,7 @@ class _InputPageState extends State<InputPage> {
       return;
     }
 
-    final amount = selectedType == MoneyType.memo ? 0 : int.tryParse(cleanedAmount);
+    final amount = selectedType == MoneyType.memo ? 0.0 : double.tryParse(cleanedAmount);
     if (amount == null) return;
 
     final box = Hive.box<MoneyEntry>(HiveConstants.moneyBoxName);
@@ -130,6 +137,9 @@ class _InputPageState extends State<InputPage> {
       memo: memo,
       type: selectedType.name,
       date: selectedDate,
+      // 編集時は元の通貨情報を維持、新規は現在のグローバルを使用
+      currency: isEdit ? (widget.entry!.currency ?? currencyNotifier.value) : currencyNotifier.value,
+      decimalDigits: isEdit ? (widget.entry!.decimalDigits ?? decimalDigitsNotifier.value) : decimalDigitsNotifier.value,
     );
 
     if (isEdit) {
@@ -544,8 +554,9 @@ class _InputPageState extends State<InputPage> {
                   enabled: selectedType != MoneyType.memo,
                   keyboardType: TextInputType.number,
                   inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    ThousandsSeparatorInputFormatter(),
+                    ThousandsSeparatorInputFormatter(
+                      initialDecimalDigits: isEdit ? widget.entry!.decimalDigits : null,
+                    ),
                   ],
                   decoration: InputDecoration(
                     hintText: '0',
@@ -556,11 +567,17 @@ class _InputPageState extends State<InputPage> {
                     ),
                     prefix: Padding(
                       padding: const EdgeInsets.only(right: 4),
-                      child: Text(
-                        '¥',
-                        style: TextStyle(
-                          color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
-                        ),
+                      child: ValueListenableBuilder<String>(
+                        valueListenable: currencyNotifier,
+                        builder: (context, symbol, child) {
+                          final displaySymbol = isEdit ? (widget.entry!.currency ?? symbol) : symbol;
+                          return Text(
+                            displaySymbol,
+                            style: TextStyle(
+                              color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
+                            ),
+                          );
+                        },
                       ),
                     ),
                     border: InputBorder.none,

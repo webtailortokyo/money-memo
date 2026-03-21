@@ -1,12 +1,13 @@
 import 'package:hive/hive.dart';
-import 'package:intl/intl.dart'; // IntLパッケージをインポート
+import 'package:intl/intl.dart';
+import '../app_state.dart';
 
 part 'money_entry.g.dart';
 
 @HiveType(typeId: 0)
 class MoneyEntry extends HiveObject {
   @HiveField(0)
-  final int amount;
+  final double amount;
 
   @HiveField(1)
   final String memo;
@@ -21,28 +22,46 @@ class MoneyEntry extends HiveObject {
   @HiveField(4)
   final DateTime createdAt;
 
+  /// 🔽 追加：保存時の通貨記号
+  @HiveField(5)
+  final String? currency;
+
+  /// 🔽 追加：保存時の小数点桁数
+  @HiveField(6)
+  final int? decimalDigits;
+
   MoneyEntry({
-    required this.amount,
+    required num amount, // int/double 両方受け取れるように num に
     required this.memo,
     required this.type,
     required this.date,
     DateTime? createdAt,
-  }) : createdAt = createdAt ?? DateTime.now();
+    this.currency,
+    this.decimalDigits,
+  }) : amount = amount.toDouble(),
+       createdAt = createdAt ?? DateTime.now();
 
   /// 🔽 表示専用：＋ / − を付けた金額文字列
   String get displayAmount {
-    final formatter = NumberFormat('#,###'); // 桁区切りフォーマッタ
-    final formattedAmount = formatter.format(amount);
+    // レコード固有の情報を優先し、無ければグローバル（旧データ用）を参照
+    final digits = decimalDigits ?? decimalDigitsNotifier.value;
+    final symbol = currency ?? currencyNotifier.value;
+    
+    final formatter = NumberFormat.currency(
+      symbol: '', // 記号は手動で付けるため空に
+      decimalDigits: digits,
+    );
+    final formattedAmount = formatter.format(amount).trim();
 
     switch (type) {
       case 'decrease':
-        return '-¥$formattedAmount';
+        return '-$symbol$formattedAmount';
       case 'increase':
-        return '+¥$formattedAmount';
+        return '+$symbol$formattedAmount';
       case 'memo':
         return 'メモ';
       default:
-        return '¥$formattedAmount';
+        return '$symbol$formattedAmount';
     }
   }
 }

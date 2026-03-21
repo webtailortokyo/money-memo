@@ -18,10 +18,20 @@ void main() async {
   // 設定保存用のBoxを開く
   final settingsBox = await Hive.openBox(HiveConstants.settingsBoxName);
   
-  // 保存されているタイトルがあれば反映
+  // 保存されている設定を反映
   final savedTitle = settingsBox.get(HiveConstants.keyAppTitle, defaultValue: '') as String;
   if (savedTitle.isNotEmpty) {
     appTitleNotifier.value = savedTitle;
+  }
+
+  final savedCurrency = settingsBox.get(HiveConstants.keyCurrency) as String?;
+  if (savedCurrency != null) {
+    currencyNotifier.value = savedCurrency;
+  }
+
+  final savedDecimalDigits = settingsBox.get(HiveConstants.keyDecimalDigits) as int?;
+  if (savedDecimalDigits != null) {
+    decimalDigitsNotifier.value = savedDecimalDigits;
   }
 
   runApp(const MyApp());

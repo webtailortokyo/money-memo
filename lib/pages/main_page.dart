@@ -94,7 +94,7 @@ class _MainPageState extends State<MainPage> {
       return;
     }
 
-    final amount = selectedType == MoneyType.memo ? 0 : int.tryParse(cleanedAmount);
+    final amount = selectedType == MoneyType.memo ? 0.0 : double.tryParse(cleanedAmount);
     if (amount == null) return;
 
     final newEntry = MoneyEntry(
@@ -102,6 +102,8 @@ class _MainPageState extends State<MainPage> {
       memo: memo,
       type: selectedType.name,
       date: selectedDate,
+      currency: currencyNotifier.value,
+      decimalDigits: decimalDigitsNotifier.value,
     );
 
     box.add(newEntry);
@@ -350,10 +352,13 @@ class _MainPageState extends State<MainPage> {
               left: AppNumbers.defaultPadding,
               right: 4,
             ),
-            child: Text(
-              '¥',
-              style: TextStyle(
-                color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
+            child: ValueListenableBuilder<String>(
+              valueListenable: currencyNotifier,
+              builder: (context, symbol, child) => Text(
+                symbol,
+                style: TextStyle(
+                  color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
+                ),
               ),
             ),
           ),
@@ -364,7 +369,6 @@ class _MainPageState extends State<MainPage> {
               enabled: selectedType != MoneyType.memo,
               keyboardType: TextInputType.number,
               inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
                 ThousandsSeparatorInputFormatter(),
               ],
               decoration: const InputDecoration(
@@ -410,9 +414,10 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: AppNumbers.appBarElevation,
-        title: ValueListenableBuilder<String>(
-          valueListenable: appTitleNotifier,
-          builder: (context, title, child) {
+        title: ValueListenableBuilder2<String, String>(
+          valueListenable1: appTitleNotifier,
+          valueListenable2: currencyNotifier,
+          builder: (context, title, symbol, child) {
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [

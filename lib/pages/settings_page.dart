@@ -132,6 +132,43 @@ class _SettingsPageState extends State<SettingsPage> {
 
           const Divider(height: 32),
           
+          // 通貨設定
+          _SectionHeader(title: AppStrings.currencySettingTitle),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: ValueListenableBuilder2<String, int>(
+              valueListenable1: currencyNotifier,
+              valueListenable2: decimalDigitsNotifier,
+              builder: (context, symbol, digits, child) {
+                return SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: '¥', label: Text('JPY(¥)')),
+                    ButtonSegment(value: '\$', label: Text('USD(\$)')),
+                    ButtonSegment(value: '€', label: Text('EUR(€)')),
+                  ],
+                  selected: {symbol},
+                  onSelectionChanged: (Set<String> newSelection) {
+                    final newSymbol = newSelection.first;
+                    final newDigits = newSymbol == '¥' ? 0 : 2;
+                    
+                    currencyNotifier.value = newSymbol;
+                    decimalDigitsNotifier.value = newDigits;
+                    
+                    final box = Hive.box(HiveConstants.settingsBoxName);
+                    box.put(HiveConstants.keyCurrency, newSymbol);
+                    box.put(HiveConstants.keyDecimalDigits, newDigits);
+                  },
+                  showSelectedIcon: false,
+                  style: SegmentedButton.styleFrom(
+                    selectedBackgroundColor: AppColors.accent,
+                    selectedForegroundColor: Colors.white,
+                    side: const BorderSide(color: AppColors.accent),
+                  ),
+                );
+              },
+            ),
+          ),
+
           // データ管理
           _SectionHeader(title: AppStrings.dataManagementTitle),
           ListTile(

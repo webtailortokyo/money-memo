@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:money_memo/widgets/money_amount_text.dart';
 import '../constants.dart';
+import '../app_state.dart';
 
 class TotalAmountRow extends StatelessWidget {
     const TotalAmountRow({
@@ -14,10 +15,10 @@ class TotalAmountRow extends StatelessWidget {
     });
 
     final String label;
-    final int value;
+    final num value;
     final Color color;
 
-    final String Function(int) formatAmount;
+    final String Function(num) formatAmount;
 
     @override
     Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ class TotalAmountRow extends StatelessWidget {
         textBaseline: TextBaseline.alphabetic,
         children: [
             Text(
-                '¥',
+                currencyNotifier.value,
                 style: TextStyle(
                 color: color,
                 fontSize: AppNumbers.totalAmountSize,

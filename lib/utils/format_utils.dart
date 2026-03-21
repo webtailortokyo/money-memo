@@ -1,11 +1,15 @@
+import 'package:intl/intl.dart';
+import '../app_state.dart';
+
 String formatDate(DateTime d) {
-    return '${d.year}/${d.month}/${d.day}';
+  return '${d.year}/${d.month}/${d.day}';
 }
 
-String formatAmount(int value) {
-    final abs = value.abs();
-    return abs.toString().replaceAllMapped(
-    RegExp(r'(\d)(?=(\d{3})+$)'),
-    (m) => '${m[1]},',
-    );
+String formatAmount(num value) {
+  final decimalDigits = decimalDigitsNotifier.value;
+  final formatter = NumberFormat.currency(
+    symbol: '',
+    decimalDigits: decimalDigits,
+  );
+  return formatter.format(value.abs()).trim();
 }

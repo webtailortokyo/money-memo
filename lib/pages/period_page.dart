@@ -12,6 +12,7 @@ import '../widgets/total_amount_row.dart';
 import '../utils/format_utils.dart';
 import '../utils/sort_entries.dart';
 import '../constants.dart';
+import '../app_state.dart';
 import 'input_page.dart';
 
 enum PeriodViewMode { monthly, yearly }
@@ -124,8 +125,8 @@ class _PeriodPageState extends State<PeriodPage> {
             periodLabel = '${targetDate.year}年';
           }
 
-          int totalIncrease = 0;
-          int totalDecrease = 0;
+          double totalIncrease = 0;
+          double totalDecrease = 0;
 
           for (final e in filtered) {
             if (e.type == MoneyEntryTypes.increase) {
@@ -232,14 +233,14 @@ class _PeriodPageState extends State<PeriodPage> {
                         label: AppStrings.increaseTypeLabel,
                         value: totalIncrease,
                         color: AppColors.increaseAmount,
-                        formatAmount: formatAmount,
+                        formatAmount: (val) => formatAmount(val),
                       ),
                       const SizedBox(height: AppNumbers.smallSpacing),
                       TotalAmountRow(
                         label: AppStrings.decreaseTypeLabel,
                         value: totalDecrease,
                         color: AppColors.decreaseAmount,
-                        formatAmount: formatAmount,
+                        formatAmount: (val) => formatAmount(val),
                       ),
                     ],
                   ),
@@ -342,9 +343,9 @@ class _PeriodPageState extends State<PeriodPage> {
   }
 
   List<Widget> _buildYearlyMonthlyList(List<MoneyEntry> yearlyEntries) {
-    final Map<int, Map<String, int>> monthlySums = {};
+    final Map<int, Map<String, double>> monthlySums = {};
     for (int i = 1; i <= 12; i++) {
-      monthlySums[i] = {'increase': 0, 'decrease': 0};
+      monthlySums[i] = {'increase': 0.0, 'decrease': 0.0};
     }
 
     for (final e in yearlyEntries) {
@@ -385,7 +386,7 @@ class _PeriodPageState extends State<PeriodPage> {
     }).toList();
   }
 
-  Future<void> _shareRecord(String periodLabel, List<MoneyEntry> filtered, int totalIncrease, int totalDecrease) async {
+  Future<void> _shareRecord(String periodLabel, List<MoneyEntry> filtered, double totalIncrease, double totalDecrease) async {
     if (filtered.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('記録がない期間は共有できません')));
       return;
@@ -393,8 +394,8 @@ class _PeriodPageState extends State<PeriodPage> {
 
     final text = StringBuffer()..writeln('$periodLabel の記録\n');
     text.writeln(AppStrings.totalSectionTitle);
-    text.writeln('${AppStrings.increaseTypeLabel}\t$totalIncrease');
-    text.writeln('${AppStrings.decreaseTypeLabel}\t$totalDecrease');
+    text.writeln('${AppStrings.increaseTypeLabel}\t${formatAmount(totalIncrease)}');
+    text.writeln('${AppStrings.decreaseTypeLabel}\t${formatAmount(totalDecrease)}');
     text.writeln('');
 
     if (viewMode == PeriodViewMode.monthly) {
@@ -408,7 +409,7 @@ class _PeriodPageState extends State<PeriodPage> {
     } else {
       text.writeln('月別集計');
       text.writeln('月\t${AppStrings.increaseTypeLabel}\t${AppStrings.decreaseTypeLabel}');
-      final Map<int, Map<String, int>> monthlySums = {};
+      final Map<int, Map<String, double>> monthlySums = {};
       for (final e in filtered) {
         monthlySums.putIfAbsent(e.date.month, () => {'in': 0, 'out': 0});
         if (e.type == MoneyEntryTypes.increase) {
@@ -419,7 +420,7 @@ class _PeriodPageState extends State<PeriodPage> {
       }
       final sortedMonths = monthlySums.keys.toList()..sort();
       for (final m in sortedMonths) {
-        text.writeln('${m}月\t${monthlySums[m]!['in']}\t${monthlySums[m]!['out']}');
+        text.writeln('${m}月\t${formatAmount(monthlySums[m]!['in']!)}\t${formatAmount(monthlySums[m]!['out']!)}');
       }
     }
 
