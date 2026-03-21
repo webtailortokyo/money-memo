@@ -118,11 +118,16 @@ class _MainPageState extends State<MainPage> {
 
     try {
       final feedbackType = selectedType == MoneyType.memo ? MoneyType.memo : (newEntry.type == MoneyType.increase.name ? MoneyType.increase : MoneyType.decrease);
-      await _playFeedback(feedbackType);
       
-      // 保存完了後にマイルストーン判定を行う
+      // 先にマイルストーン判定を行う
+      bool milestoneShown = false;
       if (context.mounted) {
-        await MilestoneManager.checkAndShow(context);
+        milestoneShown = await MilestoneManager.checkAndShow(context);
+      }
+
+      // マイルストーンが表示されなかった場合のみ、通常のフィードバックを再生
+      if (!milestoneShown) {
+        await _playFeedback(feedbackType);
       }
     } catch (e) {
       log('Feedback error: $e');

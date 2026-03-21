@@ -11,7 +11,7 @@ class MilestoneManager {
   static const String _keyLastDays = 'lastShownDaysMilestone';
 
   /// 記録保存直後に呼び出し、必要ならお祝いを表示する
-  static Future<void> checkAndShow(BuildContext context) async {
+  static Future<bool> checkAndShow(BuildContext context) async {
     final moneyBox = Hive.box<MoneyEntry>(HiveConstants.moneyBoxName);
     final statsBox = Hive.box(HiveConstants.statsBoxName);
 
@@ -28,9 +28,9 @@ class MilestoneManager {
 
     // 3. マイルストーン判定（日数を優先し、表示した場合は回数の方を次回に回す）
     final dayShown = await _checkDaysMilestone(context, uniqueDays, lastDays, statsBox);
-    if (dayShown || !context.mounted) return;
+    if (dayShown || !context.mounted) return dayShown;
 
-    await _checkCountMilestone(context, totalCount, lastCount, statsBox);
+    return await _checkCountMilestone(context, totalCount, lastCount, statsBox);
   }
 
   static Future<bool> _checkCountMilestone(
