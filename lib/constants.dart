@@ -45,6 +45,8 @@ class AppStrings {
       'detailSectionTitle': '内訳',
       'increaseTypeLabel': '増えた',
       'decreaseTypeLabel': '減った',
+      'shareIncreaseLabel': '増えた：',
+      'shareDecreaseLabel': '減った：',
       'memoTypeLabel': 'メモのみ',
       'clipboardHeader': '日付\t内容\t種別\t金額',
       'clipboardNote': '※タブ区切りテキスト形式のため、Excel等の表計算ソフトへの貼り付けが可能です\n',
@@ -111,9 +113,11 @@ class AppStrings {
       'toLabel': 'To',
       'copyButtonText': 'Share records',
       'totalSectionTitle': 'Total',
-      'detailSectionTitle': 'Breakdown',
+      'detailSectionTitle': 'Details',
       'increaseTypeLabel': 'Income',
       'decreaseTypeLabel': 'Expense',
+      'shareIncreaseLabel': 'Income: ',
+      'shareDecreaseLabel': 'Expense: ',
       'memoTypeLabel': 'Memo',
       'clipboardHeader': 'Date\tContent\tType\tAmount',
       'clipboardNote': '*Tab-separated text format, suitable for spreadsheets like Excel.\n',
@@ -211,6 +215,8 @@ class AppStrings {
   static String get detailSectionTitle => _get('detailSectionTitle');
   static String get increaseTypeLabel => _get('increaseTypeLabel');
   static String get decreaseTypeLabel => _get('decreaseTypeLabel');
+  static String get shareIncreaseLabel => _get('shareIncreaseLabel');
+  static String get shareDecreaseLabel => _get('shareDecreaseLabel');
   static String get memoTypeLabel => _get('memoTypeLabel');
   static String get clipboardHeader => _get('clipboardHeader');
   static String get clipboardNote => _get('clipboardNote');

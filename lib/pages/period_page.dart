@@ -454,37 +454,69 @@ class _PeriodPageState extends State<PeriodPage> {
     }).toList();
   }
 
+  String _getCurrencyCode(String symbol) {
+    switch (symbol) {
+      case '¥': return 'JPY';
+      case '\$': return 'USD';
+      case '€': return 'EUR';
+      default: return symbol;
+    }
+  }
+
   Future<void> _shareRecord(String periodLabel, List<MoneyEntry> filtered, Map<String, CurrencySummary> totals) async {
     if (filtered.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppStrings.shareNoRecordError)));
       return;
     }
 
-    final text = StringBuffer()..writeln('$periodLabel ${AppStrings.shareMessage}\n');
-    text.writeln(AppStrings.totalSectionTitle);
-    
-    for (final summary in _sortSummaries(totals.values)) {
-      final inc = formatAmount(summary.increase, decimalDigits: summary.decimalDigits);
-      final dec = formatAmount(summary.decrease, decimalDigits: summary.decimalDigits);
-      text.writeln('${AppStrings.increaseTypeLabel}\t${summary.symbol}$inc');
-      text.writeln('${AppStrings.decreaseTypeLabel}\t${summary.symbol}$dec');
+    final isEn = languageNotifier.value == 'en';
+    final text = StringBuffer();
+
+    // タイトル
+    if (viewMode == PeriodViewMode.monthly) {
+      if (isEn) {
+        text.writeln(DateFormat.yMMMM('en_US').format(targetDate));
+      } else {
+        text.writeln('${targetDate.year}${AppStrings.yearLabel}${targetDate.month}${AppStrings.monthLabel}${AppStrings.shareMessage}');
+      }
+    } else {
+      if (isEn) {
+        text.writeln(targetDate.year.toString());
+      } else {
+        text.writeln('${targetDate.year}${AppStrings.yearLabel}${AppStrings.shareMessage}');
+      }
     }
     text.writeln('');
 
+    // 合計セクション
+    text.writeln(AppStrings.totalSectionTitle);
+    
+    final sortedSummaries = _sortSummaries(totals.values);
+    for (final summary in sortedSummaries) {
+      text.writeln(_getCurrencyCode(summary.symbol));
+      final inc = formatAmount(summary.increase, decimalDigits: summary.decimalDigits);
+      final dec = formatAmount(summary.decrease, decimalDigits: summary.decimalDigits);
+      text.writeln('${AppStrings.shareIncreaseLabel}${summary.symbol}$inc');
+      text.writeln('${AppStrings.shareDecreaseLabel}${summary.symbol}$dec');
+      text.writeln('');
+    }
+
+    // 内訳 / 月別セクション
     if (viewMode == PeriodViewMode.monthly) {
       text.writeln(AppStrings.detailSectionTitle);
-      text.writeln(AppStrings.clipboardHeader);
       for (final e in filtered) {
-        final label = e.type == MoneyEntryTypes.increase ? AppStrings.increaseTypeLabel : AppStrings.decreaseTypeLabel;
+        if (e.type == MoneyEntryTypes.memo) {
+          text.writeln('${formatDate(e.date)} ${e.memo}');
+          continue;
+        }
         final sym = e.currency ?? '¥';
         final digits = e.decimalDigits ?? 0;
         final amountText = formatAmount(e.amount, decimalDigits: digits);
         final signedAmount = e.type == MoneyEntryTypes.increase ? '+$sym$amountText' : '-$sym$amountText';
-        text.writeln('${formatDate(e.date)}\t${e.memo}\t$label\t$signedAmount');
+        text.writeln('${formatDate(e.date)} ${e.memo}  $signedAmount');
       }
     } else {
       text.writeln(AppStrings.monthlySummaryTitle);
-      text.writeln('${AppStrings.monthHeader}\t${AppStrings.increaseTypeLabel}\t${AppStrings.decreaseTypeLabel}');
       
       final Map<int, Map<String, CurrencySummary>> monthlyCurrencySums = {};
       for (final e in filtered) {
@@ -496,7 +528,7 @@ class _PeriodPageState extends State<PeriodPage> {
         
         if (e.type == MoneyEntryTypes.increase) {
           monthlyCurrencySums[e.date.month]![key]!.increase += e.amount;
-        } else {
+        } else if (e.type == MoneyEntryTypes.decrease) {
           monthlyCurrencySums[e.date.month]![key]!.decrease += e.amount;
         }
       }
@@ -504,17 +536,23 @@ class _PeriodPageState extends State<PeriodPage> {
       final sortedMonths = monthlyCurrencySums.keys.toList()..sort();
       for (final m in sortedMonths) {
         final summaries = _sortSummaries(monthlyCurrencySums[m]!.values);
+        final monthName = _formatMonth(m);
         for (final s in summaries) {
           final inc = formatAmount(s.increase, decimalDigits: s.decimalDigits);
           final dec = formatAmount(s.decrease, decimalDigits: s.decimalDigits);
-          text.writeln('${_formatMonth(m)}\t${s.symbol}$inc\t${s.symbol}$dec');
+          
+          if (s.increase > 0 && s.decrease > 0) {
+            text.writeln('$monthName +${s.symbol}$inc / -${s.symbol}$dec');
+          } else if (s.increase > 0) {
+            text.writeln('$monthName +${s.symbol}$inc');
+          } else if (s.decrease > 0) {
+            text.writeln('$monthName -${s.symbol}$dec');
+          }
         }
       }
     }
-
-    text.writeln('\n${AppStrings.clipboardNote}');
     
     // OS標準の共有ダイアログを表示
-    await Share.share(text.toString());
+    await Share.share(text.toString().trim());
   }
 }
