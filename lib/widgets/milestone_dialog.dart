@@ -1,4 +1,4 @@
-﻿import 'dart:math';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../widgets/piggy_character.dart';
@@ -7,10 +7,10 @@ import '../constants.dart';
 
 enum MilestoneAnimationType {
   none,
-  spin,    // 蝗櫁ｻ｢縺励※逋ｻ蝣ｴ
-  slide,   // 讓ｪ縺九ｉ繧ｹ繝ｩ繧､繝・
-  bounce,  // 縺ｴ繧・ｓ縺ｴ繧・ｓ霍ｳ縺ｭ繧・
-  dance,   // 繝昴・繧ｺ繧呈ｬ｡縲・↓蛻・ｊ譖ｿ縺医ｋ
+  spin,    // 回転して登場
+  slide,   // 横からスライド
+  bounce,  // ぴょんぴょん跳ねる
+  dance,   // ポーズを次々に切り替える
 }
 
 class MilestoneDialog extends StatefulWidget {
@@ -34,7 +34,6 @@ class MilestoneDialog extends StatefulWidget {
   @override
   State<MilestoneDialog> createState() => _MilestoneDialogState();
 
-  // 陦ｨ遉ｺ逕ｨ static 繝｡繧ｽ繝・ラ
   static Future<void> show(
     BuildContext context, {
     required String message,
@@ -44,7 +43,6 @@ class MilestoneDialog extends StatefulWidget {
     String lottieAsset = 'assets/lottie/confetti.json',
     MilestoneAnimationType? animationType,
   }) {
-    // 繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ繧ｿ繧､繝励′謖・ｮ壹＆繧後※縺・↑縺・ｴ蜷医・繝ｩ繝ｳ繝繝縺ｫ驕ｸ謚橸ｼ・one莉･螟厄ｼ・
     final types = MilestoneAnimationType.values.where((t) => t != MilestoneAnimationType.none).toList();
     final selectedType = animationType ?? types[Random().nextInt(types.length)];
 
@@ -52,8 +50,8 @@ class MilestoneDialog extends StatefulWidget {
       context: context,
       barrierDismissible: false,
       barrierLabel: '',
-      barrierColor: Colors.black54,
-      transitionDuration: const Duration(milliseconds: 400),
+      barrierColor: const Color(0xFFFFFBF0), // 完全に不透明なクリーム色の背景
+      transitionDuration: const Duration(milliseconds: 600),
       pageBuilder: (context, anim1, anim2) => MilestoneDialog(
         message: message,
         pose: pose,
@@ -63,26 +61,24 @@ class MilestoneDialog extends StatefulWidget {
         animationType: selectedType,
       ),
       transitionBuilder: (context, anim1, anim2, child) {
-        return ScaleTransition(
-          scale: CurvedAnimation(
-            parent: anim1,
-            curve: Curves.easeOutBack,
-          ),
-          child: FadeTransition(
-            opacity: anim1,
-            child: child,
-          ),
+        return FadeTransition(
+          opacity: anim1,
+          child: child,
         );
       },
     );
   }
 }
 
-class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _mainAnimation;
+class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderStateMixin {
+  late AnimationController _entranceController;
+  late AnimationController _idleController;
+  
+  late Animation<double> _scaleAnimation;
   late Animation<double> _rotationAnimation;
   late Animation<Offset> _slideAnimation;
+  late Animation<double> _idleFloatAnimation;
+  late Animation<double> _idleTiltAnimation;
 
   PiggyPose _currentPose = PiggyPose.joy;
 
@@ -91,18 +87,50 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
     super.initState();
     _currentPose = widget.pose;
     
-    _controller = AnimationController(
+    // 登場アニメーション用コントローラー
+    _entranceController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1200),
     );
 
-    _mainAnimation = CurvedAnimation(parent: _controller, curve: Curves.elasticOut);
-    _rotationAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(_mainAnimation);
-    _slideAnimation = Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero).animate(_mainAnimation);
+    _scaleAnimation = CurvedAnimation(
+      parent: _entranceController,
+      curve: Curves.elasticOut,
+    );
 
-    _controller.forward();
+    // スピン登場：2回転しながら登場
+    _rotationAnimation = Tween<double>(begin: -4 * pi, end: 0).animate(
+      CurvedAnimation(parent: _entranceController, curve: Curves.easeOutBack),
+    );
 
-    // dance繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ縺ｮ蝣ｴ蜷医・繝昴・繧ｺ繧貞・繧頑崛縺医ｋ
+    _slideAnimation = Tween<Offset>(begin: const Offset(-2, 0), end: Offset.zero).animate(
+      CurvedAnimation(parent: _entranceController, curve: Curves.easeOutBack),
+    );
+
+    // アイドルアニメーション用コントローラー（継続的な動き）
+    _idleController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
+
+    _idleFloatAnimation = Tween<double>(begin: 0, end: -10).animate(
+      CurvedAnimation(
+        parent: _idleController,
+        curve: const Interval(0, 0.5, curve: Curves.easeInOutSine),
+      ),
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) _idleController.reverse();
+        else if (status == AnimationStatus.dismissed) _idleController.forward();
+      });
+
+    _idleTiltAnimation = Tween<double>(begin: -0.05, end: 0.05).animate(
+      CurvedAnimation(parent: _idleController, curve: Curves.easeInOutSine),
+    );
+
+    _entranceController.forward().then((_) {
+      _idleController.forward();
+    });
+
     if (widget.animationType == MilestoneAnimationType.dance) {
       _startDance();
     }
@@ -112,101 +140,116 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
     final poses = [PiggyPose.basic, PiggyPose.joy, PiggyPose.think];
     int count = 0;
     while (mounted && count < 6) {
-      await Future.delayed(const Duration(milliseconds: 300));
+      await Future.delayed(const Duration(milliseconds: 400));
       if (!mounted) return;
       setState(() {
         _currentPose = poses[count % poses.length];
       });
       count++;
     }
-    // 譛蠕後・蜈・・繝昴・繧ｺ縺ｫ謌ｻ縺・
     if (mounted) setState(() => _currentPose = widget.pose);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _entranceController.dispose();
+    _idleController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final dialogWidth = screenWidth * 0.85 > 400.0 ? 400.0 : screenWidth * 0.85;
 
-    return Dialog(
+    return Scaffold(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Stack(
-        alignment: Alignment.center,
-        clipBehavior: Clip.none,
+      body: Stack(
         children: [
-          // 閭梧勹縺ｮ逋ｽ縺・き繝ｼ繝・
-          Container(
-            width: dialogWidth,
-            padding: const EdgeInsets.fromLTRB(24, 140, 24, 24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 20,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  widget.message,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: context.appColors.mainText,
-                    height: 1.5,
-                  ),
-                ),
-                SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: context.appColors.accent,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    AppStrings.closeButtonText,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Lottie繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ・亥燕髱｢・・
-          Positioned(
-            top: -120,
+          // 背面のLottie演出
+          Center(
             child: IgnorePointer(
               child: Lottie.asset(
                 widget.lottieAsset,
-                width: dialogWidth * 1.3,
+                width: screenWidth,
                 repeat: true,
               ),
             ),
           ),
-
-          // 繧ｭ繝｣繝ｩ繧ｯ繧ｿ繝ｼ・井ｸ企擇・・
-          Positioned(
-            top: -130,
-            child: IgnorePointer(
-              child: _buildAnimatedCharacter(),
+          
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 1. ぶたさん（揺れる）
+                AnimatedBuilder(
+                  animation: _idleController,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, _idleFloatAnimation.value),
+                      child: Transform.rotate(
+                        angle: _idleTiltAnimation.value,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: _buildAnimatedCharacter(),
+                ),
+                
+                // 2. メッセージボックス（四角・固定）
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 15,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.message,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: context.appColors.mainText,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: context.appColors.accent,
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size(140, 48),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              elevation: 4,
+                            ),
+                            child: Text(
+                              AppStrings.closeButtonText,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -226,11 +269,11 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
     switch (widget.animationType) {
       case MilestoneAnimationType.spin:
         return AnimatedBuilder(
-          animation: _controller,
+          animation: _entranceController,
           builder: (context, child) => Transform.rotate(
             angle: _rotationAnimation.value,
             child: Transform.scale(
-              scale: _mainAnimation.value,
+              scale: _scaleAnimation.value,
               child: child,
             ),
           ),
@@ -243,9 +286,9 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
         );
       case MilestoneAnimationType.bounce:
         return AnimatedBuilder(
-          animation: _controller,
+          animation: _entranceController,
           builder: (context, child) {
-            final double bounce = sin(_controller.value * pi * 4) * 20; // 2蝗槭ヰ繧ｦ繝ｳ繝・
+            final double bounce = sin(_entranceController.value * pi * 4) * 30;
             return Transform.translate(
               offset: Offset(0, bounce),
               child: child,
@@ -256,7 +299,11 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
       case MilestoneAnimationType.dance:
       case MilestoneAnimationType.none:
       default:
-        return character;
+        return ScaleTransition(
+          scale: _scaleAnimation,
+          child: character,
+        );
     }
   }
 }
+
