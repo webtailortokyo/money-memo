@@ -4,6 +4,7 @@ import '../constants.dart';
 import '../app_state.dart';
 import '../models/money_entry.dart';
 import '../theme.dart';
+import '../utils/csv_helper.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -269,8 +270,27 @@ class _SettingsPageState extends State<SettingsPage> {
             subtitle: Text(AppStrings.resetAllDataSubtitle),
             onTap: _resetAllData,
           ),
-
-
+          ListTile(
+            leading: Icon(Icons.file_download, color: context.appColors.accent),
+            title: Text(
+              'エクスポート (CSV)',
+              style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text('記録データを保存・共有します'),
+            onTap: () => CsvHelper.exportCsv(context),
+          ),
+          ListTile(
+            leading: Icon(Icons.file_upload, color: context.appColors.accent),
+            title: Text(
+              'インポート (CSV)',
+              style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text('保存したデータを読み込みます'),
+            onTap: () async {
+              await CsvHelper.importCsv(context);
+              setState(() {});
+            },
+          ),
           
           // 繧｢繝励Μ縺ｫ縺､縺・※
           _SectionHeader(title: AppStrings.appInfoTitle),
