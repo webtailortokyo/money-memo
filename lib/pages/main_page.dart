@@ -34,7 +34,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   late Box<MoneyEntry> box;
 
-  // 蜈･蜉帙お繝ｪ繧｢縺ｮ迥ｶ諷狗ｮ｡逅・
+  // 入力エリアの状態管理
   MoneyType selectedType = MoneyType.decrease;
   DateTime selectedDate = DateTime.now();
   final amountController = TextEditingController();
@@ -42,12 +42,29 @@ class _MainPageState extends State<MainPage> {
   final amountFocusNode = FocusNode();
   final memoFocusNode = FocusNode();
 
+  // 無限スクロール用の管理
+  final ScrollController _scrollController = ScrollController();
+  int _displayCount = 20;
+  static const int _increment = 20;
+
   @override
   void initState() {
     super.initState();
     box = Hive.box<MoneyEntry>(HiveConstants.moneyBoxName);
     amountFocusNode.addListener(() => setState(() {}));
     memoFocusNode.addListener(() => setState(() {}));
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      // 下端から200px以内に到達したら読み込み
+      if (_displayCount < box.length) {
+        setState(() {
+          _displayCount += _increment;
+        });
+      }
+    }
   }
 
   @override
@@ -56,6 +73,7 @@ class _MainPageState extends State<MainPage> {
     memoController.dispose();
     amountFocusNode.dispose();
     memoFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -477,6 +495,7 @@ class _MainPageState extends State<MainPage> {
 
       body: SafeArea(
         child: CustomScrollView(
+          controller: _scrollController,
           slivers: [
             // 蜈･蜉帙お繝ｪ繧｢
             SliverToBoxAdapter(
@@ -622,7 +641,8 @@ class _MainPageState extends State<MainPage> {
                   );
                 }
 
-                final entries = sortedEntries(box);
+                final allEntries = sortedEntries(box);
+                final entries = allEntries.take(_displayCount).toList();
 
                 return SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: AppNumbers.listViewHorizontalPadding),
@@ -674,9 +694,25 @@ class _MainPageState extends State<MainPage> {
                 );
               },
             ),
-            // 荳矩Κ縺ｮ菴咏區
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 80.0), // FAB縺ｨ驥阪↑繧峨↑縺・ｈ縺・↓菴咏區繧貞､壹ａ縺ｫ遒ｺ菫・
+            // 下部の余白と読み込みインジケータ
+            SliverToBoxAdapter(
+              child: ValueListenableBuilder(
+                valueListenable: box.listenable(),
+                builder: (context, Box<MoneyEntry> box, _) {
+                  if (_displayCount < box.length) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: context.appColors.accent.withOpacity(0.5),
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox(height: 80.0); // FABと重ならないように余白を多めに確保
+                },
+              ),
             ),
           ],
         ),
