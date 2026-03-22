@@ -1,7 +1,6 @@
 // lib/pages/period_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
@@ -79,9 +78,9 @@ class _PeriodPageState extends State<PeriodPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.appColors.background,
         elevation: AppNumbers.appBarElevation,
         centerTitle: false,
         titleSpacing: 0,
@@ -89,20 +88,20 @@ class _PeriodPageState extends State<PeriodPage> {
         leading: IconButton(
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
-          icon: const Icon(Icons.arrow_back_ios, color: AppColors.accent),
+          icon: Icon(Icons.arrow_back_ios, color: context.appColors.accent),
           onPressed: () => Navigator.pop(context),
         ),
 
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.history, color: AppColors.accent, size: 28),
+            Icon(Icons.history, color: context.appColors.accent, size: 28),
 
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text(
               AppStrings.periodPageTitle,
               style: TextStyle(
-                color: AppColors.accent,
+                color: context.appColors.accent,
                 fontWeight: FontWeight.bold,
                 fontSize: AppNumbers.subPageTitleFontSize,
               ),
@@ -110,7 +109,7 @@ class _PeriodPageState extends State<PeriodPage> {
           ],
         ),
 
-        iconTheme: const IconThemeData(color: AppColors.accent),
+        iconTheme: IconThemeData(color: context.appColors.accent),
       ),
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
@@ -145,7 +144,7 @@ class _PeriodPageState extends State<PeriodPage> {
 
           final Map<String, CurrencySummary> totals = {};
           for (final e in filtered) {
-            final sym = e.currency ?? '¥';
+            final sym = e.currency ?? 'ﾂ･';
             final digits = e.decimalDigits ?? 0;
             final key = '$sym-$digits';
             
@@ -162,21 +161,21 @@ class _PeriodPageState extends State<PeriodPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// 🔹 モード切替
+                /// 隼 繝｢繝ｼ繝牙・譖ｿ
                 Row(
                   children: [
                     _buildModeButton(PeriodViewMode.monthly, AppStrings.monthlySummaryTitle),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     _buildModeButton(PeriodViewMode.yearly, AppStrings.yearlySummaryTitle),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
 
-                /// 🔹 期間選択
+                /// 隼 譛滄俣驕ｸ謚・
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.appColors.inputBg,
                     borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
                     border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   ),
@@ -184,66 +183,66 @@ class _PeriodPageState extends State<PeriodPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.chevron_left, color: AppColors.accent, size: 32),
+                        icon: Icon(Icons.chevron_left, color: context.appColors.accent, size: 32),
                         onPressed: () => _changePeriod(-1),
                       ),
                       GestureDetector(
                         onTap: _pickPeriod,
                         child: Text(
                           periodLabel,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.mainText,
+                            color: context.appColors.mainText,
                           ),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.chevron_right, color: AppColors.accent, size: 32),
+                        icon: Icon(Icons.chevron_right, color: context.appColors.accent, size: 32),
                         onPressed: () => _changePeriod(1),
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: AppNumbers.largeSpacing),
+                SizedBox(height: AppNumbers.largeSpacing),
 
-                /// 🔹 コピーボタン
+                /// 隼 繧ｳ繝斐・繝懊ち繝ｳ
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     onPressed: () => _shareRecord(periodLabel, filtered, totals),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accent,
+                      backgroundColor: context.appColors.accent,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
                       ),
                     ),
-                    icon: const Icon(Icons.share, size: 20),
+                    icon: Icon(Icons.share, size: 20),
                     label: Text(AppStrings.copyButtonText),
                   ),
                 ),
 
-                const SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
+                SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
 
-                /// 🔹 合計
+                /// 隼 蜷郁ｨ・
                 Row(
                   children: [
-                    const Icon(Icons.analytics_rounded, color: AppColors.accent, size: 24),
-                    const SizedBox(width: 8),
+                    Icon(Icons.analytics_rounded, color: context.appColors.accent, size: 24),
+                    SizedBox(width: 8),
                     Text(
                       AppStrings.totalSectionTitle,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
                     ),
                   ],
                 ),
-                const SizedBox(height: AppNumbers.smallSpacing),
+                SizedBox(height: AppNumbers.smallSpacing),
                 Container(
                   padding: const EdgeInsets.all(AppNumbers.defaultPadding),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.appColors.inputBg,
                     borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
                     border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   ),
@@ -251,7 +250,7 @@ class _PeriodPageState extends State<PeriodPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (totals.isEmpty)
-                        const Center(child: Text('-'))
+                        Center(child: Text('-'))
                       else
                         ..._sortSummaries(totals.values).map((summary) => Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
@@ -261,15 +260,15 @@ class _PeriodPageState extends State<PeriodPage> {
                               TotalAmountRow(
                                 label: AppStrings.increaseTypeLabel,
                                 value: summary.increase,
-                                color: AppColors.increaseAmount,
+                                color: context.appColors.increaseAmount,
                                 symbol: summary.symbol,
                                 formatAmount: (val) => formatAmount(val, decimalDigits: summary.decimalDigits),
                               ),
-                              const SizedBox(height: 4),
+                              SizedBox(height: 4),
                               TotalAmountRow(
                                 label: AppStrings.decreaseTypeLabel,
                                 value: summary.decrease,
-                                color: AppColors.decreaseAmount,
+                                color: context.appColors.decreaseAmount,
                                 symbol: summary.symbol,
                                 formatAmount: (val) => formatAmount(val, decimalDigits: summary.decimalDigits),
                               ),
@@ -282,24 +281,24 @@ class _PeriodPageState extends State<PeriodPage> {
                   ),
                 ),
 
-                const SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
+                SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
 
-                /// 🔹 内訳 / 月別リスト
+                /// 隼 蜀・ｨｳ / 譛亥挨繝ｪ繧ｹ繝・
                 Row(
                   children: [
                     Icon(
                       viewMode == PeriodViewMode.monthly ? Icons.list_alt_rounded : Icons.calendar_month_rounded,
-                      color: AppColors.accent,
+                      color: context.appColors.accent,
                       size: 24,
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Text(
                       viewMode == PeriodViewMode.monthly ? AppStrings.detailSectionTitle : AppStrings.monthlySummaryTitle,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
                     ),
                   ],
                 ),
-                const SizedBox(height: AppNumbers.smallSpacing),
+                SizedBox(height: AppNumbers.smallSpacing),
                 if (filtered.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 32),
@@ -331,7 +330,7 @@ class _PeriodPageState extends State<PeriodPage> {
                                   onPressed: () => Navigator.pop(context, true),
                                   child: Text(
                                     AppStrings.deleteButtonText,
-                                    style: const TextStyle(color: Colors.red),
+                                    style: TextStyle(color: Colors.red),
                                   ),
                                 ),
                               ],
@@ -353,11 +352,11 @@ class _PeriodPageState extends State<PeriodPage> {
     );
   }
 
-  /// 🔽 追加：通貨の表示順序を定義（円 -> ドル -> ユーロ）
+  /// 反 霑ｽ蜉・夐夊ｲｨ縺ｮ陦ｨ遉ｺ鬆・ｺ上ｒ螳夂ｾｩ・亥・ -> 繝峨Ν -> 繝ｦ繝ｼ繝ｭ・・
   List<CurrencySummary> _sortSummaries(Iterable<CurrencySummary> summaries) {
     return summaries.toList()
       ..sort((a, b) {
-        final order = {'¥': 0, '\$': 1, '€': 2};
+        final order = {'ﾂ･': 0, '\$': 1, '竄ｬ': 2};
         final aOrder = order[a.symbol] ?? 99;
         final bOrder = order[b.symbol] ?? 99;
         return aOrder.compareTo(bOrder);
@@ -372,7 +371,7 @@ class _PeriodPageState extends State<PeriodPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.accent : Colors.white,
+            color: isSelected ? context.appColors.accent : context.appColors.inputBg,
             borderRadius: BorderRadius.circular(20),
             border: isSelected ? null : Border.all(color: Colors.grey.shade300, width: 1.5),
           ),
@@ -380,7 +379,7 @@ class _PeriodPageState extends State<PeriodPage> {
           child: Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : AppColors.mainText,
+              color: isSelected ? Colors.white : context.appColors.mainText,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -393,7 +392,7 @@ class _PeriodPageState extends State<PeriodPage> {
     if (languageNotifier.value == 'en') {
       return DateFormat.MMM('en_US').format(DateTime(2024, month));
     }
-    return '${month}${AppStrings.monthLabel}';
+    return '$month${AppStrings.monthLabel}';
   }
 
   List<Widget> _buildYearlyMonthlyList(List<MoneyEntry> yearlyEntries) {
@@ -403,7 +402,7 @@ class _PeriodPageState extends State<PeriodPage> {
     }
 
     for (final e in yearlyEntries) {
-      final sym = e.currency ?? '¥';
+      final sym = e.currency ?? 'ﾂ･';
       final digits = e.decimalDigits ?? 0;
       final key = '$sym-$digits';
       
@@ -426,13 +425,13 @@ class _PeriodPageState extends State<PeriodPage> {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.appColors.inputBg,
           borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
           border: Border.all(color: Colors.grey.shade300, width: 1.5),
         ),
         child: Row(
           children: [
-            Text(_formatMonth(month), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(_formatMonth(month), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const Spacer(),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -441,10 +440,10 @@ class _PeriodPageState extends State<PeriodPage> {
                 children: [
                   if (s.increase > 0)
                     Text('+${s.symbol}${formatAmount(s.increase, decimalDigits: s.decimalDigits)}', 
-                        style: const TextStyle(color: AppColors.increaseAmount, fontSize: 13)),
+                        style: TextStyle(color: context.appColors.increaseAmount, fontSize: 13)),
                   if (s.decrease > 0)
                     Text('-${s.symbol}${formatAmount(s.decrease, decimalDigits: s.decimalDigits)}', 
-                        style: const TextStyle(color: AppColors.decreaseAmount, fontSize: 13)),
+                        style: TextStyle(color: context.appColors.decreaseAmount, fontSize: 13)),
                 ],
               )).toList(),
             ),
@@ -456,9 +455,9 @@ class _PeriodPageState extends State<PeriodPage> {
 
   String _getCurrencyCode(String symbol) {
     switch (symbol) {
-      case '¥': return 'JPY';
+      case 'ﾂ･': return 'JPY';
       case '\$': return 'USD';
-      case '€': return 'EUR';
+      case '竄ｬ': return 'EUR';
       default: return symbol;
     }
   }
@@ -472,7 +471,7 @@ class _PeriodPageState extends State<PeriodPage> {
     final isEn = languageNotifier.value == 'en';
     final text = StringBuffer();
 
-    // タイトル
+    // 繧ｿ繧､繝医Ν
     if (viewMode == PeriodViewMode.monthly) {
       if (isEn) {
         text.writeln(DateFormat.yMMMM('en_US').format(targetDate));
@@ -488,7 +487,7 @@ class _PeriodPageState extends State<PeriodPage> {
     }
     text.writeln('');
 
-    // 合計セクション
+    // 蜷郁ｨ医そ繧ｯ繧ｷ繝ｧ繝ｳ
     text.writeln(AppStrings.totalSectionTitle);
     
     final sortedSummaries = _sortSummaries(totals.values);
@@ -501,7 +500,7 @@ class _PeriodPageState extends State<PeriodPage> {
       text.writeln('');
     }
 
-    // 内訳 / 月別セクション
+    // 蜀・ｨｳ / 譛亥挨繧ｻ繧ｯ繧ｷ繝ｧ繝ｳ
     if (viewMode == PeriodViewMode.monthly) {
       text.writeln(AppStrings.detailSectionTitle);
       for (final e in filtered) {
@@ -509,7 +508,7 @@ class _PeriodPageState extends State<PeriodPage> {
           text.writeln('${formatDate(e.date)} ${e.memo}');
           continue;
         }
-        final sym = e.currency ?? '¥';
+        final sym = e.currency ?? 'ﾂ･';
         final digits = e.decimalDigits ?? 0;
         final amountText = formatAmount(e.amount, decimalDigits: digits);
         final signedAmount = e.type == MoneyEntryTypes.increase ? '+$sym$amountText' : '-$sym$amountText';
@@ -520,7 +519,7 @@ class _PeriodPageState extends State<PeriodPage> {
       
       final Map<int, Map<String, CurrencySummary>> monthlyCurrencySums = {};
       for (final e in filtered) {
-        final sym = e.currency ?? '¥';
+        final sym = e.currency ?? 'ﾂ･';
         final digits = e.decimalDigits ?? 0;
         final key = '$sym-$digits';
         monthlyCurrencySums.putIfAbsent(e.date.month, () => {});
@@ -552,7 +551,7 @@ class _PeriodPageState extends State<PeriodPage> {
       }
     }
     
-    // OS標準の共有ダイアログを表示
+    // OS讓呎ｺ悶・蜈ｱ譛峨ム繧､繧｢繝ｭ繧ｰ繧定｡ｨ遉ｺ
     await Share.share(text.toString().trim());
   }
 }

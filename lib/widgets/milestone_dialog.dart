@@ -1,17 +1,16 @@
-import 'dart:math';
+﻿import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../widgets/piggy_character.dart';
 import '../theme.dart';
 import '../constants.dart';
 
 enum MilestoneAnimationType {
   none,
-  spin,    // 回転して登場
-  slide,   // 横からスライド
-  bounce,  // ぴょんぴょん跳ねる
-  dance,   // ポーズを次々に切り替える
+  spin,    // 蝗櫁ｻ｢縺励※逋ｻ蝣ｴ
+  slide,   // 讓ｪ縺九ｉ繧ｹ繝ｩ繧､繝・
+  bounce,  // 縺ｴ繧・ｓ縺ｴ繧・ｓ霍ｳ縺ｭ繧・
+  dance,   // 繝昴・繧ｺ繧呈ｬ｡縲・↓蛻・ｊ譖ｿ縺医ｋ
 }
 
 class MilestoneDialog extends StatefulWidget {
@@ -35,7 +34,7 @@ class MilestoneDialog extends StatefulWidget {
   @override
   State<MilestoneDialog> createState() => _MilestoneDialogState();
 
-  // 表示用 static メソッド
+  // 陦ｨ遉ｺ逕ｨ static 繝｡繧ｽ繝・ラ
   static Future<void> show(
     BuildContext context, {
     required String message,
@@ -45,7 +44,7 @@ class MilestoneDialog extends StatefulWidget {
     String lottieAsset = 'assets/lottie/confetti.json',
     MilestoneAnimationType? animationType,
   }) {
-    // アニメーションタイプが指定されていない場合はランダムに選択（none以外）
+    // 繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ繧ｿ繧､繝励′謖・ｮ壹＆繧後※縺・↑縺・ｴ蜷医・繝ｩ繝ｳ繝繝縺ｫ驕ｸ謚橸ｼ・one莉･螟厄ｼ・
     final types = MilestoneAnimationType.values.where((t) => t != MilestoneAnimationType.none).toList();
     final selectedType = animationType ?? types[Random().nextInt(types.length)];
 
@@ -103,7 +102,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
 
     _controller.forward();
 
-    // danceアニメーションの場合はポーズを切り替える
+    // dance繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ縺ｮ蝣ｴ蜷医・繝昴・繧ｺ繧貞・繧頑崛縺医ｋ
     if (widget.animationType == MilestoneAnimationType.dance) {
       _startDance();
     }
@@ -120,7 +119,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
       });
       count++;
     }
-    // 最後は元のポーズに戻す
+    // 譛蠕後・蜈・・繝昴・繧ｺ縺ｫ謌ｻ縺・
     if (mounted) setState(() => _currentPose = widget.pose);
   }
 
@@ -142,7 +141,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
         alignment: Alignment.center,
         clipBehavior: Clip.none,
         children: [
-          // 背景の白いカード
+          // 閭梧勹縺ｮ逋ｽ縺・き繝ｼ繝・
           Container(
             width: dialogWidth,
             padding: const EdgeInsets.fromLTRB(24, 140, 24, 24),
@@ -163,18 +162,18 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
                 Text(
                   widget.message,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.mainText,
+                    color: context.appColors.mainText,
                     height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: context.appColors.accent,
                     foregroundColor: Colors.white,
                     minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
@@ -184,14 +183,14 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
                   ),
                   child: Text(
                     AppStrings.closeButtonText,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
               ],
             ),
           ),
 
-          // Lottieアニメーション（前面）
+          // Lottie繧｢繝九Γ繝ｼ繧ｷ繝ｧ繝ｳ・亥燕髱｢・・
           Positioned(
             top: -120,
             child: IgnorePointer(
@@ -203,7 +202,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
             ),
           ),
 
-          // キャラクター（上面）
+          // 繧ｭ繝｣繝ｩ繧ｯ繧ｿ繝ｼ・井ｸ企擇・・
           Positioned(
             top: -130,
             child: IgnorePointer(
@@ -246,7 +245,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> with SingleTickerProv
         return AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
-            final double bounce = sin(_controller.value * pi * 4) * 20; // 2回バウンド
+            final double bounce = sin(_controller.value * pi * 4) * 20; // 2蝗槭ヰ繧ｦ繝ｳ繝・
             return Transform.translate(
               offset: Offset(0, bounce),
               child: child,

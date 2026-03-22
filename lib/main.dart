@@ -5,6 +5,7 @@ import 'models/money_entry.dart';
 import 'pages/main_page.dart';
 import 'app_state.dart';
 import 'constants.dart';
+import 'theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +40,11 @@ void main() async {
     languageNotifier.value = savedLanguage;
   }
 
+  final savedThemeMode = settingsBox.get(HiveConstants.keyThemeMode) as String?;
+  if (savedThemeMode != null) {
+    appThemeNotifier.value = savedThemeMode == 'dark' ? ThemeMode.dark : ThemeMode.light;
+  }
+
   // 言語が変わったとき、タイトルがデフォルト（空）なら AppStrings.appTitle に更新する
   languageNotifier.addListener(() {
     final box = Hive.box(HiveConstants.settingsBoxName);
@@ -56,18 +62,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder2<String, String>(
-      valueListenable1: appTitleNotifier,
-      valueListenable2: languageNotifier,
-      builder: (context, title, lang, child) {
-        return MaterialApp(
-          title: title,
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            useMaterial3: true,
-            fontFamily: 'Rounded Mplus 1c',
-          ),
-          home: MainPage(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: appThemeNotifier,
+      builder: (context, themeMode, _) {
+        return ValueListenableBuilder2<String, String>(
+          valueListenable1: appTitleNotifier,
+          valueListenable2: languageNotifier,
+          builder: (context, title, lang, child) {
+            return MaterialApp(
+              title: title,
+              debugShowCheckedModeBanner: false,
+              themeMode: themeMode,
+              theme: ThemeData(
+                useMaterial3: true,
+                fontFamily: 'Rounded Mplus 1c',
+                extensions: const [lightAppColors],
+              ),
+              darkTheme: ThemeData(
+                useMaterial3: true,
+                brightness: Brightness.dark,
+                fontFamily: 'Rounded Mplus 1c',
+                extensions: const [darkAppColors],
+              ),
+              home: MainPage(),
+            );
+          },
         );
       },
     );

@@ -41,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {});
   }
 
-  /// データとマイルストーン達成履歴をすべてリセット
+  /// 繝・・繧ｿ縺ｨ繝槭う繝ｫ繧ｹ繝医・繝ｳ驕疲・螻･豁ｴ繧偵☆縺ｹ縺ｦ繝ｪ繧ｻ繝・ヨ
   Future<void> _resetAllData() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -55,18 +55,18 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(AppStrings.deleteButtonText, style: const TextStyle(color: Colors.red)),
+            child: Text(AppStrings.deleteButtonText, style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
 
     if (confirm == true) {
-      // 記録データを削除
+      // 險倬鹸繝・・繧ｿ繧貞炎髯､
       final moneyBox = Hive.box<MoneyEntry>(HiveConstants.moneyBoxName);
       await moneyBox.clear();
       
-      // 統計情報（マイルストーン）もリセット
+      // 邨ｱ險域ュ蝣ｱ・医・繧､繝ｫ繧ｹ繝医・繝ｳ・峨ｂ繝ｪ繧ｻ繝・ヨ
       final statsBox = Hive.box(HiveConstants.statsBoxName);
       await statsBox.clear();
 
@@ -89,16 +89,22 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.appColors.background,
         elevation: 0,
+        leading: IconButton(
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          icon: Icon(Icons.arrow_back_ios, color: context.appColors.accent),
+          onPressed: () => Navigator.pop(context),
+        ),
         centerTitle: false,
-        titleSpacing: 40, // 以前の調整に合わせる
+        titleSpacing: 0,
         title: Text(
           AppStrings.settingsTitle,
-          style: const TextStyle(
-            color: AppColors.accent,
+          style: TextStyle(
+            color: context.appColors.accent,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -111,19 +117,21 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(
               controller: _titleController,
-              cursorColor: AppColors.accent,
+              cursorColor: context.appColors.accent,
               decoration: InputDecoration(
                 hintText: AppStrings.appTitle,
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).brightness == Brightness.dark 
+                    ? const Color(0xFF333333) 
+                    : Colors.white,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.accent.withOpacity(0.2)),
+                  borderSide: BorderSide(color: context.appColors.accent.withOpacity(0.2)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.accent, width: 2),
+                  borderSide: BorderSide(color: context.appColors.accent, width: 2),
                 ),
               ),
               onChanged: _updateTitle,
@@ -160,9 +168,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   showSelectedIcon: false,
                   style: SegmentedButton.styleFrom(
-                    selectedBackgroundColor: AppColors.accent,
+                    selectedBackgroundColor: context.appColors.accent,
                     selectedForegroundColor: Colors.white,
-                    side: const BorderSide(color: AppColors.accent),
+                    foregroundColor: context.appColors.accent,
+                    side: BorderSide(color: context.appColors.accent),
                   ),
                 );
               },
@@ -191,36 +200,85 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   showSelectedIcon: false,
                   style: SegmentedButton.styleFrom(
-                    selectedBackgroundColor: AppColors.accent,
+                    selectedBackgroundColor: context.appColors.accent,
                     selectedForegroundColor: Colors.white,
-                    side: const BorderSide(color: AppColors.accent),
+                    foregroundColor: context.appColors.accent,
+                    side: BorderSide(color: context.appColors.accent),
                   ),
                 );
               },
             ),
           ),
 
+          // テーマ設定
+          const _SectionHeader(title: 'テーマ'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: ValueListenableBuilder<ThemeMode>(
+              valueListenable: appThemeNotifier,
+              builder: (context, themeMode, _) {
+                return DropdownButtonFormField<ThemeMode>(
+                  value: themeMode,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: context.appColors.inputBg,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: context.appColors.accent, width: 2),
+                    ),
+                  ),
+                  dropdownColor: context.appColors.inputBg,
+                  items: const [
+                    DropdownMenuItem(
+                      value: ThemeMode.light,
+                      child: Text('ライトモード'),
+                    ),
+                    DropdownMenuItem(
+                      value: ThemeMode.dark,
+                      child: Text('ダークモード'),
+                    ),
+                  ],
+                  onChanged: (ThemeMode? newTheme) {
+                    if (newTheme != null) {
+                      appThemeNotifier.value = newTheme;
+                      Hive.box(HiveConstants.settingsBoxName).put(
+                          HiveConstants.keyThemeMode,
+                          newTheme == ThemeMode.dark ? 'dark' : 'light');
+                    }
+                  },
+                );
+              },
+            ),
+          ),
+          
+          const Divider(height: 32),
+
           // データ管理
           _SectionHeader(title: AppStrings.dataManagementTitle),
           ListTile(
-            leading: const Icon(Icons.refresh, color: AppColors.accent),
+            leading: Icon(Icons.refresh, color: context.appColors.accent),
             title: Text(
               AppStrings.resetAllData,
-              style: const TextStyle(color: AppColors.mainText, fontWeight: FontWeight.bold),
+              style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
             ),
             subtitle: Text(AppStrings.resetAllDataSubtitle),
             onTap: _resetAllData,
           ),
 
-          const Divider(height: 32),
+
           
-          // アプリについて
+          // 繧｢繝励Μ縺ｫ縺､縺・※
           _SectionHeader(title: AppStrings.appInfoTitle),
           ListTile(
             title: Text(AppStrings.versionLabel),
-            trailing: const Text(AppStrings.appVersion),
+            trailing: Text(AppStrings.appVersion),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32),
         ],
       ),
     );
@@ -237,8 +295,8 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
         title,
-        style: const TextStyle(
-          color: AppColors.accent,
+        style: TextStyle(
+          color: context.appColors.accent,
           fontWeight: FontWeight.bold,
           fontSize: 14,
         ),

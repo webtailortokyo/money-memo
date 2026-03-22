@@ -59,7 +59,7 @@ class AppStrings {
       'milestoneDay30': '通算30日の継続中！\n1ヶ月の記念だね、その調子！',
       'milestoneDay100': '通算100日の記録達成！\nもうプロの域だね、すばらしい！',
       'settingsTitle': '設定',
-      'titleSetting': 'メイン画面のタイトル',
+      'titleSetting': 'タイトル',
       'dataManagementTitle': 'データ管理',
       'resetAllData': '初期化',
       'resetAllDataSubtitle': 'すべての記録と達成記録を消去します',
@@ -130,7 +130,7 @@ class AppStrings {
       'milestoneDay30': '30 days persistence!\nA one-month anniversary, keep it up!',
       'milestoneDay100': 'Total 100 days!\nYou\'re a pro now, wonderful!',
       'settingsTitle': 'Settings',
-      'titleSetting': 'Main screen title',
+      'titleSetting': 'Title',
       'dataManagementTitle': 'Data Management',
       'resetAllData': 'Reset',
       'resetAllDataSubtitle': 'Erase all records and milestones',
@@ -303,6 +303,7 @@ class HiveConstants {
   static const String keyCurrency = 'currency';
   static const String keyDecimalDigits = 'decimalDigits';
   static const String keyLanguage = 'language';
+  static const String keyThemeMode = 'themeMode';
 }
 
 // MoneyEntryのtypeを表す文字列 (これはmodels/money_entry.dartのextensionで使うことを想定)

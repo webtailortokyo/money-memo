@@ -17,42 +17,42 @@ class MoneyEntryCard extends StatelessWidget {
     this.onLongPress,
   });
 
-  /// 種類ごとのメインカラー（左アクセントカラー）
-  Color _typeColor() {
+  /// 遞ｮ鬘槭＃縺ｨ縺ｮ繝｡繧､繝ｳ繧ｫ繝ｩ繝ｼ・亥ｷｦ繧｢繧ｯ繧ｻ繝ｳ繝医き繝ｩ繝ｼ・・
+  Color _typeColor(BuildContext context) {
     switch (entry.type) {
       case 'decrease':
-        return AppColors.decrease;
+        return context.appColors.decrease;
       case 'increase':
-        return AppColors.increase;
+        return context.appColors.increase;
       case 'memo':
-        return AppColors.memo;
+        return context.appColors.memo;
       default:
         return Colors.grey;
     }
   }
 
-  /// 種類ごとの背景色
-  Color _bgColor() {
+  /// 遞ｮ鬘槭＃縺ｨ縺ｮ閭梧勹濶ｲ
+  Color _bgColor(BuildContext context) {
     switch (entry.type) {
       case 'decrease':
-        return AppColors.decreaseBg;
+        return context.appColors.decreaseBg;
       case 'increase':
-        return AppColors.increaseBg;
+        return context.appColors.increaseBg;
 
       case 'memo':
-        return AppColors.memoBg;
+        return context.appColors.memoBg;
       default:
-        return AppColors.sectionBg;
+        return context.appColors.sectionBg;
     }
   }
 
-  /// 種類ごとの金額色
-  Color _amountColor() {
+  /// 遞ｮ鬘槭＃縺ｨ縺ｮ驥鷹｡崎牡
+  Color _amountColor(BuildContext context) {
     switch (entry.type) {
       case 'decrease':
-        return AppColors.decreaseAmount;
+        return context.appColors.decreaseAmount;
       case 'increase':
-        return AppColors.increaseAmount;
+        return context.appColors.increaseAmount;
 
       default:
         return Colors.grey;
@@ -63,9 +63,9 @@ class MoneyEntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _typeColor();
-    final bgColor = _bgColor();
-    final amountColor = _amountColor();
+    final color = _typeColor(context);
+    final bgColor = _bgColor(context);
+    final amountColor = _amountColor(context);
 
     return GestureDetector(
       onTap: onTap,
@@ -74,13 +74,13 @@ class MoneyEntryCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 6),
         child: Stack(
           children: [
-            /// 柔らかいシャドウ & 左のアクセント影
+            /// 譟斐ｉ縺九＞繧ｷ繝｣繝峨え & 蟾ｦ縺ｮ繧｢繧ｯ繧ｻ繝ｳ繝亥ｽｱ
             Container(
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
-                  // 通常のふわっとした影
+                  // 騾壼ｸｸ縺ｮ縺ｵ繧上▲縺ｨ縺励◆蠖ｱ
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
                     spreadRadius: 1,
@@ -88,7 +88,7 @@ class MoneyEntryCard extends StatelessWidget {
                     offset: const Offset(1, 2),
                   ),
 
-                  // ★ 左側だけにアクセント影
+                  // 笘・蟾ｦ蛛ｴ縺縺代↓繧｢繧ｯ繧ｻ繝ｳ繝亥ｽｱ
                   BoxShadow(
                     color: color,
                     spreadRadius: -1,
@@ -101,7 +101,7 @@ class MoneyEntryCard extends StatelessWidget {
                 constraints: const BoxConstraints(minHeight: 82),
                 child: Row(
                   children: [
-                    /// メイン内容
+                    /// 繝｡繧､繝ｳ蜀・ｮｹ
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -110,18 +110,18 @@ class MoneyEntryCard extends StatelessWidget {
                           children: [
                             Text(
                               entry.memo,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.mainText,
+                                color: context.appColors.mainText,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               dateLabel(entry.date),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.mainText,
+                                color: context.appColors.mainText,
                               ),
                             ),
                           ],
@@ -129,7 +129,7 @@ class MoneyEntryCard extends StatelessWidget {
                       ),
                     ),
 
-                    /// 金額 + 銀行アイコン
+                    /// 驥鷹｡・+ 驫陦後い繧､繧ｳ繝ｳ
                     Padding(
                       padding: const EdgeInsets.only(right: 16),
                       child: Row(
@@ -138,7 +138,7 @@ class MoneyEntryCard extends StatelessWidget {
                         children: [
 
 
-                          /// 金額
+                          /// 驥鷹｡・
                           MoneyAmountText(
                             text: entry.displayAmount,
                             color: amountColor,

@@ -1,7 +1,6 @@
 // lib/pages/main_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:developer';
 import 'dart:async';
@@ -35,7 +34,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   late Box<MoneyEntry> box;
 
-  // 入力エリアの状態管理
+  // 蜈･蜉帙お繝ｪ繧｢縺ｮ迥ｶ諷狗ｮ｡逅・
   MoneyType selectedType = MoneyType.decrease;
   DateTime selectedDate = DateTime.now();
   final amountController = TextEditingController();
@@ -78,7 +77,7 @@ class _MainPageState extends State<MainPage> {
   void _onTypeChanged(MoneyType type) {
     setState(() {
       selectedType = type;
-      // ユーザーの要望により、入力済みのメモは消さないようにする
+      // 繝ｦ繝ｼ繧ｶ繝ｼ縺ｮ隕∵悍縺ｫ繧医ｊ縲∝・蜉帶ｸ医∩縺ｮ繝｡繝｢縺ｯ豸医＆縺ｪ縺・ｈ縺・↓縺吶ｋ
       // memoController.clear(); 
     });
   }
@@ -109,7 +108,7 @@ class _MainPageState extends State<MainPage> {
 
     box.add(newEntry);
 
-    // 入力エリアをリセット
+    // 蜈･蜉帙お繝ｪ繧｢繧偵Μ繧ｻ繝・ヨ
     memoController.clear();
     amountController.clear();
     setState(() {
@@ -120,13 +119,13 @@ class _MainPageState extends State<MainPage> {
     try {
       final feedbackType = selectedType == MoneyType.memo ? MoneyType.memo : (newEntry.type == MoneyType.increase.name ? MoneyType.increase : MoneyType.decrease);
       
-      // 先にマイルストーン判定を行う
+      // 蜈医↓繝槭う繝ｫ繧ｹ繝医・繝ｳ蛻､螳壹ｒ陦後≧
       bool milestoneShown = false;
       if (context.mounted) {
         milestoneShown = await MilestoneManager.checkAndShow(context);
       }
 
-      // マイルストーンが表示されなかった場合のみ、通常のフィードバックを再生
+      // 繝槭う繝ｫ繧ｹ繝医・繝ｳ縺瑚｡ｨ遉ｺ縺輔ｌ縺ｪ縺九▲縺溷ｴ蜷医・縺ｿ縲・壼ｸｸ縺ｮ繝輔ぅ繝ｼ繝峨ヰ繝・け繧貞・逕・
       if (!milestoneShown) {
         await _playFeedback(feedbackType);
       }
@@ -188,7 +187,7 @@ class _MainPageState extends State<MainPage> {
             Future.delayed(Duration.zero, () {
                if (context.mounted) Navigator.of(context).pop();
             });
-            return const SizedBox();
+            return SizedBox();
           },
         );
 
@@ -273,15 +272,15 @@ class _MainPageState extends State<MainPage> {
     switch (type) {
       case MoneyType.increase:
         iconData = Icons.arrow_upward;
-        iconColor = AppColors.increaseAmount;
+        iconColor = context.appColors.increaseAmount;
         break;
       case MoneyType.decrease:
         iconData = Icons.arrow_downward;
-        iconColor = AppColors.decreaseAmount;
+        iconColor = context.appColors.decreaseAmount;
         break;
       case MoneyType.memo:
         iconData = Icons.edit_note;
-        iconColor = AppColors.memo;
+        iconColor = context.appColors.memo;
         break;
     }
 
@@ -292,11 +291,11 @@ class _MainPageState extends State<MainPage> {
         padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing, horizontal: AppNumbers.smallSpacing),
         decoration: BoxDecoration(
           color: type == MoneyType.decrease
-              ? AppColors.decreaseBg
+              ? context.appColors.decreaseBg
               : type == MoneyType.increase
-                  ? AppColors.increaseBg
+                  ? context.appColors.increaseBg
                   : type == MoneyType.memo
-                      ? AppColors.memoBg
+                      ? context.appColors.memoBg
                       : Colors.transparent,
           borderRadius: BorderRadius.circular(AppNumbers.typeButtonBorderRadius),
           border: selected
@@ -312,15 +311,15 @@ class _MainPageState extends State<MainPage> {
               color: iconColor,
               size: 28,
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               label,
-              maxLines: 1, // ボタンの中で改行されないようにする
-              overflow: TextOverflow.visible, // はみ出してもボタン自体を広げる
-              style: const TextStyle(
+              maxLines: 1, // 繝懊ち繝ｳ縺ｮ荳ｭ縺ｧ謾ｹ陦後＆繧後↑縺・ｈ縺・↓縺吶ｋ
+              overflow: TextOverflow.visible, // 縺ｯ縺ｿ蜃ｺ縺励※繧ゅ・繧ｿ繝ｳ閾ｪ菴薙ｒ蠎・￡繧・
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: AppColors.mainText,
-                fontSize: 12, // アイコンが入るため少し小さめに調整
+                color: context.appColors.mainText,
+                fontSize: 12, // 繧｢繧､繧ｳ繝ｳ縺悟・繧九◆繧∝ｰ代＠蟆上＆繧√↓隱ｿ謨ｴ
               ),
             ),
           ],
@@ -335,16 +334,18 @@ class _MainPageState extends State<MainPage> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: selectedType == MoneyType.memo ? Colors.grey.shade200 : Colors.white,
+        color: selectedType == MoneyType.memo 
+            ? context.appColors.memoBg 
+            : context.appColors.inputBg,
         borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
         border: Border.all(
-          color: amountFocusNode.hasFocus ? AppColors.accent : Colors.grey.shade300,
+          color: amountFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
           width: 1.5,
         ),
         boxShadow: amountFocusNode.hasFocus
             ? [
                 BoxShadow(
-                  color: AppColors.accent.withOpacity(0.3),
+                  color: context.appColors.accent.withOpacity(0.3),
                   blurRadius: 6,
                   spreadRadius: 0,
                 )
@@ -363,7 +364,7 @@ class _MainPageState extends State<MainPage> {
               builder: (context, symbol, child) => Text(
                 symbol,
                 style: TextStyle(
-                  color: selectedType == MoneyType.memo ? Colors.grey : AppColors.mainText,
+                  color: selectedType == MoneyType.memo ? Colors.grey : context.appColors.mainText,
                 ),
               ),
             ),
@@ -397,16 +398,16 @@ class _MainPageState extends State<MainPage> {
     return ElevatedButton.icon(
       onPressed: _save,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.accent,
+        backgroundColor: context.appColors.accent,
         foregroundColor: Colors.white,
         shape: const StadiumBorder(),
         padding: const EdgeInsets.only(left: 28, right: 44, top: 22, bottom: 22),
       ),
 
-      icon: const Icon(Icons.check_circle),
+      icon: Icon(Icons.check_circle),
       label: Text(
         AppStrings.recordButtonText,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -415,10 +416,10 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.appColors.background,
 
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: context.appColors.background,
         elevation: AppNumbers.appBarElevation,
         title: ValueListenableBuilder2<String, String>(
           valueListenable1: appTitleNotifier,
@@ -432,11 +433,11 @@ class _MainPageState extends State<MainPage> {
                   width: 28,
                   height: 28,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: AppColors.accent,
+                  style: TextStyle(
+                    color: context.appColors.accent,
                     fontWeight: FontWeight.bold,
                     fontSize: AppNumbers.titleFontSize,
                   ),
@@ -447,7 +448,7 @@ class _MainPageState extends State<MainPage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings, color: AppColors.accent),
+            icon: Icon(Icons.settings, color: context.appColors.accent),
             onPressed: () {
               Navigator.push(
                 context,
@@ -455,7 +456,7 @@ class _MainPageState extends State<MainPage> {
               );
             },
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -467,17 +468,17 @@ class _MainPageState extends State<MainPage> {
         },
         label: Text(
           AppStrings.periodPageTitle,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        icon: const Icon(Icons.history, color: Colors.white),
-        backgroundColor: AppColors.accent,
+        icon: Icon(Icons.history, color: Colors.white),
+        backgroundColor: context.appColors.accent,
         foregroundColor: Colors.white,
       ),
 
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // 入力エリア
+            // 蜈･蜉帙お繝ｪ繧｢
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -495,22 +496,22 @@ class _MainPageState extends State<MainPage> {
                           horizontal: AppNumbers.defaultPadding,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.appColors.inputBg,
                           borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
                           border: Border.all(color: Colors.grey.shade300, width: 1.5),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.calendar_today,
                               size: AppNumbers.calendarIconSize,
                             ),
-                            const SizedBox(width: AppNumbers.smallSpacing),
+                            SizedBox(width: AppNumbers.smallSpacing),
                             Text(
                               formatDate(selectedDate),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: AppNumbers.calendarFontSize,
-                                color: AppColors.mainText,
+                                color: context.appColors.mainText,
                               ),
                             ),
                           ],
@@ -518,7 +519,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ),
 
-                    const SizedBox(height: AppNumbers.smallSpacing),
+                    SizedBox(height: AppNumbers.smallSpacing),
 
                     LayoutBuilder(
                       builder: (context, constraints) {
@@ -527,11 +528,11 @@ class _MainPageState extends State<MainPage> {
                         if (isWide) {
                           return Row(
                             children: [
-                              Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, AppColors.increase)),
-                              const SizedBox(width: AppNumbers.smallSpacing),
-                              Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, AppColors.decrease)),
-                              const SizedBox(width: AppNumbers.smallSpacing),
-                              Expanded(child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, AppColors.memo)),
+                              Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
+                              SizedBox(width: AppNumbers.smallSpacing),
+                              Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
+                              SizedBox(width: AppNumbers.smallSpacing),
+                              Expanded(child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo)),
                             ],
                           );
                         } else {
@@ -539,15 +540,15 @@ class _MainPageState extends State<MainPage> {
                             children: [
                               Row(
                                 children: [
-                                  Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, AppColors.increase)),
-                                  const SizedBox(width: AppNumbers.smallSpacing),
-                                  Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, AppColors.decrease)),
+                                  Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
+                                  SizedBox(width: AppNumbers.smallSpacing),
+                                  Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
                                 ],
                               ),
-                              const SizedBox(height: AppNumbers.smallSpacing),
+                              SizedBox(height: AppNumbers.smallSpacing),
                               SizedBox(
                                 width: double.infinity,
-                                child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, AppColors.memo),
+                                child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo),
                               ),
                             ],
                           );
@@ -555,21 +556,21 @@ class _MainPageState extends State<MainPage> {
                       },
                     ),
 
-                    const SizedBox(height: AppNumbers.smallSpacing),
+                    SizedBox(height: AppNumbers.smallSpacing),
 
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: context.appColors.inputBg,
                         borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
                         border: Border.all(
-                          color: memoFocusNode.hasFocus ? AppColors.accent : Colors.grey.shade300,
+                          color: memoFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
                           width: 1.5,
                         ),
                         boxShadow: memoFocusNode.hasFocus
                             ? [
                                 BoxShadow(
-                                  color: AppColors.accent.withOpacity(0.3),
+                                  color: context.appColors.accent.withOpacity(0.3),
                                   blurRadius: 6,
                                   spreadRadius: 0,
                                 )
@@ -589,12 +590,12 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ),
 
-                    const SizedBox(height: AppNumbers.smallSpacing),
+                    SizedBox(height: AppNumbers.smallSpacing),
 
                     Column(
                       children: [
                         _amountTextField(),
-                        const SizedBox(height: AppNumbers.smallSpacing),
+                        SizedBox(height: AppNumbers.smallSpacing),
                         Align(
                           alignment: Alignment.center,
                           child: _recordButton(),
@@ -608,7 +609,7 @@ class _MainPageState extends State<MainPage> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-            // 記録リスト
+            // 險倬鹸繝ｪ繧ｹ繝・
             ValueListenableBuilder(
               valueListenable: box.listenable(),
               builder: (context, Box<MoneyEntry> box, _) {
@@ -654,7 +655,7 @@ class _MainPageState extends State<MainPage> {
                                     onPressed: () => Navigator.pop(context, true),
                                     child: Text(
                                       AppStrings.deleteButtonText,
-                                      style: const TextStyle(color: Colors.red),
+                                      style: TextStyle(color: Colors.red),
                                     ),
                                   ),
                                 ],
@@ -673,9 +674,9 @@ class _MainPageState extends State<MainPage> {
                 );
               },
             ),
-            // 下部の余白
+            // 荳矩Κ縺ｮ菴咏區
             const SliverToBoxAdapter(
-              child: SizedBox(height: 80.0), // FABと重ならないように余白を多めに確保
+              child: SizedBox(height: 80.0), // FAB縺ｨ驥阪↑繧峨↑縺・ｈ縺・↓菴咏區繧貞､壹ａ縺ｫ遒ｺ菫・
             ),
           ],
         ),
