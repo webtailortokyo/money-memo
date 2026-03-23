@@ -13,7 +13,6 @@ class MilestoneManager {
   // マイルストーン用のLottieアセットリスト
   static const List<String> _standardLottieAssets = [
     'assets/lottie/confetti.json',
-    'assets/lottie/cartoon_explosion.json',
     'assets/lottie/flying_rocket.json',
     'assets/lottie/light.json',
     'assets/lottie/lines_left_to_right.json',

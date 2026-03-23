@@ -124,6 +124,8 @@ class _MainPageState extends State<MainPage> {
 
     box.add(newEntry);
 
+    final feedbackType = selectedType == MoneyType.memo ? MoneyType.memo : (newEntry.type == MoneyType.increase.name ? MoneyType.increase : MoneyType.decrease);
+    
     // 蜈･蜉帙お繝ｪ繧｢繧偵Μ繧ｻ繝・ヨ
     memoController.clear();
     amountController.clear();
@@ -133,8 +135,6 @@ class _MainPageState extends State<MainPage> {
     });
 
     try {
-      final feedbackType = selectedType == MoneyType.memo ? MoneyType.memo : (newEntry.type == MoneyType.increase.name ? MoneyType.increase : MoneyType.decrease);
-      
       // 蜈医↓繝槭う繝ｫ繧ｹ繝医・繝ｳ蛻､螳壹ｒ陦後≧
       bool milestoneShown = false;
       if (context.mounted) {
@@ -167,8 +167,8 @@ class _MainPageState extends State<MainPage> {
         vibrationDuration = 500;
         break;
       case MoneyType.memo:
-        soundFile = 'sounds/increase.mp3';
-        lottieFile = 'assets/lottie/increase.json';
+        soundFile = 'sounds/pen_writing.mp3';
+        lottieFile = 'assets/lottie/sparkle_stars.json';
         vibrationDuration = 200;
         break;
     }
@@ -189,8 +189,8 @@ class _MainPageState extends State<MainPage> {
 
         final lottieWidget = Lottie.asset(
           lottieFile,
-          width: type == MoneyType.increase ? size * 1.5 : size,
-          height: type == MoneyType.increase ? size * 1.5 : size,
+          width: (type == MoneyType.increase || type == MoneyType.memo) ? size * 1.5 : size,
+          height: (type == MoneyType.increase || type == MoneyType.memo) ? size * 1.5 : size,
           repeat: false,
           onLoaded: (composition) {
             Future.delayed(composition.duration * 1.2, () {
@@ -207,36 +207,47 @@ class _MainPageState extends State<MainPage> {
           },
         );
 
-        final imageWidget = TweenAnimationBuilder<double>(
-          tween: Tween<double>(begin: screenHeight, end: 0),
-          duration: const Duration(milliseconds: 720),
-          curve: Curves.easeOutBack,
-          builder: (context, value, child) {
-            return Transform.translate(
-              offset: Offset(0, value),
-              child: child,
-            );
-          },
-          child: type == MoneyType.increase
-              ? Padding(
-                  padding: const EdgeInsets.only(top: 150),
-                  child: SvgPicture.asset(
-                    'assets/img/piggy_bank.svg',
+        Widget imageWidget;
+        if (type == MoneyType.memo) {
+          // 「メモのみ」の場合は執筆中のLottieを表示
+          imageWidget = Lottie.asset(
+            'assets/lottie/writing.json',
+            width: size * 1.2,
+            height: size * 1.2,
+            repeat: true,
+          );
+        } else {
+          imageWidget = TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: screenHeight, end: 0),
+            duration: const Duration(milliseconds: 720),
+            curve: Curves.easeOutBack,
+            builder: (context, value, child) {
+              return Transform.translate(
+                offset: Offset(0, value),
+                child: child,
+              );
+            },
+            child: type == MoneyType.increase
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 150),
+                    child: SvgPicture.asset(
+                      'assets/img/piggy_bank.svg',
+                      width: size * 0.7,
+                    ),
+                  )
+                : PiggyCharacter(
                     width: size * 0.7,
+                    pose: PiggyPose.joy,
+                    eyes: PiggyEyes.smile,
+                    isBlinking: true,
                   ),
-                )
-              : PiggyCharacter(
-                  width: size * 0.7,
-                  pose: PiggyPose.joy,
-                  eyes: PiggyEyes.smile,
-                  isBlinking: true,
-                ),
-        );
+          );
+        }
 
         return Center(
           child: Material(
             type: MaterialType.transparency,
-            child: type == MoneyType.increase
+            child: (type == MoneyType.increase || type == MoneyType.memo)
                 ? Stack(
                     clipBehavior: Clip.none,
                     alignment: Alignment.center,

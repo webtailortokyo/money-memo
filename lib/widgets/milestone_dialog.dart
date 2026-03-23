@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:vibration/vibration.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../widgets/piggy_character.dart';
 import '../theme.dart';
 import '../constants.dart';
@@ -134,6 +136,32 @@ class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderSt
     if (widget.animationType == MilestoneAnimationType.dance) {
       _startDance();
     }
+
+    _playMilestoneEffects();
+  }
+
+  void _playMilestoneEffects() async {
+    // 8種類のサウンドからランダムに選択
+    final sounds = [
+      'sounds/hyousigi.mp3',
+      'sounds/kotsudumi.mp3',
+      'sounds/shing.mp3',
+      'sounds/ta-da.mp3',
+      'sounds/trumpet.mp3',
+      'sounds/twinkle.mp3',
+      'sounds/wadaiko.mp3',
+      'sounds/金額表示.mp3',
+    ];
+    final soundFile = sounds[Random().nextInt(sounds.length)];
+
+    // バイブレーション（適当なパターン：短い振動2回など）
+    Vibration.vibrate(pattern: [0, 100, 50, 100, 50, 100]);
+
+    try {
+      await AudioPlayer().play(AssetSource(soundFile));
+    } catch (e) {
+      debugPrint('Milestone sound error: $e');
+    }
   }
 
   void _startDance() async {
@@ -166,34 +194,44 @@ class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderSt
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
-            // 背面のLottie演出
-            Center(
-              child: IgnorePointer(
-                child: Lottie.asset(
-                  widget.lottieAsset,
-                  width: screenWidth,
-                  repeat: true,
-                ),
-              ),
-            ),
-            
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 1. ぶたさん（揺れる）
-                  AnimatedBuilder(
-                    animation: _idleController,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: Offset(0, _idleFloatAnimation.value),
-                        child: Transform.rotate(
-                          angle: _idleTiltAnimation.value,
-                          child: child,
+                  // 1. ぶたさん（揺れる）と背景のLottieを重ねる
+                  Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      // 背景のLottie演出（中心がブタさんの頭辺りに来るように調整）
+                      Positioned(
+                        top: -screenWidth / 2, // Lottieの大きさの半分だけ上にずらすことで中心を頭に合わせる
+                        child: IgnorePointer(
+                          child: Builder(
+                            builder: (context) {
+                              return Lottie.asset(
+                                widget.lottieAsset,
+                                width: screenWidth,
+                                repeat: true,
+                              );
+                            },
+                          ),
                         ),
-                      );
-                    },
-                    child: _buildAnimatedCharacter(),
+                      ),
+                      AnimatedBuilder(
+                        animation: _idleController,
+                        builder: (context, child) {
+                          return Transform.translate(
+                            offset: Offset(0, _idleFloatAnimation.value),
+                            child: Transform.rotate(
+                              angle: _idleTiltAnimation.value,
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: _buildAnimatedCharacter(),
+                      ),
+                    ],
                   ),
                   
                   // 2. メッセージボックス（四角・固定）

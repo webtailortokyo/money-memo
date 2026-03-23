@@ -202,10 +202,13 @@ class _SetupPageState extends State<SetupPage> {
             valueListenable: currencyNotifier,
             builder: (context, symbol, child) {
               return SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: '¥', label: Text('JPY(¥)')),
-                  ButtonSegment(value: '\$', label: Text('USD(\$)')),
-                  ButtonSegment(value: '€', label: Text('EUR(€)')),
+                segments: [
+                  ButtonSegment(
+                    value: '¥', 
+                    label: Text(languageNotifier.value == 'ja' ? '円(¥)' : 'JPY(¥)'),
+                  ),
+                  const ButtonSegment(value: '\$', label: Text('USD(\$)')),
+                  const ButtonSegment(value: '€', label: Text('EUR(€)')),
                 ],
                 selected: {symbol},
                 onSelectionChanged: (Set<String> newSelection) {
