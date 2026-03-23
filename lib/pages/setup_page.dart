@@ -70,30 +70,32 @@ class _SetupPageState extends State<SetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SelectionArea(
+      child: Scaffold(
       backgroundColor: context.appColors.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (page) {
-                  setState(() {
-                    _currentPage = page;
-                  });
-                },
-                children: [
-                  _buildLanguageStep(),
-                  _buildCurrencyStep(),
-                  _buildTitleStep(),
-                  _buildFinalStep(),
-                ],
+          child: Column(
+            children: [
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: (page) {
+                    setState(() {
+                      _currentPage = page;
+                    });
+                  },
+                  children: [
+                    _buildLanguageStep(),
+                    _buildCurrencyStep(),
+                    _buildTitleStep(),
+                    _buildFinalStep(),
+                  ],
+                ),
               ),
-            ),
-            _buildBottomBar(),
-          ],
+              _buildBottomBar(),
+            ],
+          ),
         ),
       ),
     );

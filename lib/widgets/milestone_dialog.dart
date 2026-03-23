@@ -161,98 +161,100 @@ class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderSt
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-        children: [
-          // 背面のLottie演出
-          Center(
-            child: IgnorePointer(
-              child: Lottie.asset(
-                widget.lottieAsset,
-                width: screenWidth,
-                repeat: true,
+    return SelectionArea(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            // 背面のLottie演出
+            Center(
+              child: IgnorePointer(
+                child: Lottie.asset(
+                  widget.lottieAsset,
+                  width: screenWidth,
+                  repeat: true,
+                ),
               ),
             ),
-          ),
-          
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 1. ぶたさん（揺れる）
-                AnimatedBuilder(
-                  animation: _idleController,
-                  builder: (context, child) {
-                    return Transform.translate(
-                      offset: Offset(0, _idleFloatAnimation.value),
-                      child: Transform.rotate(
-                        angle: _idleTiltAnimation.value,
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: _buildAnimatedCharacter(),
-                ),
-                
-                // 2. メッセージボックス（四角・固定）
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 15,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            widget.message,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: context.appColors.mainText,
-                              height: 1.5,
+            
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 1. ぶたさん（揺れる）
+                  AnimatedBuilder(
+                    animation: _idleController,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(0, _idleFloatAnimation.value),
+                        child: Transform.rotate(
+                          angle: _idleTiltAnimation.value,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: _buildAnimatedCharacter(),
+                  ),
+                  
+                  // 2. メッセージボックス（四角・固定）
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 15,
+                              spreadRadius: 2,
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: context.appColors.accent,
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size(140, 48),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.message,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: context.appColors.mainText,
+                                height: 1.5,
                               ),
-                              elevation: 4,
                             ),
-                            child: Text(
-                              AppStrings.closeButtonText,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            const SizedBox(height: 24),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: context.appColors.accent,
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(140, 48),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                elevation: 4,
+                              ),
+                              child: Text(
+                                AppStrings.closeButtonText,
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

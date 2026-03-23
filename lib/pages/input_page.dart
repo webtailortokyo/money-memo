@@ -379,7 +379,8 @@ class _InputPageState extends State<InputPage> {
   Widget build(BuildContext context) {
     final dateText = formatDate(selectedDate);
 
-    return Scaffold(
+    return SelectionArea(
+      child: Scaffold(
       backgroundColor: context.appColors.background,
       appBar: AppBar(
         backgroundColor: context.appColors.background,
@@ -413,226 +414,227 @@ class _InputPageState extends State<InputPage> {
 
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding + AppNumbers.smallSpacing, vertical: 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InkWell(
-                onTap: _pickDate,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppNumbers.smallSpacing,
-                    horizontal: AppNumbers.defaultPadding,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding + AppNumbers.smallSpacing, vertical: 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  onTap: _pickDate,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppNumbers.smallSpacing,
+                      horizontal: AppNumbers.defaultPadding,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.appColors.inputBg,
+                      borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                      border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today, 
+                          size: AppNumbers.calendarIconSize,
+                        ),
+                        SizedBox(width: AppNumbers.smallSpacing),
+                        Text(
+                          dateText,
+                          style: TextStyle(
+                            fontSize: AppNumbers.calendarFontSize,
+                            // fontWeight: FontWeight.bold,
+                            color: context.appColors.mainText,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                ),
+  
+                SizedBox(height: AppNumbers.smallSpacing),
+                Text(AppStrings.typeSelectionTitle, style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize)),
+  
+                SizedBox(height: AppNumbers.defaultPadding),
+  
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide = constraints.maxWidth > 300;
+  
+                    if (isWide) {
+                      return Row(
+                        children: [
+                          Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
+                          SizedBox(width: AppNumbers.smallSpacing),
+                          Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
+                          SizedBox(width: AppNumbers.smallSpacing),
+                          Expanded(child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo)),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
+                              SizedBox(width: AppNumbers.smallSpacing),
+                              Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
+                            ],
+                          ),
+                          SizedBox(height: AppNumbers.smallSpacing),
+                          SizedBox(
+                            width: double.infinity,
+                            child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo),
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
+  
+  
+  
+                SizedBox(height: AppNumbers.smallSpacing),
+  
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
                     color: context.appColors.inputBg,
                     borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                    border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                    border: Border.all(
+                      color: memoFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
+                      width: 1.5,
+                    ),
+                    boxShadow: memoFocusNode.hasFocus
+                        ? [
+                            BoxShadow(
+                              color: context.appColors.accent.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 0,
+                            )
+                          ]
+                        : [],
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today, 
-                        size: AppNumbers.calendarIconSize,
-                      ),
-                      SizedBox(width: AppNumbers.smallSpacing),
-                      Text(
-                        dateText,
-                        style: TextStyle(
-                          fontSize: AppNumbers.calendarFontSize,
-                          // fontWeight: FontWeight.bold,
-                          color: context.appColors.mainText,
-                        ),
+                  child: TextField(
+                    focusNode: memoFocusNode,
+                    controller: memoController,
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      hintText: memoHint,
+                      filled: false,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+  
+                SizedBox(height: AppNumbers.defaultPadding),
+  
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  decoration: BoxDecoration(
+                    color: selectedType == MoneyType.memo 
+                        ? context.appColors.memoBg 
+                        : context.appColors.inputBg,
+                    borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                    border: Border.all(
+                      color: amountFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
+                      width: 1.5,
+                    ),
+                    boxShadow: amountFocusNode.hasFocus
+                        ? [
+                            BoxShadow(
+                              color: context.appColors.accent.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 0,
+                            )
+                          ]
+                        : [],
+                  ),
+                  child: TextField(
+                    focusNode: amountFocusNode,
+                    controller: amountController,
+                    enabled: selectedType != MoneyType.memo,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      ThousandsSeparatorInputFormatter(
+                        initialDecimalDigits: isEdit ? widget.entry!.decimalDigits : null,
                       ),
                     ],
-                  ),
-                ),
-              ),
-
-              SizedBox(height: AppNumbers.smallSpacing),
-              Text(AppStrings.typeSelectionTitle, style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize)),
-
-              SizedBox(height: AppNumbers.defaultPadding),
-
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final isWide = constraints.maxWidth > 300;
-
-                  if (isWide) {
-                    return Row(
-                      children: [
-                        Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
-                        SizedBox(width: AppNumbers.smallSpacing),
-                        Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
-                        SizedBox(width: AppNumbers.smallSpacing),
-                        Expanded(child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo)),
-                      ],
-                    );
-                  } else {
-                    return Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
-                            SizedBox(width: AppNumbers.smallSpacing),
-                            Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
-                          ],
+                    decoration: InputDecoration(
+                      hintText: '0',
+                      filled: false,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppNumbers.defaultPadding,
+                        vertical: AppNumbers.defaultPadding,
+                      ),
+                      prefix: Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: ValueListenableBuilder<String>(
+                          valueListenable: currencyNotifier,
+                          builder: (context, symbol, child) {
+                            final displaySymbol = isEdit ? (widget.entry!.currency ?? symbol) : symbol;
+                            return Text(
+                              displaySymbol,
+                              style: TextStyle(
+                                color: selectedType == MoneyType.memo ? Colors.grey : context.appColors.mainText,
+                              ),
+                            );
+                          },
                         ),
-                        SizedBox(height: AppNumbers.smallSpacing),
-                        SizedBox(
-                          width: double.infinity,
-                          child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo),
-                        ),
-                      ],
-                    );
-                  }
-                },
-              ),
-
-
-
-              SizedBox(height: AppNumbers.smallSpacing),
-
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                decoration: BoxDecoration(
-                  color: context.appColors.inputBg,
-                  borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                  border: Border.all(
-                    color: memoFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
-                    width: 1.5,
-                  ),
-                  boxShadow: memoFocusNode.hasFocus
-                      ? [
-                          BoxShadow(
-                            color: context.appColors.accent.withOpacity(0.3),
-                            blurRadius: 6,
-                            spreadRadius: 0,
-                          )
-                        ]
-                      : [],
-                ),
-                child: TextField(
-                  focusNode: memoFocusNode,
-                  controller: memoController,
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    hintText: memoHint,
-                    filled: false,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-
-              SizedBox(height: AppNumbers.defaultPadding),
-
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                decoration: BoxDecoration(
-                  color: selectedType == MoneyType.memo 
-                      ? context.appColors.memoBg 
-                      : context.appColors.inputBg,
-                  borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                  border: Border.all(
-                    color: amountFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
-                    width: 1.5,
-                  ),
-                  boxShadow: amountFocusNode.hasFocus
-                      ? [
-                          BoxShadow(
-                            color: context.appColors.accent.withOpacity(0.3),
-                            blurRadius: 6,
-                            spreadRadius: 0,
-                          )
-                        ]
-                      : [],
-                ),
-                child: TextField(
-                  focusNode: amountFocusNode,
-                  controller: amountController,
-                  enabled: selectedType != MoneyType.memo,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    ThousandsSeparatorInputFormatter(
-                      initialDecimalDigits: isEdit ? widget.entry!.decimalDigits : null,
+                      ),
+                      border: InputBorder.none,
                     ),
+                  ),
+                ),
+  
+                SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
+  
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          // OutlinedButton縺ｮ譁・ｭ苓牡繧偵Γ繧､繝ｳ縺ｮ鮟偵↓
+                          foregroundColor: context.appColors.mainText, 
+                          side: const BorderSide(color: Colors.grey), // 譫邱壹・濶ｲ繧ょ､峨∴縺溘＞蝣ｴ蜷医・縺薙％
+                          minimumSize: const Size(0, 50),
+                        ),
+                        child: Text(AppStrings.cancelButtonText),
+                      ),
+                    ),
+                    SizedBox(width: AppNumbers.mediumSpacing),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _save,
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: context.appColors.accent,
+                          minimumSize: const Size(0, 50),
+                        ),
+                        icon: Icon(Icons.check_circle),
+                        label: Text(isEdit ? AppStrings.updateButtonText : AppStrings.recordButtonText),
+                      ),
+                    ),
+  
                   ],
-                  decoration: InputDecoration(
-                    hintText: '0',
-                    filled: false,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppNumbers.defaultPadding,
-                      vertical: AppNumbers.defaultPadding,
-                    ),
-                    prefix: Padding(
-                      padding: const EdgeInsets.only(right: 4),
-                      child: ValueListenableBuilder<String>(
-                        valueListenable: currencyNotifier,
-                        builder: (context, symbol, child) {
-                          final displaySymbol = isEdit ? (widget.entry!.currency ?? symbol) : symbol;
-                          return Text(
-                            displaySymbol,
-                            style: TextStyle(
-                              color: selectedType == MoneyType.memo ? Colors.grey : context.appColors.mainText,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    border: InputBorder.none,
-                  ),
                 ),
-              ),
-
-              SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        // OutlinedButton縺ｮ譁・ｭ苓牡繧偵Γ繧､繝ｳ縺ｮ鮟偵↓
-                        foregroundColor: context.appColors.mainText, 
-                        side: const BorderSide(color: Colors.grey), // 譫邱壹・濶ｲ繧ょ､峨∴縺溘＞蝣ｴ蜷医・縺薙％
-                        minimumSize: const Size(0, 50),
+  
+                if (isEdit) ...[
+                  SizedBox(height: AppNumbers.mediumSpacing),
+                  Center(
+                    child: TextButton.icon(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      label: Text(
+                        AppStrings.deleteButtonTextInput,
+                        style: TextStyle(color: Colors.red),
                       ),
-                      child: Text(AppStrings.cancelButtonText),
+                      onPressed: _delete,
                     ),
                   ),
-                  SizedBox(width: AppNumbers.mediumSpacing),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _save,
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: context.appColors.accent,
-                        minimumSize: const Size(0, 50),
-                      ),
-                      icon: Icon(Icons.check_circle),
-                      label: Text(isEdit ? AppStrings.updateButtonText : AppStrings.recordButtonText),
-                    ),
-                  ),
-
                 ],
-              ),
-
-              if (isEdit) ...[
-                SizedBox(height: AppNumbers.mediumSpacing),
-                Center(
-                  child: TextButton.icon(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    label: Text(
-                      AppStrings.deleteButtonTextInput,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    onPressed: _delete,
-                  ),
-                ),
               ],
-            ],
+            ),
           ),
         ),
       ),

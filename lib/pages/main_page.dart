@@ -431,7 +431,8 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SelectionArea(
+      child: Scaffold(
       backgroundColor: context.appColors.background,
 
       appBar: AppBar(
@@ -492,227 +493,230 @@ class _MainPageState extends State<MainPage> {
       ),
 
       body: SafeArea(
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            // 蜈･蜉帙お繝ｪ繧｢
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppNumbers.defaultPadding + AppNumbers.smallSpacing,
-                  vertical: AppNumbers.smallSpacing,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    InkWell(
-                      onTap: _pickDate,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppNumbers.smallSpacing,
-                          horizontal: AppNumbers.defaultPadding,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              // 蜈･蜉帙お繝ｪ繧Area
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppNumbers.defaultPadding + AppNumbers.smallSpacing,
+                    vertical: AppNumbers.smallSpacing,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: _pickDate,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppNumbers.smallSpacing,
+                            horizontal: AppNumbers.defaultPadding,
+                          ),
+                          decoration: BoxDecoration(
+                            color: context.appColors.inputBg,
+                            borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                            border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today,
+                                size: AppNumbers.calendarIconSize,
+                              ),
+                              SizedBox(width: AppNumbers.smallSpacing),
+                              Text(
+                                formatDate(selectedDate),
+                                style: TextStyle(
+                                  fontSize: AppNumbers.calendarFontSize,
+                                  color: context.appColors.mainText,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      ),
+  
+                      SizedBox(height: AppNumbers.smallSpacing),
+  
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isWide = constraints.maxWidth > 300;
+  
+                          if (isWide) {
+                            return Row(
+                              children: [
+                                Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
+                                SizedBox(width: AppNumbers.smallSpacing),
+                                Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
+                                SizedBox(width: AppNumbers.smallSpacing),
+                                Expanded(child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo)),
+                              ],
+                            );
+                          } else {
+                            return Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
+                                    SizedBox(width: AppNumbers.smallSpacing),
+                                    Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
+                                  ],
+                                ),
+                                SizedBox(height: AppNumbers.smallSpacing),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo),
+                                ),
+                              ],
+                            );
+                          }
+                        },
+                      ),
+  
+                      SizedBox(height: AppNumbers.smallSpacing),
+  
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
                         decoration: BoxDecoration(
                           color: context.appColors.inputBg,
                           borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                          border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                          border: Border.all(
+                            color: memoFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
+                            width: 1.5,
+                          ),
+                          boxShadow: memoFocusNode.hasFocus
+                              ? [
+                                  BoxShadow(
+                                    color: context.appColors.accent.withOpacity(0.3),
+                                    blurRadius: 6,
+                                    spreadRadius: 0,
+                                  )
+                                ]
+                              : [],
                         ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              size: AppNumbers.calendarIconSize,
-                            ),
-                            SizedBox(width: AppNumbers.smallSpacing),
-                            Text(
-                              formatDate(selectedDate),
-                              style: TextStyle(
-                                fontSize: AppNumbers.calendarFontSize,
-                                color: context.appColors.mainText,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(height: AppNumbers.smallSpacing),
-
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final isWide = constraints.maxWidth > 300;
-
-                        if (isWide) {
-                          return Row(
-                            children: [
-                              Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
-                              SizedBox(width: AppNumbers.smallSpacing),
-                              Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
-                              SizedBox(width: AppNumbers.smallSpacing),
-                              Expanded(child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo)),
-                            ],
-                          );
-                        } else {
-                          return Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
-                                  SizedBox(width: AppNumbers.smallSpacing),
-                                  Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
-                                ],
-                              ),
-                              SizedBox(height: AppNumbers.smallSpacing),
-                              SizedBox(
-                                width: double.infinity,
-                                child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo),
-                              ),
-                            ],
-                          );
-                        }
-                      },
-                    ),
-
-                    SizedBox(height: AppNumbers.smallSpacing),
-
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      decoration: BoxDecoration(
-                        color: context.appColors.inputBg,
-                        borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                        border: Border.all(
-                          color: memoFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
-                          width: 1.5,
-                        ),
-                        boxShadow: memoFocusNode.hasFocus
-                            ? [
-                                BoxShadow(
-                                  color: context.appColors.accent.withOpacity(0.3),
-                                  blurRadius: 6,
-                                  spreadRadius: 0,
-                                )
-                              ]
-                            : [],
-                      ),
-                      child: TextField(
-                        focusNode: memoFocusNode,
-                        controller: memoController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                          hintText: memoHint,
-                          filled: false,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
-                          border: InputBorder.none,
+                        child: TextField(
+                          focusNode: memoFocusNode,
+                          controller: memoController,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                            hintText: memoHint,
+                            filled: false,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
-                    ),
-
-                    SizedBox(height: AppNumbers.smallSpacing),
-
-                    Column(
-                      children: [
-                        _amountTextField(),
-                        SizedBox(height: AppNumbers.smallSpacing),
-                        Align(
-                          alignment: Alignment.center,
-                          child: _recordButton(),
-                        ),
-                      ],
-                    ),
-                  ],
+  
+                      SizedBox(height: AppNumbers.smallSpacing),
+  
+                      Column(
+                        children: [
+                          _amountTextField(),
+                          SizedBox(height: AppNumbers.smallSpacing),
+                          Align(
+                            alignment: Alignment.center,
+                            child: _recordButton(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
-
-            // 險倬鹸繝ｪ繧ｹ繝・
-            ValueListenableBuilder(
-              valueListenable: box.listenable(),
-              builder: (context, Box<MoneyEntry> box, _) {
-                if (box.isEmpty) {
-                  return SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: Text(AppStrings.noRecordMessage),
-                    ),
-                  );
-                }
-
-                final allEntries = sortedEntries(box);
-                final entries = allEntries.take(_displayCount).toList();
-
-                return SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppNumbers.listViewHorizontalPadding),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final entry = entries[index];
-                        return MoneyEntryCard(
-                          entry: entry,
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => InputPage(entry: entry),
-                              ),
-                            );
-                          },
-                          onLongPress: () async {
-                            final result = await showDialog<bool>(
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                title: Text(AppStrings.deleteDialogTitle),
-                                content: Text(AppStrings.deleteDialogContent),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
-                                    child: Text(AppStrings.cancelButtonText),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, true),
-                                    child: Text(
-                                      AppStrings.deleteButtonText,
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-
-                            if (result == true) {
-                              box.delete(entry.key);
-                            }
-                          },
-                        );
-                      },
-                      childCount: entries.length,
-                    ),
-                  ),
-                );
-              },
-            ),
-            // 下部の余白と読み込みインジケータ
-            SliverToBoxAdapter(
-              child: ValueListenableBuilder(
+  
+              const SliverToBoxAdapter(child: SizedBox(height: 12)),
+  
+              // 險倬鹸繝ｪ繧ｹ繝・
+              ValueListenableBuilder(
                 valueListenable: box.listenable(),
                 builder: (context, Box<MoneyEntry> box, _) {
-                  if (_displayCount < box.length) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
+                  if (box.isEmpty) {
+                    return SliverFillRemaining(
+                      hasScrollBody: false,
                       child: Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: context.appColors.accent.withOpacity(0.5),
-                        ),
+                        child: Text(AppStrings.noRecordMessage),
                       ),
                     );
                   }
-                  return const SizedBox(height: 80.0); // FABと重ならないように余白を多めに確保
+  
+                  final allEntries = sortedEntries(box);
+                  final entries = allEntries.take(_displayCount).toList();
+  
+                  return SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppNumbers.listViewHorizontalPadding),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final entry = entries[index];
+                          return MoneyEntryCard(
+                            entry: entry,
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => InputPage(entry: entry),
+                                ),
+                              );
+                            },
+                            onLongPress: () async {
+                              final result = await showDialog<bool>(
+                                context: context,
+                                builder: (_) => SelectionArea(
+                                  child: AlertDialog(
+                                  title: Text(AppStrings.deleteDialogTitle),
+                                  content: Text(AppStrings.deleteDialogContent),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false),
+                                      child: Text(AppStrings.cancelButtonText),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, true),
+                                      child: Text(
+                                        AppStrings.deleteButtonText,
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+  
+                              if (result == true) {
+                                box.delete(entry.key);
+                              }
+                            },
+                          );
+                        },
+                        childCount: entries.length,
+                      ),
+                    ),
+                  );
                 },
               ),
-            ),
-          ],
+              // 下部の余白と読み込みインジケータ
+              SliverToBoxAdapter(
+                child: ValueListenableBuilder(
+                  valueListenable: box.listenable(),
+                  builder: (context, Box<MoneyEntry> box, _) {
+                    if (_displayCount < box.length) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: context.appColors.accent.withOpacity(0.5),
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox(height: 80.0); // FABと重ならないように余白を多めに確保
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

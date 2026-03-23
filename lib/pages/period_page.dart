@@ -77,7 +77,8 @@ class _PeriodPageState extends State<PeriodPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SelectionArea(
+      child: Scaffold(
       backgroundColor: context.appColors.background,
       appBar: AppBar(
         backgroundColor: context.appColors.background,
@@ -112,242 +113,245 @@ class _PeriodPageState extends State<PeriodPage> {
         iconTheme: IconThemeData(color: context.appColors.accent),
       ),
       body: ValueListenableBuilder(
-        valueListenable: box.listenable(),
-        builder: (context, Box<MoneyEntry> box, _) {
-          if (box.isEmpty) {
-            return Center(child: Text(AppStrings.noRecordMessage));
-          }
-
-          final entries = sortedEntries(box);
-          final List<MoneyEntry> filtered;
-          final String periodLabel;
-
-          if (viewMode == PeriodViewMode.monthly) {
-            filtered = entries.where((e) {
-              return e.date.year == targetDate.year && e.date.month == targetDate.month;
-            }).toList();
-            if (languageNotifier.value == 'en') {
-              periodLabel = DateFormat.yMMM('en_US').format(targetDate);
+          valueListenable: box.listenable(),
+          builder: (context, Box<MoneyEntry> box, _) {
+            if (box.isEmpty) {
+              return Center(child: Text(AppStrings.noRecordMessage));
+            }
+  
+            final entries = sortedEntries(box);
+            final List<MoneyEntry> filtered;
+            final String periodLabel;
+  
+            if (viewMode == PeriodViewMode.monthly) {
+              filtered = entries.where((e) {
+                return e.date.year == targetDate.year && e.date.month == targetDate.month;
+              }).toList();
+              if (languageNotifier.value == 'en') {
+                periodLabel = DateFormat.yMMM('en_US').format(targetDate);
+              } else {
+                periodLabel = '${targetDate.year}${AppStrings.yearLabel}${targetDate.month}${AppStrings.monthLabel}';
+              }
             } else {
-              periodLabel = '${targetDate.year}${AppStrings.yearLabel}${targetDate.month}${AppStrings.monthLabel}';
+              filtered = entries.where((e) {
+                return e.date.year == targetDate.year;
+              }).toList();
+              if (languageNotifier.value == 'en') {
+                periodLabel = targetDate.year.toString();
+              } else {
+                periodLabel = '${targetDate.year}${AppStrings.yearLabel}';
+              }
             }
-          } else {
-            filtered = entries.where((e) {
-              return e.date.year == targetDate.year;
-            }).toList();
-            if (languageNotifier.value == 'en') {
-              periodLabel = targetDate.year.toString();
-            } else {
-              periodLabel = '${targetDate.year}${AppStrings.yearLabel}';
+  
+            final Map<String, CurrencySummary> totals = {};
+            for (final e in filtered) {
+              final sym = e.currency ?? 'ﾂ･';
+              final digits = e.decimalDigits ?? 0;
+              final key = '$sym-$digits';
+              
+              totals.putIfAbsent(key, () => CurrencySummary(sym, digits));
+              if (e.type == MoneyEntryTypes.increase) {
+                totals[key]!.increase += e.amount;
+              } else if (e.type == MoneyEntryTypes.decrease) {
+                totals[key]!.decrease += e.amount;
+              }
             }
-          }
-
-          final Map<String, CurrencySummary> totals = {};
-          for (final e in filtered) {
-            final sym = e.currency ?? 'ﾂ･';
-            final digits = e.decimalDigits ?? 0;
-            final key = '$sym-$digits';
-            
-            totals.putIfAbsent(key, () => CurrencySummary(sym, digits));
-            if (e.type == MoneyEntryTypes.increase) {
-              totals[key]!.increase += e.amount;
-            } else if (e.type == MoneyEntryTypes.decrease) {
-              totals[key]!.decrease += e.amount;
-            }
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding, vertical: 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// 隼 繝｢繝ｼ繝牙・譖ｿ
-                Row(
-                  children: [
-                    _buildModeButton(PeriodViewMode.monthly, AppStrings.monthlySummaryTitle),
-                    SizedBox(width: 8),
-                    _buildModeButton(PeriodViewMode.yearly, AppStrings.yearlySummaryTitle),
-                  ],
-                ),
-                SizedBox(height: 12),
-
-                /// 隼 譛滄俣驕ｸ謚・
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  decoration: BoxDecoration(
-                    color: context.appColors.inputBg,
-                    borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                    border: Border.all(color: Colors.grey.shade300, width: 1.5),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding, vertical: 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// 隼 繝｢繝ｼ繝牙・譖ｿ
+                  Row(
                     children: [
-                      IconButton(
-                        icon: Icon(Icons.chevron_left, color: context.appColors.accent, size: 32),
-                        onPressed: () => _changePeriod(-1),
-                      ),
-                      GestureDetector(
-                        onTap: _pickPeriod,
-                        child: Text(
-                          periodLabel,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: context.appColors.mainText,
+                      _buildModeButton(PeriodViewMode.monthly, AppStrings.monthlySummaryTitle),
+                      SizedBox(width: 8),
+                      _buildModeButton(PeriodViewMode.yearly, AppStrings.yearlySummaryTitle),
+                    ],
+                  ),
+                  SizedBox(height: 12),
+  
+                  /// 隼 譛滄俣驕ｸ謚・
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    decoration: BoxDecoration(
+                      color: context.appColors.inputBg,
+                      borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                      border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.chevron_left, color: context.appColors.accent, size: 32),
+                          onPressed: () => _changePeriod(-1),
+                        ),
+                        GestureDetector(
+                          onTap: _pickPeriod,
+                          child: Text(
+                            periodLabel,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: context.appColors.mainText,
+                            ),
                           ),
                         ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.chevron_right, color: context.appColors.accent, size: 32),
-                        onPressed: () => _changePeriod(1),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: AppNumbers.largeSpacing),
-
-                /// 隼 繧ｳ繝斐・繝懊ち繝ｳ
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _shareRecord(periodLabel, filtered, totals),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: context.appColors.accent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
-                      ),
+                        IconButton(
+                          icon: Icon(Icons.chevron_right, color: context.appColors.accent, size: 32),
+                          onPressed: () => _changePeriod(1),
+                        ),
+                      ],
                     ),
-                    icon: Icon(Icons.share, size: 20),
-                    label: Text(AppStrings.copyButtonText),
                   ),
-                ),
-
-                SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
-
-                /// 隼 蜷郁ｨ・
-                Row(
-                  children: [
-                    Icon(Icons.analytics_rounded, color: context.appColors.accent, size: 24),
-                    SizedBox(width: 8),
-                    Text(
-                      AppStrings.totalSectionTitle,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
+  
+                  SizedBox(height: AppNumbers.largeSpacing),
+  
+                  /// 隼 繧ｳ繝斐・繝懊ち繝ｳ
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _shareRecord(periodLabel, filtered, totals),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: context.appColors.accent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: AppNumbers.mediumSpacing),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
+                        ),
+                      ),
+                      icon: Icon(Icons.share, size: 20),
+                      label: Text(AppStrings.copyButtonText),
                     ),
-                  ],
-                ),
-                SizedBox(height: AppNumbers.smallSpacing),
-                Container(
-                  padding: const EdgeInsets.all(AppNumbers.defaultPadding),
-                  decoration: BoxDecoration(
-                    color: context.appColors.inputBg,
-                    borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
-                    border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+  
+                  SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
+  
+                  /// 隼 蜷郁ｨ・
+                  Row(
                     children: [
-                      if (totals.isEmpty)
-                        Center(child: Text('-'))
-                      else
-                        ..._sortSummaries(totals.values).map((summary) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Column(
-                            key: ValueKey('${summary.symbol}-${summary.decimalDigits}'),
-                            children: [
-                              TotalAmountRow(
-                                label: AppStrings.increaseTypeLabel,
-                                value: summary.increase,
-                                color: context.appColors.increaseAmount,
-                                symbol: summary.symbol,
-                                formatAmount: (val) => formatAmount(val, decimalDigits: summary.decimalDigits),
-                              ),
-                              SizedBox(height: 4),
-                              TotalAmountRow(
-                                label: AppStrings.decreaseTypeLabel,
-                                value: summary.decrease,
-                                color: context.appColors.decreaseAmount,
-                                symbol: summary.symbol,
-                                formatAmount: (val) => formatAmount(val, decimalDigits: summary.decimalDigits),
-                              ),
-                              if (summary != _sortSummaries(totals.values).last)
-                                const Divider(height: 16),
-                            ],
-                          ),
-                        )),
+                      Icon(Icons.analytics_rounded, color: context.appColors.accent, size: 24),
+                      SizedBox(width: 8),
+                      Text(
+                        AppStrings.totalSectionTitle,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
+                      ),
                     ],
                   ),
-                ),
-
-                SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
-
-                /// 隼 蜀・ｨｳ / 譛亥挨繝ｪ繧ｹ繝・
-                Row(
-                  children: [
-                    Icon(
-                      viewMode == PeriodViewMode.monthly ? Icons.list_alt_rounded : Icons.calendar_month_rounded,
-                      color: context.appColors.accent,
-                      size: 24,
+                  SizedBox(height: AppNumbers.smallSpacing),
+                  Container(
+                    padding: const EdgeInsets.all(AppNumbers.defaultPadding),
+                    decoration: BoxDecoration(
+                      color: context.appColors.inputBg,
+                      borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
+                      border: Border.all(color: Colors.grey.shade300, width: 1.5),
                     ),
-                    SizedBox(width: 8),
-                    Text(
-                      viewMode == PeriodViewMode.monthly ? AppStrings.detailSectionTitle : AppStrings.monthlySummaryTitle,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
-                    ),
-                  ],
-                ),
-                SizedBox(height: AppNumbers.smallSpacing),
-                if (filtered.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 32),
-                    child: Center(child: Text(AppStrings.noRecordInPeriod)),
-                  )
-                else if (viewMode == PeriodViewMode.monthly)
-                  ...filtered.map((e) => MoneyEntryCard(
-                        entry: e,
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => InputPage(entry: e),
-                            ),
-                          );
-                        },
-                        onLongPress: () async {
-                          final result = await showDialog<bool>(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: Text(AppStrings.deleteDialogTitle),
-                              content: Text(AppStrings.deleteDialogContent),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: Text(AppStrings.cancelButtonText),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (totals.isEmpty)
+                          Center(child: Text('-'))
+                        else
+                          ..._sortSummaries(totals.values).map((summary) => Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Column(
+                              key: ValueKey('${summary.symbol}-${summary.decimalDigits}'),
+                              children: [
+                                TotalAmountRow(
+                                  label: AppStrings.increaseTypeLabel,
+                                  value: summary.increase,
+                                  color: context.appColors.increaseAmount,
+                                  symbol: summary.symbol,
+                                  formatAmount: (val) => formatAmount(val, decimalDigits: summary.decimalDigits),
                                 ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: Text(
-                                    AppStrings.deleteButtonText,
-                                    style: TextStyle(color: Colors.red),
-                                  ),
+                                SizedBox(height: 4),
+                                TotalAmountRow(
+                                  label: AppStrings.decreaseTypeLabel,
+                                  value: summary.decrease,
+                                  color: context.appColors.decreaseAmount,
+                                  symbol: summary.symbol,
+                                  formatAmount: (val) => formatAmount(val, decimalDigits: summary.decimalDigits),
                                 ),
+                                if (summary != _sortSummaries(totals.values).last)
+                                  const Divider(height: 16),
                               ],
                             ),
-                          );
-
-                          if (result == true) {
-                            box.delete(e.key);
-                          }
-                        },
-                      ))
-                else
-                  ..._buildYearlyMonthlyList(filtered),
-              ],
-            ),
-          );
-        },
+                          )),
+                      ],
+                    ),
+                  ),
+  
+                  SizedBox(height: AppNumbers.defaultPadding + AppNumbers.smallSpacing),
+  
+                  /// 隼 蜀・ｨｳ / 譛亥挨繝ｪ繧ｹ繝・
+                  Row(
+                    children: [
+                      Icon(
+                        viewMode == PeriodViewMode.monthly ? Icons.list_alt_rounded : Icons.calendar_month_rounded,
+                        color: context.appColors.accent,
+                        size: 24,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        viewMode == PeriodViewMode.monthly ? AppStrings.detailSectionTitle : AppStrings.monthlySummaryTitle,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: AppNumbers.smallSpacing),
+                  if (filtered.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32),
+                      child: Center(child: Text(AppStrings.noRecordInPeriod)),
+                    )
+                  else if (viewMode == PeriodViewMode.monthly)
+                    ...filtered.map((e) => MoneyEntryCard(
+                          entry: e,
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => InputPage(entry: e),
+                              ),
+                            );
+                          },
+                          onLongPress: () async {
+                            final result = await showDialog<bool>(
+                              context: context,
+                              builder: (_) => SelectionArea(
+                                child: AlertDialog(
+                                  title: Text(AppStrings.deleteDialogTitle),
+                                  content: Text(AppStrings.deleteDialogContent),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false),
+                                      child: Text(AppStrings.cancelButtonText),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, true),
+                                      child: Text(
+                                        AppStrings.deleteButtonText,
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+  
+                            if (result == true) {
+                              box.delete(e.key);
+                            }
+                          },
+                        ))
+                  else
+                    ..._buildYearlyMonthlyList(filtered),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

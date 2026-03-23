@@ -47,19 +47,21 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _resetAllData() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppStrings.resetConfirmTitle),
-        content: Text(AppStrings.resetConfirmContent),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(AppStrings.cancelButtonText),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(AppStrings.deleteButtonText, style: TextStyle(color: Colors.red)),
-          ),
-        ],
+      builder: (context) => SelectionArea(
+        child: AlertDialog(
+          title: Text(AppStrings.resetConfirmTitle),
+          content: Text(AppStrings.resetConfirmContent),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(AppStrings.cancelButtonText),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(AppStrings.deleteButtonText, style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -106,7 +108,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SelectionArea(
+      child: Scaffold(
       backgroundColor: context.appColors.background,
       appBar: AppBar(
         backgroundColor: context.appColors.background,
@@ -128,195 +131,196 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       ),
       body: ListView(
-        children: [
-          // タイトル設定
-          _SectionHeader(title: AppStrings.titleSetting),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              controller: _titleController,
-              cursorColor: context.appColors.accent,
-              decoration: InputDecoration(
-                hintText: AppStrings.appTitle,
-                filled: true,
-                fillColor: Theme.of(context).brightness == Brightness.dark 
-                    ? const Color(0xFF333333) 
-                    : Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: context.appColors.accent.withOpacity(0.2)),
+          children: [
+            // タイトル設定
+            _SectionHeader(title: AppStrings.titleSetting),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: _titleController,
+                cursorColor: context.appColors.accent,
+                decoration: InputDecoration(
+                  hintText: AppStrings.appTitle,
+                  filled: true,
+                  fillColor: Theme.of(context).brightness == Brightness.dark 
+                      ? const Color(0xFF333333) 
+                      : Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: context.appColors.accent.withOpacity(0.2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: context.appColors.accent, width: 2),
+                  ),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: context.appColors.accent, width: 2),
-                ),
+                onChanged: _updateTitle,
               ),
-              onChanged: _updateTitle,
             ),
-          ),
-
-          const Divider(height: 32),
-          
-          // 通貨設定
-          _SectionHeader(title: AppStrings.currencySettingTitle),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: ValueListenableBuilder2<String, int>(
-              valueListenable1: currencyNotifier,
-              valueListenable2: decimalDigitsNotifier,
-              builder: (context, symbol, digits, child) {
-                return SegmentedButton<String>(
-                  segments: const [
-                    ButtonSegment(value: '¥', label: Text('JPY(¥)')),
-                    ButtonSegment(value: '\$', label: Text('USD(\$)')),
-                    ButtonSegment(value: '€', label: Text('EUR(€)')),
-                  ],
-                  selected: {symbol},
-                  onSelectionChanged: (Set<String> newSelection) {
-                    final newSymbol = newSelection.first;
-                    final newDigits = newSymbol == '¥' ? 0 : 2;
-                    
-                    currencyNotifier.value = newSymbol;
-                    decimalDigitsNotifier.value = newDigits;
-                    
-                    final box = Hive.box(HiveConstants.settingsBoxName);
-                    box.put(HiveConstants.keyCurrency, newSymbol);
-                    box.put(HiveConstants.keyDecimalDigits, newDigits);
-                  },
-                  showSelectedIcon: false,
-                  style: SegmentedButton.styleFrom(
-                    selectedBackgroundColor: context.appColors.accent,
-                    selectedForegroundColor: Colors.white,
-                    foregroundColor: context.appColors.accent,
-                    side: BorderSide(color: context.appColors.accent),
-                  ),
-                );
+  
+            const Divider(height: 32),
+            
+            // 通貨設定
+            _SectionHeader(title: AppStrings.currencySettingTitle),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: ValueListenableBuilder2<String, int>(
+                valueListenable1: currencyNotifier,
+                valueListenable2: decimalDigitsNotifier,
+                builder: (context, symbol, digits, child) {
+                  return SegmentedButton<String>(
+                    segments: const [
+                      ButtonSegment(value: '¥', label: Text('JPY(¥)')),
+                      ButtonSegment(value: '\$', label: Text('USD(\$)')),
+                      ButtonSegment(value: '€', label: Text('EUR(€)')),
+                    ],
+                    selected: {symbol},
+                    onSelectionChanged: (Set<String> newSelection) {
+                      final newSymbol = newSelection.first;
+                      final newDigits = newSymbol == '¥' ? 0 : 2;
+                      
+                      currencyNotifier.value = newSymbol;
+                      decimalDigitsNotifier.value = newDigits;
+                      
+                      final box = Hive.box(HiveConstants.settingsBoxName);
+                      box.put(HiveConstants.keyCurrency, newSymbol);
+                      box.put(HiveConstants.keyDecimalDigits, newDigits);
+                    },
+                    showSelectedIcon: false,
+                    style: SegmentedButton.styleFrom(
+                      selectedBackgroundColor: context.appColors.accent,
+                      selectedForegroundColor: Colors.white,
+                      foregroundColor: context.appColors.accent,
+                      side: BorderSide(color: context.appColors.accent),
+                    ),
+                  );
+                },
+              ),
+            ),
+  
+            // 言語設定
+            _SectionHeader(title: AppStrings.languageSettingTitle),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: ValueListenableBuilder<String>(
+                valueListenable: languageNotifier,
+                builder: (context, lang, child) {
+                  return SegmentedButton<String>(
+                    segments: [
+                      ButtonSegment(value: 'ja', label: Text(AppStrings.languageJa)),
+                      ButtonSegment(value: 'en', label: Text(AppStrings.languageEn)),
+                    ],
+                    selected: {lang},
+                    onSelectionChanged: (Set<String> newSelection) {
+                      final newLang = newSelection.first;
+                      languageNotifier.value = newLang;
+                      
+                      final box = Hive.box(HiveConstants.settingsBoxName);
+                      box.put(HiveConstants.keyLanguage, newLang);
+                    },
+                    showSelectedIcon: false,
+                    style: SegmentedButton.styleFrom(
+                      selectedBackgroundColor: context.appColors.accent,
+                      selectedForegroundColor: Colors.white,
+                      foregroundColor: context.appColors.accent,
+                      side: BorderSide(color: context.appColors.accent),
+                    ),
+                  );
+                },
+              ),
+            ),
+  
+            // テーマ設定
+            _SectionHeader(title: AppStrings.themeSettingTitle),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: ValueListenableBuilder<ThemeMode>(
+                valueListenable: appThemeNotifier,
+                builder: (context, themeMode, _) {
+                  return DropdownButtonFormField<ThemeMode>(
+                    value: themeMode,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: context.appColors.inputBg,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: context.appColors.accent, width: 2),
+                      ),
+                    ),
+                    dropdownColor: context.appColors.inputBg,
+                    items: [
+                      DropdownMenuItem(
+                        value: ThemeMode.light,
+                        child: Text(AppStrings.lightMode),
+                      ),
+                      DropdownMenuItem(
+                        value: ThemeMode.dark,
+                        child: Text(AppStrings.darkMode),
+                      ),
+                    ],
+                    onChanged: (ThemeMode? newTheme) {
+                      if (newTheme != null) {
+                        appThemeNotifier.value = newTheme;
+                        Hive.box(HiveConstants.settingsBoxName).put(
+                            HiveConstants.keyThemeMode,
+                            newTheme == ThemeMode.dark ? 'dark' : 'light');
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
+            
+            const Divider(height: 32),
+  
+            // データ管理
+            _SectionHeader(title: AppStrings.dataManagementTitle),
+            ListTile(
+              leading: Icon(Icons.refresh, color: context.appColors.accent),
+              title: Text(
+                AppStrings.resetAllData,
+                style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(AppStrings.resetAllDataSubtitle),
+              onTap: _resetAllData,
+            ),
+            ListTile(
+              leading: Icon(Icons.file_download, color: context.appColors.accent),
+              title: Text(
+                AppStrings.exportLabel,
+                style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(AppStrings.exportSubtitle),
+              onTap: () => CsvHelper.exportCsv(context),
+            ),
+            ListTile(
+              leading: Icon(Icons.file_upload, color: context.appColors.accent),
+              title: Text(
+                AppStrings.importLabel,
+                style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(AppStrings.importSubtitle),
+              onTap: () async {
+                await CsvHelper.importCsv(context);
+                setState(() {});
               },
             ),
-          ),
-
-          // 言語設定
-          _SectionHeader(title: AppStrings.languageSettingTitle),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: ValueListenableBuilder<String>(
-              valueListenable: languageNotifier,
-              builder: (context, lang, child) {
-                return SegmentedButton<String>(
-                  segments: [
-                    ButtonSegment(value: 'ja', label: Text(AppStrings.languageJa)),
-                    ButtonSegment(value: 'en', label: Text(AppStrings.languageEn)),
-                  ],
-                  selected: {lang},
-                  onSelectionChanged: (Set<String> newSelection) {
-                    final newLang = newSelection.first;
-                    languageNotifier.value = newLang;
-                    
-                    final box = Hive.box(HiveConstants.settingsBoxName);
-                    box.put(HiveConstants.keyLanguage, newLang);
-                  },
-                  showSelectedIcon: false,
-                  style: SegmentedButton.styleFrom(
-                    selectedBackgroundColor: context.appColors.accent,
-                    selectedForegroundColor: Colors.white,
-                    foregroundColor: context.appColors.accent,
-                    side: BorderSide(color: context.appColors.accent),
-                  ),
-                );
-              },
+            
+            // 繧｢繝励Μ縺ｫ縺､縺・※
+            _SectionHeader(title: AppStrings.appInfoTitle),
+            ListTile(
+              title: Text(AppStrings.versionLabel),
+              trailing: Text(AppStrings.appVersion),
             ),
-          ),
-
-          // テーマ設定
-          _SectionHeader(title: AppStrings.themeSettingTitle),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: ValueListenableBuilder<ThemeMode>(
-              valueListenable: appThemeNotifier,
-              builder: (context, themeMode, _) {
-                return DropdownButtonFormField<ThemeMode>(
-                  value: themeMode,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: context.appColors.inputBg,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: context.appColors.accent, width: 2),
-                    ),
-                  ),
-                  dropdownColor: context.appColors.inputBg,
-                  items: [
-                    DropdownMenuItem(
-                      value: ThemeMode.light,
-                      child: Text(AppStrings.lightMode),
-                    ),
-                    DropdownMenuItem(
-                      value: ThemeMode.dark,
-                      child: Text(AppStrings.darkMode),
-                    ),
-                  ],
-                  onChanged: (ThemeMode? newTheme) {
-                    if (newTheme != null) {
-                      appThemeNotifier.value = newTheme;
-                      Hive.box(HiveConstants.settingsBoxName).put(
-                          HiveConstants.keyThemeMode,
-                          newTheme == ThemeMode.dark ? 'dark' : 'light');
-                    }
-                  },
-                );
-              },
-            ),
-          ),
-          
-          const Divider(height: 32),
-
-          // データ管理
-          _SectionHeader(title: AppStrings.dataManagementTitle),
-          ListTile(
-            leading: Icon(Icons.refresh, color: context.appColors.accent),
-            title: Text(
-              AppStrings.resetAllData,
-              style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(AppStrings.resetAllDataSubtitle),
-            onTap: _resetAllData,
-          ),
-          ListTile(
-            leading: Icon(Icons.file_download, color: context.appColors.accent),
-            title: Text(
-              AppStrings.exportLabel,
-              style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(AppStrings.exportSubtitle),
-            onTap: () => CsvHelper.exportCsv(context),
-          ),
-          ListTile(
-            leading: Icon(Icons.file_upload, color: context.appColors.accent),
-            title: Text(
-              AppStrings.importLabel,
-              style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(AppStrings.importSubtitle),
-            onTap: () async {
-              await CsvHelper.importCsv(context);
-              setState(() {});
-            },
-          ),
-          
-          // 繧｢繝励Μ縺ｫ縺､縺・※
-          _SectionHeader(title: AppStrings.appInfoTitle),
-          ListTile(
-            title: Text(AppStrings.versionLabel),
-            trailing: Text(AppStrings.appVersion),
-          ),
-          SizedBox(height: 32),
-        ],
+            SizedBox(height: 32),
+          ],
+        ),
       ),
     );
   }
