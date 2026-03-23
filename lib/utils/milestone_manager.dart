@@ -10,6 +10,24 @@ class MilestoneManager {
   static const String _keyLastCount = 'lastShownCountMilestone';
   static const String _keyLastDays = 'lastShownDaysMilestone';
 
+  // マイルストーン用のLottieアセットリスト
+  static const List<String> _standardLottieAssets = [
+    'assets/lottie/confetti.json',
+    'assets/lottie/cartoon_explosion.json',
+    'assets/lottie/flying_rocket.json',
+    'assets/lottie/light.json',
+    'assets/lottie/lines_left_to_right.json',
+    'assets/lottie/snowflake.json',
+    'assets/lottie/sparkle_stars.json',
+    'assets/lottie/spring.json',
+    'assets/lottie/sun_ray.json',
+  ];
+
+  static String _getRandomLottie({bool isSpecial = false}) {
+    if (isSpecial) return 'assets/lottie/fireworks.json';
+    return _standardLottieAssets[Random().nextInt(_standardLottieAssets.length)];
+  }
+
   /// 記録保存直後に呼び出し、必要ならお祝いを表示する
   static Future<bool> checkAndShow(BuildContext context) async {
     final moneyBox = Hive.box<MoneyEntry>(HiveConstants.moneyBoxName);
@@ -59,7 +77,7 @@ class MilestoneManager {
 
     if (nextMilestone != null) {
       String message;
-      String lottieAsset = 'assets/lottie/confetti.json';
+      String lottieAsset = _getRandomLottie();
       PiggyEyes eyes = PiggyEyes.smile;
       PiggyPose pose = PiggyPose.joy;
 
@@ -74,7 +92,7 @@ class MilestoneManager {
         message = AppStrings.milestoneCount30;
       } else if (nextMilestone == 50) {
         message = AppStrings.milestoneCount50;
-        lottieAsset = 'assets/lottie/fireworks.json'; // 50回は特別
+        lottieAsset = _getRandomLottie(isSpecial: true); // 50回は特別
       } else {
         // 50回ごとのランダムメッセージ
         final random = Random();
@@ -122,7 +140,7 @@ class MilestoneManager {
 
     if (nextMilestone != null) {
       String message;
-      String lottieAsset = 'assets/lottie/confetti.json';
+      String lottieAsset = _getRandomLottie();
       PiggyPose pose = PiggyPose.joy;
 
       if (nextMilestone == 3) {
@@ -132,10 +150,10 @@ class MilestoneManager {
         message = AppStrings.milestoneDay7;
       } else if (nextMilestone == 30) {
         message = AppStrings.milestoneDay30;
-        lottieAsset = 'assets/lottie/fireworks.json'; // 30日/100日は特別
+        lottieAsset = _getRandomLottie(isSpecial: true); // 30日/100日は特別
       } else if (nextMilestone == 100) {
         message = AppStrings.milestoneDay100;
-        lottieAsset = 'assets/lottie/fireworks.json';
+        lottieAsset = _getRandomLottie(isSpecial: true);
       } else {
         // 100日ごとのランダムメッセージ
         final random = Random();
@@ -157,3 +175,4 @@ class MilestoneManager {
     return false;
   }
 }
+
