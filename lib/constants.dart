@@ -47,7 +47,7 @@ class AppStrings {
       'decreaseTypeLabel': '減った',
       'shareIncreaseLabel': '増えた：',
       'shareDecreaseLabel': '減った：',
-      'memoTypeLabel': 'メモのみ',
+      'memoTypeLabel': 'メモ',
       'clipboardHeader': '日付\t内容\t種別\t金額',
       'clipboardNote': '※タブ区切りテキスト形式のため、Excel等の表計算ソフトへの貼り付けが可能です\n',
       'milestoneCount1': 'はじめのいっぽ！\nおかねの記録をはじめたね',
@@ -100,6 +100,12 @@ class AppStrings {
       'themeSettingTitle': 'テーマ',
       'lightMode': 'ライトモード',
       'darkMode': 'ダークモード',
+      'notificationTitle': 'おかねメモ',
+      'notification3DayPatternA': '最近お変わりありませんか？気が向いたときに、今日一日の小さな出来事もメモしてみてくださいね。',
+      'notification3DayPatternB': 'コツコツの習慣、マイペースに続けていきましょう！一言メモだけでも大歓迎ですよ。',
+      'notification3DayPatternC': 'おかねメモが少し寂しがっているかも？また一緒に記録できるのを楽しみに待っています！',
+      'notification7DayMessage': '1週間が経ちました。また気が向いたときに、いつでもお待ちしています。',
+      'backButtonText': '戻る',
     },
     'en': {
       'appTitle': 'Money Memo',
@@ -188,6 +194,12 @@ class AppStrings {
       'themeSettingTitle': 'Theme',
       'lightMode': 'Light Mode',
       'darkMode': 'Dark Mode',
+      'notificationTitle': 'Money Memo',
+      'notification3DayPatternA': 'How are you lately? Please open it again when you feel like it and record small things.',
+      'notification3DayPatternB': 'Let\'s keep up the habit at your own pace! Even a short memo is very welcome.',
+      'notification3DayPatternC': 'Money Memo might be feeling lonely? Hope to see you again soon!',
+      'notification7DayMessage': 'It\'s been a week. We\'re always here whenever you\'re ready to record again.',
+      'backButtonText': 'Back',
     }
   };
 
@@ -304,6 +316,12 @@ class AppStrings {
   static String get themeSettingTitle => _get('themeSettingTitle');
   static String get lightMode => _get('lightMode');
   static String get darkMode => _get('darkMode');
+  static String get notificationTitle => _get('notificationTitle');
+  static String get notification3DayPatternA => _get('notification3DayPatternA');
+  static String get notification3DayPatternB => _get('notification3DayPatternB');
+  static String get notification3DayPatternC => _get('notification3DayPatternC');
+  static String get notification7DayMessage => _get('notification7DayMessage');
+  static String get backButtonText => _get('backButtonText');
 
   static const String appVersion = '1.0.0';
 

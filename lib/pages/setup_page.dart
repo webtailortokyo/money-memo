@@ -5,6 +5,7 @@ import '../constants.dart';
 import '../app_state.dart';
 import 'main_page.dart';
 import '../theme.dart';
+import '../utils/notification_manager.dart';
 
 class SetupPage extends StatefulWidget {
   const SetupPage({super.key});
@@ -47,7 +48,7 @@ class _SetupPageState extends State<SetupPage> {
 
   Future<void> _completeSetup() async {
     final settingsBox = Hive.box(HiveConstants.settingsBoxName);
-    
+
     // タイトルの保存
     final title = _titleController.text.trim();
     if (title.isNotEmpty) {
@@ -60,6 +61,9 @@ class _SetupPageState extends State<SetupPage> {
     // オンボーディング完了フラグをセット
     await settingsBox.put(HiveConstants.keyOnboardingCompleted, true);
 
+    // 通知のスケジュールを設定
+    await NotificationManager.scheduleInactivityNotifications();
+
     if (mounted) {
       Navigator.pushReplacement(
         context,
@@ -70,34 +74,39 @@ class _SetupPageState extends State<SetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SelectionArea(
-      child: Scaffold(
-      backgroundColor: context.appColors.background,
-      body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: PageView(
-                  controller: _pageController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  onPageChanged: (page) {
-                    setState(() {
-                      _currentPage = page;
-                    });
-                  },
-                  children: [
-                    _buildLanguageStep(),
-                    _buildCurrencyStep(),
-                    _buildTitleStep(),
-                    _buildFinalStep(),
-                  ],
-                ),
+    return ValueListenableBuilder<String>(
+      valueListenable: languageNotifier,
+      builder: (context, lang, child) {
+        return SelectionArea(
+          child: Scaffold(
+            backgroundColor: context.appColors.background,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onPageChanged: (page) {
+                        setState(() {
+                          _currentPage = page;
+                        });
+                      },
+                      children: [
+                        _buildLanguageStep(),
+                        _buildCurrencyStep(),
+                        _buildTitleStep(),
+                        _buildFinalStep(),
+                      ],
+                    ),
+                  ),
+                  _buildBottomBar(),
+                ],
               ),
-              _buildBottomBar(),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -114,10 +123,7 @@ class _SetupPageState extends State<SetupPage> {
         children: [
           titleWidget,
           const SizedBox(height: 40),
-          SizedBox(
-            height: svgHeight ?? 200,
-            child: SvgPicture.asset(svgPath),
-          ),
+          SizedBox(height: svgHeight ?? 200, child: SvgPicture.asset(svgPath)),
           const SizedBox(height: 40),
           content,
         ],
@@ -154,14 +160,22 @@ class _SetupPageState extends State<SetupPage> {
             builder: (context, lang, child) {
               return SegmentedButton<String>(
                 segments: [
-                  ButtonSegment(value: 'ja', label: Text(AppStrings.languageJa)),
-                  ButtonSegment(value: 'en', label: Text(AppStrings.languageEn)),
+                  ButtonSegment(
+                    value: 'ja',
+                    label: Text(AppStrings.languageJa),
+                  ),
+                  ButtonSegment(
+                    value: 'en',
+                    label: Text(AppStrings.languageEn),
+                  ),
                 ],
                 selected: {lang},
                 onSelectionChanged: (Set<String> newSelection) {
                   final newLang = newSelection.first;
                   languageNotifier.value = newLang;
-                  Hive.box(HiveConstants.settingsBoxName).put(HiveConstants.keyLanguage, newLang);
+                  Hive.box(
+                    HiveConstants.settingsBoxName,
+                  ).put(HiveConstants.keyLanguage, newLang);
                 },
                 showSelectedIcon: false,
                 style: SegmentedButton.styleFrom(
@@ -204,8 +218,10 @@ class _SetupPageState extends State<SetupPage> {
               return SegmentedButton<String>(
                 segments: [
                   ButtonSegment(
-                    value: '¥', 
-                    label: Text(languageNotifier.value == 'ja' ? '円(¥)' : 'JPY(¥)'),
+                    value: '¥',
+                    label: Text(
+                      languageNotifier.value == 'ja' ? '円(¥)' : 'JPY(¥)',
+                    ),
                   ),
                   const ButtonSegment(value: '\$', label: Text('USD(\$)')),
                   const ButtonSegment(value: '€', label: Text('EUR(€)')),
@@ -214,10 +230,10 @@ class _SetupPageState extends State<SetupPage> {
                 onSelectionChanged: (Set<String> newSelection) {
                   final newSymbol = newSelection.first;
                   final newDigits = newSymbol == '¥' ? 0 : 2;
-                  
+
                   currencyNotifier.value = newSymbol;
                   decimalDigitsNotifier.value = newDigits;
-                  
+
                   final box = Hive.box(HiveConstants.settingsBoxName);
                   box.put(HiveConstants.keyCurrency, newSymbol);
                   box.put(HiveConstants.keyDecimalDigits, newDigits);
@@ -253,7 +269,10 @@ class _SetupPageState extends State<SetupPage> {
         children: [
           Text(
             AppStrings.setupTitle,
-            style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: context.appColors.mainText,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -261,17 +280,25 @@ class _SetupPageState extends State<SetupPage> {
             cursorColor: context.appColors.accent,
             textAlign: TextAlign.center,
             decoration: InputDecoration(
-              hintText: AppStrings.setupTitleHint, 
+              hintText: AppStrings.setupTitleHint,
               filled: true,
               fillColor: context.appColors.inputBg,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: context.appColors.accent.withOpacity(0.2)),
+                borderSide: BorderSide(
+                  color: context.appColors.accent.withOpacity(0.2),
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: context.appColors.accent, width: 2),
+                borderSide: BorderSide(
+                  color: context.appColors.accent,
+                  width: 2,
+                ),
               ),
             ),
           ),
@@ -280,7 +307,10 @@ class _SetupPageState extends State<SetupPage> {
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
               AppStrings.setupTitleExample,
-              style: TextStyle(color: context.appColors.mainText.withOpacity(0.7), fontSize: 13),
+              style: TextStyle(
+                color: context.appColors.mainText.withOpacity(0.7),
+                fontSize: 13,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -305,10 +335,7 @@ class _SetupPageState extends State<SetupPage> {
         children: [
           Text(
             AppStrings.setupFinalMessage,
-            style: TextStyle(
-              color: context.appColors.mainText,
-              fontSize: 18,
-            ),
+            style: TextStyle(color: context.appColors.mainText, fontSize: 18),
             textAlign: TextAlign.center,
           ),
         ],
@@ -323,37 +350,40 @@ class _SetupPageState extends State<SetupPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // 戻るボタンまたはインジケーター
-          _currentPage > 0 
-            ? OutlinedButton(
-                onPressed: _previousPage,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: context.appColors.accent,
-                  side: BorderSide(color: context.appColors.accent),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-                child: Text(
-                  languageNotifier.value == 'ja' ? '戻る' : 'Back',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              )
-            : Row(
-                children: List.generate(4, (index) {
-                  return Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _currentPage == index
-                          ? context.appColors.accent
-                          : context.appColors.accent.withOpacity(0.2),
+          _currentPage > 0
+              ? OutlinedButton(
+                  onPressed: _previousPage,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: context.appColors.accent,
+                    side: BorderSide(color: context.appColors.accent),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
                     ),
-                  );
-                }),
-              ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                  child: Text(
+                    AppStrings.backButtonText,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                )
+              : Row(
+                  children: List.generate(4, (index) {
+                    return Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _currentPage == index
+                            ? context.appColors.accent
+                            : context.appColors.accent.withOpacity(0.2),
+                      ),
+                    );
+                  }),
+                ),
           // 次へボタン
           ElevatedButton(
             onPressed: _nextPage,

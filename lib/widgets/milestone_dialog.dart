@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:vibration/vibration.dart';
@@ -52,7 +53,9 @@ class MilestoneDialog extends StatefulWidget {
       context: context,
       barrierDismissible: false,
       barrierLabel: '',
-      barrierColor: const Color(0xFFFFFBF0), // 完全に不透明なクリーム色の背景
+      barrierColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.black
+          : const Color(0xFFFFFBF0), // 完全に不透明な背景
       transitionDuration: const Duration(milliseconds: 600),
       pageBuilder: (context, anim1, anim2) => MilestoneDialog(
         message: message,
@@ -154,8 +157,10 @@ class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderSt
     ];
     final soundFile = sounds[Random().nextInt(sounds.length)];
 
-    // バイブレーション（適当なパターン：短い振動2回など）
-    Vibration.vibrate(pattern: [0, 100, 50, 100, 50, 100]);
+    // バイブレーション（モバイル端末のみ）
+    if (Platform.isAndroid || Platform.isIOS) {
+      Vibration.vibrate(pattern: [0, 100, 50, 100, 50, 100]);
+    }
 
     try {
       await AudioPlayer().play(AssetSource(soundFile));
@@ -188,36 +193,59 @@ class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderSt
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // 全画面表示にすべきアセットのリスト
+    final fullScreenAssets = [
+      'assets/lottie/spring.json',
+      'assets/lottie/fireworks.json',
+      'assets/lottie/light.json',
+      'assets/lottie/snowflake.json',
+      'assets/lottie/sparkle_stars.json',
+      'assets/lottie/confetti.json',
+    ];
+    final isFullScreen = fullScreenAssets.contains(widget.lottieAsset);
 
     return SelectionArea(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: Stack(
           children: [
+            // 全画面背景アニメーション
+            if (isFullScreen)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: Lottie.asset(
+                    widget.lottieAsset,
+                    width: screenWidth,
+                    height: screenHeight,
+                    fit: BoxFit.cover,
+                    repeat: true,
+                  ),
+                ),
+              ),
+
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // 1. ぶたさん（揺れる）と背景のLottieを重ねる
+                  // 1. ぶたさん（揺れる）
                   Stack(
                     alignment: Alignment.center,
                     clipBehavior: Clip.none,
                     children: [
-                      // 背景のLottie演出（中心がブタさんの頭辺りに来るように調整）
-                      Positioned(
-                        top: -screenWidth / 2, // Lottieの大きさの半分だけ上にずらすことで中心を頭に合わせる
-                        child: IgnorePointer(
-                          child: Builder(
-                            builder: (context) {
-                              return Lottie.asset(
-                                widget.lottieAsset,
-                                width: screenWidth,
-                                repeat: true,
-                              );
-                            },
+                      // 背景のLottie演出（全画面でない場合のみ、キャラクター中心に表示）
+                      if (!isFullScreen)
+                        Positioned(
+                          top: -screenWidth / 2, // Lottieの大きさの半分だけ上にずらすことで中心を頭に合わせる
+                          child: IgnorePointer(
+                            child: Lottie.asset(
+                              widget.lottieAsset,
+                              width: screenWidth,
+                              repeat: true,
+                            ),
                           ),
                         ),
-                      ),
                       AnimatedBuilder(
                         animation: _idleController,
                         builder: (context, child) {
@@ -243,15 +271,17 @@ class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderSt
                       child: Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.appColors.inputBg,
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 15,
-                              spreadRadius: 2,
-                            ),
-                          ],
+                          boxShadow: Theme.of(context).brightness == Brightness.dark
+                              ? []
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 15,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,

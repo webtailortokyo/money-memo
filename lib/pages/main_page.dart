@@ -4,8 +4,8 @@ import 'dart:developer';
 import 'dart:async';
 import 'package:vibration/vibration.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:lottie/lottie.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../widgets/feedback_animation.dart';
 
 import 'period_page.dart';
 import 'input_page.dart';
@@ -15,7 +15,6 @@ import '../theme.dart';
 import '../models/money_entry.dart';
 import '../models/money_type.dart';
 import '../widgets/money_entry_card.dart';
-import '../widgets/piggy_character.dart';
 import '../utils/sort_entries.dart';
 import '../utils/input_formatter.dart';
 import '../constants.dart';
@@ -152,23 +151,19 @@ class _MainPageState extends State<MainPage> {
 
   Future<void> _playFeedback(MoneyType type) async {
     String soundFile;
-    String lottieFile;
     int vibrationDuration;
 
     switch (type) {
       case MoneyType.increase:
         soundFile = 'sounds/increase.mp3';
-        lottieFile = 'assets/lottie/increase.json';
         vibrationDuration = 1000;
         break;
       case MoneyType.decrease:
         soundFile = 'sounds/decrease.mp3';
-        lottieFile = 'assets/lottie/decrease.json';
         vibrationDuration = 500;
         break;
       case MoneyType.memo:
         soundFile = 'sounds/pen_writing.mp3';
-        lottieFile = 'assets/lottie/sparkle_stars.json';
         vibrationDuration = 200;
         break;
     }
@@ -184,86 +179,16 @@ class _MainPageState extends State<MainPage> {
       barrierDismissible: false,
       builder: (context) {
         final screenWidth = MediaQuery.of(context).size.width;
-        final screenHeight = MediaQuery.of(context).size.height;
         final size = (screenWidth * 0.8 < 300) ? screenWidth * 0.8 : 300.0;
 
-        final lottieWidget = Lottie.asset(
-          lottieFile,
-          width: (type == MoneyType.increase || type == MoneyType.memo) ? size * 1.5 : size,
-          height: (type == MoneyType.increase || type == MoneyType.memo) ? size * 1.5 : size,
-          repeat: false,
-          onLoaded: (composition) {
-            Future.delayed(composition.duration * 1.2, () {
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
-            });
+        return FeedbackAnimation(
+          type: type,
+          size: size,
+          onComplete: () {
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
           },
-          errorBuilder: (context, error, stackTrace) {
-            Future.delayed(Duration.zero, () {
-               if (context.mounted) Navigator.of(context).pop();
-            });
-            return SizedBox();
-          },
-        );
-
-        Widget imageWidget;
-        if (type == MoneyType.memo) {
-          // 「メモのみ」の場合は執筆中のLottieを表示
-          imageWidget = Lottie.asset(
-            'assets/lottie/writing.json',
-            width: size * 1.2,
-            height: size * 1.2,
-            repeat: true,
-          );
-        } else {
-          imageWidget = TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: screenHeight, end: 0),
-            duration: const Duration(milliseconds: 720),
-            curve: Curves.easeOutBack,
-            builder: (context, value, child) {
-              return Transform.translate(
-                offset: Offset(0, value),
-                child: child,
-              );
-            },
-            child: type == MoneyType.increase
-                ? Padding(
-                    padding: const EdgeInsets.only(top: 150),
-                    child: SvgPicture.asset(
-                      'assets/img/piggy_bank.svg',
-                      width: size * 0.7,
-                    ),
-                  )
-                : PiggyCharacter(
-                    width: size * 0.7,
-                    pose: PiggyPose.joy,
-                    eyes: PiggyEyes.smile,
-                    isBlinking: true,
-                  ),
-          );
-        }
-
-        return Center(
-          child: Material(
-            type: MaterialType.transparency,
-            child: (type == MoneyType.increase || type == MoneyType.memo)
-                ? Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: [
-                      lottieWidget,
-                      imageWidget,
-                    ],
-                  )
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      lottieWidget,
-                      imageWidget,
-                    ],
-                  ),
-          ),
         );
       },
     );
@@ -442,294 +367,299 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SelectionArea(
-      child: Scaffold(
-      backgroundColor: context.appColors.background,
-
-      appBar: AppBar(
-        backgroundColor: context.appColors.background,
-        elevation: AppNumbers.appBarElevation,
-        title: ValueListenableBuilder2<String, String>(
-          valueListenable1: appTitleNotifier,
-          valueListenable2: currencyNotifier,
-          builder: (context, title, symbol, child) {
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  'assets/img/app_icon.svg',
-                  width: 28,
-                  height: 28,
-                ),
-                SizedBox(width: 8),
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: context.appColors.accent,
-                    fontWeight: FontWeight.bold,
-                    fontSize: AppNumbers.titleFontSize,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings, color: context.appColors.accent),
+    return ValueListenableBuilder<String>(
+      valueListenable: languageNotifier,
+      builder: (context, lang, child) {
+        return SelectionArea(
+          child: Scaffold(
+          backgroundColor: context.appColors.background,
+    
+          appBar: AppBar(
+            backgroundColor: context.appColors.background,
+            elevation: AppNumbers.appBarElevation,
+            title: ValueListenableBuilder2<String, String>(
+              valueListenable1: appTitleNotifier,
+              valueListenable2: currencyNotifier,
+              builder: (context, title, symbol, child) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/img/app_icon.svg',
+                      width: 28,
+                      height: 28,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: context.appColors.accent,
+                        fontWeight: FontWeight.bold,
+                        fontSize: AppNumbers.titleFontSize,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.settings, color: context.appColors.accent),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                  );
+                },
+              ),
+              SizedBox(width: 8),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton.extended(
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const SettingsPage()),
+                MaterialPageRoute(builder: (_) => const PeriodPage()),
               );
             },
+            label: Text(
+              AppStrings.periodPageTitle,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            icon: Icon(Icons.history, color: Colors.white),
+            backgroundColor: context.appColors.accent,
+            foregroundColor: Colors.white,
           ),
-          SizedBox(width: 8),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const PeriodPage()),
-          );
-        },
-        label: Text(
-          AppStrings.periodPageTitle,
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        icon: Icon(Icons.history, color: Colors.white),
-        backgroundColor: context.appColors.accent,
-        foregroundColor: Colors.white,
-      ),
-
-      body: SafeArea(
-          child: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              // 蜈･蜉帙お繝ｪ繧Area
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppNumbers.defaultPadding + AppNumbers.smallSpacing,
-                    vertical: AppNumbers.smallSpacing,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        onTap: _pickDate,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppNumbers.smallSpacing,
-                            horizontal: AppNumbers.defaultPadding,
-                          ),
-                          decoration: BoxDecoration(
-                            color: context.appColors.inputBg,
-                            borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                            border: Border.all(color: Colors.grey.shade300, width: 1.5),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: AppNumbers.calendarIconSize,
-                              ),
-                              SizedBox(width: AppNumbers.smallSpacing),
-                              Text(
-                                formatDate(selectedDate),
-                                style: TextStyle(
-                                  fontSize: AppNumbers.calendarFontSize,
-                                  color: context.appColors.mainText,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+    
+          body: SafeArea(
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  // 蜈･蜉帙お繝ｪ繧Area
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppNumbers.defaultPadding + AppNumbers.smallSpacing,
+                        vertical: AppNumbers.smallSpacing,
                       ),
-  
-                      SizedBox(height: AppNumbers.smallSpacing),
-  
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isWide = constraints.maxWidth > 300;
-  
-                          if (isWide) {
-                            return Row(
-                              children: [
-                                Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
-                                SizedBox(width: AppNumbers.smallSpacing),
-                                Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
-                                SizedBox(width: AppNumbers.smallSpacing),
-                                Expanded(child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo)),
-                              ],
-                            );
-                          } else {
-                            return Column(
-                              children: [
-                                Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: _pickDate,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppNumbers.smallSpacing,
+                                horizontal: AppNumbers.defaultPadding,
+                              ),
+                              decoration: BoxDecoration(
+                                color: context.appColors.inputBg,
+                                borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                                border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today,
+                                    size: AppNumbers.calendarIconSize,
+                                  ),
+                                  SizedBox(width: AppNumbers.smallSpacing),
+                                  Text(
+                                    formatDate(selectedDate),
+                                    style: TextStyle(
+                                      fontSize: AppNumbers.calendarFontSize,
+                                      color: context.appColors.mainText,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+      
+                          SizedBox(height: AppNumbers.smallSpacing),
+      
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final isWide = constraints.maxWidth > 300;
+      
+                              if (isWide) {
+                                return Row(
                                   children: [
                                     Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
                                     SizedBox(width: AppNumbers.smallSpacing),
                                     Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
+                                    SizedBox(width: AppNumbers.smallSpacing),
+                                    Expanded(child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo)),
                                   ],
-                                ),
-                                SizedBox(height: AppNumbers.smallSpacing),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo),
-                                ),
-                              ],
-                            );
-                          }
-                        },
-                      ),
-  
-                      SizedBox(height: AppNumbers.smallSpacing),
-  
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        decoration: BoxDecoration(
-                          color: context.appColors.inputBg,
-                          borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
-                          border: Border.all(
-                            color: memoFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
-                            width: 1.5,
+                                );
+                              } else {
+                                return Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(child: _typeButtonInner(AppStrings.increaseTypeLabel, MoneyType.increase, context.appColors.increase)),
+                                        SizedBox(width: AppNumbers.smallSpacing),
+                                        Expanded(child: _typeButtonInner(AppStrings.decreaseTypeLabel, MoneyType.decrease, context.appColors.decrease)),
+                                      ],
+                                    ),
+                                    SizedBox(height: AppNumbers.smallSpacing),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: _typeButtonInner(AppStrings.memoTypeLabel, MoneyType.memo, context.appColors.memo),
+                                    ),
+                                  ],
+                                );
+                              }
+                            },
                           ),
-                          boxShadow: memoFocusNode.hasFocus
-                              ? [
-                                  BoxShadow(
-                                    color: context.appColors.accent.withOpacity(0.3),
-                                    blurRadius: 6,
-                                    spreadRadius: 0,
-                                  )
-                                ]
-                              : [],
-                        ),
-                        child: TextField(
-                          focusNode: memoFocusNode,
-                          controller: memoController,
-                          maxLines: null,
-                          decoration: InputDecoration(
-                            hintText: memoHint,
-                            filled: false,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-  
-                      SizedBox(height: AppNumbers.smallSpacing),
-  
-                      Column(
-                        children: [
-                          _amountTextField(),
+      
                           SizedBox(height: AppNumbers.smallSpacing),
-                          Align(
-                            alignment: Alignment.center,
-                            child: _recordButton(),
+      
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            decoration: BoxDecoration(
+                              color: context.appColors.inputBg,
+                              borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
+                              border: Border.all(
+                                color: memoFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
+                                width: 1.5,
+                              ),
+                              boxShadow: memoFocusNode.hasFocus
+                                  ? [
+                                      BoxShadow(
+                                        color: context.appColors.accent.withOpacity(0.3),
+                                        blurRadius: 6,
+                                        spreadRadius: 0,
+                                      )
+                                    ]
+                                  : [],
+                            ),
+                            child: TextField(
+                              focusNode: memoFocusNode,
+                              controller: memoController,
+                              maxLines: null,
+                              decoration: InputDecoration(
+                                hintText: memoHint,
+                                filled: false,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+      
+                          SizedBox(height: AppNumbers.smallSpacing),
+      
+                          Column(
+                            children: [
+                              _amountTextField(),
+                              SizedBox(height: AppNumbers.smallSpacing),
+                              Align(
+                                alignment: Alignment.center,
+                                child: _recordButton(),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-  
-              const SliverToBoxAdapter(child: SizedBox(height: 12)),
-  
-              // 險倬鹸繝ｪ繧ｹ繝・
-              ValueListenableBuilder(
-                valueListenable: box.listenable(),
-                builder: (context, Box<MoneyEntry> box, _) {
-                  if (box.isEmpty) {
-                    return SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Center(
-                        child: Text(AppStrings.noRecordMessage),
-                      ),
-                    );
-                  }
-  
-                  final allEntries = sortedEntries(box);
-                  final entries = allEntries.take(_displayCount).toList();
-  
-                  return SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppNumbers.listViewHorizontalPadding),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final entry = entries[index];
-                          return MoneyEntryCard(
-                            entry: entry,
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => InputPage(entry: entry),
-                                ),
+      
+                  const SliverToBoxAdapter(child: SizedBox(height: 12)),
+      
+                  // 險倬鹸繝ｪ繧ｹ繝・
+                  ValueListenableBuilder(
+                    valueListenable: box.listenable(),
+                    builder: (context, Box<MoneyEntry> box, _) {
+                      if (box.isEmpty) {
+                        return SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: Center(
+                            child: Text(AppStrings.noRecordMessage),
+                          ),
+                        );
+                      }
+      
+                      final allEntries = sortedEntries(box);
+                      final entries = allEntries.take(_displayCount).toList();
+      
+                      return SliverPadding(
+                        padding: const EdgeInsets.symmetric(horizontal: AppNumbers.listViewHorizontalPadding),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final entry = entries[index];
+                              return MoneyEntryCard(
+                                entry: entry,
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => InputPage(entry: entry),
+                                    ),
+                                  );
+                                },
+                                onLongPress: () async {
+                                  final result = await showDialog<bool>(
+                                    context: context,
+                                    builder: (_) => SelectionArea(
+                                      child: AlertDialog(
+                                      title: Text(AppStrings.deleteDialogTitle),
+                                      content: Text(AppStrings.deleteDialogContent),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, false),
+                                          child: Text(AppStrings.cancelButtonText),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, true),
+                                          child: Text(
+                                            AppStrings.deleteButtonText,
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+      
+                                  if (result == true) {
+                                    box.delete(entry.key);
+                                  }
+                                },
                               );
                             },
-                            onLongPress: () async {
-                              final result = await showDialog<bool>(
-                                context: context,
-                                builder: (_) => SelectionArea(
-                                  child: AlertDialog(
-                                  title: Text(AppStrings.deleteDialogTitle),
-                                  content: Text(AppStrings.deleteDialogContent),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context, false),
-                                      child: Text(AppStrings.cancelButtonText),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context, true),
-                                      child: Text(
-                                        AppStrings.deleteButtonText,
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-  
-                              if (result == true) {
-                                box.delete(entry.key);
-                              }
-                            },
-                          );
-                        },
-                        childCount: entries.length,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              // 下部の余白と読み込みインジケータ
-              SliverToBoxAdapter(
-                child: ValueListenableBuilder(
-                  valueListenable: box.listenable(),
-                  builder: (context, Box<MoneyEntry> box, _) {
-                    if (_displayCount < box.length) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: context.appColors.accent.withOpacity(0.5),
+                            childCount: entries.length,
                           ),
                         ),
                       );
-                    }
-                    return const SizedBox(height: 80.0); // FABと重ならないように余白を多めに確保
-                  },
-                ),
+                    },
+                  ),
+                  // 下部の余白と読み込みインジケータ
+                  SliverToBoxAdapter(
+                    child: ValueListenableBuilder(
+                      valueListenable: box.listenable(),
+                      builder: (context, Box<MoneyEntry> box, _) {
+                        if (_displayCount < box.length) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: context.appColors.accent.withOpacity(0.5),
+                              ),
+                            ),
+                          );
+                        }
+                        return const SizedBox(height: 80.0); // FABと重ならないように余白を多めに確保
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

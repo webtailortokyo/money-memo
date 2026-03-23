@@ -6,6 +6,7 @@ import '../models/money_entry.dart';
 import 'setup_page.dart';
 import '../theme.dart';
 import '../utils/csv_helper.dart';
+import '../utils/notification_manager.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -96,6 +97,9 @@ class _SettingsPageState extends State<SettingsPage> {
           SnackBar(content: Text(AppStrings.resetSuccess)),
         );
         
+        // 通知のスケジュールをリセットして再設定
+        await NotificationManager.scheduleInactivityNotifications();
+
         // SetupPageへ遷移
         Navigator.pushAndRemoveUntil(
           context,
@@ -221,6 +225,10 @@ class _SettingsPageState extends State<SettingsPage> {
                       
                       final box = Hive.box(HiveConstants.settingsBoxName);
                       box.put(HiveConstants.keyLanguage, newLang);
+                      
+                      // 言語変更に合わせて通知メッセージも更新（再スケジュール）
+                      NotificationManager.scheduleInactivityNotifications();
+
                       setState(() {});
                     },
                     showSelectedIcon: false,
@@ -242,40 +250,32 @@ class _SettingsPageState extends State<SettingsPage> {
               child: ValueListenableBuilder<ThemeMode>(
                 valueListenable: appThemeNotifier,
                 builder: (context, themeMode, _) {
-                  return DropdownButtonFormField<ThemeMode>(
-                    value: themeMode,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: context.appColors.inputBg,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: context.appColors.accent, width: 2),
-                      ),
-                    ),
-                    dropdownColor: context.appColors.inputBg,
-                    items: [
-                      DropdownMenuItem(
+                  return SegmentedButton<ThemeMode>(
+                    segments: [
+                      ButtonSegment(
                         value: ThemeMode.light,
-                        child: Text(AppStrings.lightMode),
+                        label: Text(AppStrings.lightMode),
                       ),
-                      DropdownMenuItem(
+                      ButtonSegment(
                         value: ThemeMode.dark,
-                        child: Text(AppStrings.darkMode),
+                        label: Text(AppStrings.darkMode),
                       ),
                     ],
-                    onChanged: (ThemeMode? newTheme) {
-                      if (newTheme != null) {
-                        appThemeNotifier.value = newTheme;
-                        Hive.box(HiveConstants.settingsBoxName).put(
-                            HiveConstants.keyThemeMode,
-                            newTheme == ThemeMode.dark ? 'dark' : 'light');
-                      }
+                    selected: {themeMode},
+                    onSelectionChanged: (Set<ThemeMode> newSelection) {
+                      final newTheme = newSelection.first;
+                      appThemeNotifier.value = newTheme;
+                      Hive.box(HiveConstants.settingsBoxName).put(
+                          HiveConstants.keyThemeMode,
+                          newTheme == ThemeMode.dark ? 'dark' : 'light');
                     },
+                    showSelectedIcon: false,
+                    style: SegmentedButton.styleFrom(
+                      selectedBackgroundColor: context.appColors.accent,
+                      selectedForegroundColor: Colors.white,
+                      foregroundColor: context.appColors.accent,
+                      side: BorderSide(color: context.appColors.accent),
+                    ),
                   );
                 },
               ),
@@ -312,6 +312,8 @@ class _SettingsPageState extends State<SettingsPage> {
               subtitle: Text(AppStrings.importSubtitle),
               onTap: () async {
                 await CsvHelper.importCsv(context);
+                // インポート後に通知を再スケジュール
+                await NotificationManager.scheduleInactivityNotifications();
                 setState(() {});
               },
             ),

@@ -7,9 +7,15 @@ import 'pages/setup_page.dart';
 import 'app_state.dart';
 import 'constants.dart';
 import 'theme.dart';
+import 'utils/notification_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 通知機能の初期化
+  await NotificationManager.init();
+  // 初回の通知スケジュール（未記録なら3日後）を設定
+  await NotificationManager.scheduleInactivityNotifications();
 
   await Hive.initFlutter();
 

@@ -40,6 +40,9 @@ dependencies:
   flutter_svg: ^2.2.4
   csv: ^6.0.0
   file_picker: ^8.0.0
+  flutter_local_notifications: ^17.2.1
+  timezone: any
+  flutter_timezone: any
 
 dev_dependencies:
   flutter_test:
