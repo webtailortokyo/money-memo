@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'models/money_entry.dart';
 import 'pages/main_page.dart';
+import 'pages/setup_page.dart';
 import 'app_state.dart';
 import 'constants.dart';
 import 'theme.dart';
@@ -45,6 +46,8 @@ void main() async {
     appThemeNotifier.value = savedThemeMode == 'dark' ? ThemeMode.dark : ThemeMode.light;
   }
 
+  final onboardingCompleted = settingsBox.get(HiveConstants.keyOnboardingCompleted, defaultValue: false) as bool;
+
   // 言語が変わったとき、タイトルがデフォルト（空）なら AppStrings.appTitle に更新する
   languageNotifier.addListener(() {
     final box = Hive.box(HiveConstants.settingsBoxName);
@@ -54,11 +57,12 @@ void main() async {
     }
   });
 
-  runApp(const MyApp());
+  runApp(MyApp(onboardingCompleted: onboardingCompleted));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool onboardingCompleted;
+  const MyApp({super.key, required this.onboardingCompleted});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +88,7 @@ class MyApp extends StatelessWidget {
                 fontFamily: 'Rounded Mplus 1c',
                 extensions: const [darkAppColors],
               ),
-              home: MainPage(),
+              home: onboardingCompleted ? const MainPage() : const SetupPage(),
             );
           },
         );

@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../constants.dart';
 import '../app_state.dart';
 import '../models/money_entry.dart';
+import 'setup_page.dart';
 import '../theme.dart';
 import '../utils/csv_helper.dart';
 
@@ -74,14 +75,30 @@ class _SettingsPageState extends State<SettingsPage> {
       // タイトルもデフォルトに戻す
       final settingsBox = Hive.box(HiveConstants.settingsBoxName);
       await settingsBox.delete(HiveConstants.keyAppTitle);
-      appTitleNotifier.value = AppStrings.appTitle;
-      _titleController.text = AppStrings.appTitle;
+      
+      // 他の設定もリセット（必要に応じて）
+      await settingsBox.delete(HiveConstants.keyCurrency);
+      await settingsBox.delete(HiveConstants.keyDecimalDigits);
+      await settingsBox.delete(HiveConstants.keyLanguage);
+      
+      // オンボーディング未完了フラグをセット
+      await settingsBox.put(HiveConstants.keyOnboardingCompleted, false);
 
-      setState(() {});
+      appTitleNotifier.value = AppStrings.appTitle;
+      currencyNotifier.value = '¥';
+      decimalDigitsNotifier.value = 0;
+      languageNotifier.value = 'ja';
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(AppStrings.resetSuccess)),
+        );
+        
+        // SetupPageへ遷移
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const SetupPage()),
+          (route) => false,
         );
       }
     }
@@ -212,7 +229,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
 
           // テーマ設定
-          const _SectionHeader(title: 'テーマ'),
+          _SectionHeader(title: AppStrings.themeSettingTitle),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: ValueListenableBuilder<ThemeMode>(
@@ -234,14 +251,14 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   dropdownColor: context.appColors.inputBg,
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: ThemeMode.light,
-                      child: Text('ライトモード'),
+                      child: Text(AppStrings.lightMode),
                     ),
                     DropdownMenuItem(
                       value: ThemeMode.dark,
-                      child: Text('ダークモード'),
+                      child: Text(AppStrings.darkMode),
                     ),
                   ],
                   onChanged: (ThemeMode? newTheme) {
@@ -273,19 +290,19 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             leading: Icon(Icons.file_download, color: context.appColors.accent),
             title: Text(
-              'エクスポート (CSV)',
+              AppStrings.exportLabel,
               style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
             ),
-            subtitle: const Text('記録データを保存・共有します'),
+            subtitle: Text(AppStrings.exportSubtitle),
             onTap: () => CsvHelper.exportCsv(context),
           ),
           ListTile(
             leading: Icon(Icons.file_upload, color: context.appColors.accent),
             title: Text(
-              'インポート (CSV)',
+              AppStrings.importLabel,
               style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
             ),
-            subtitle: const Text('保存したデータを読み込みます'),
+            subtitle: Text(AppStrings.importSubtitle),
             onTap: () async {
               await CsvHelper.importCsv(context);
               setState(() {});

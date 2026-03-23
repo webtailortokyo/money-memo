@@ -83,6 +83,23 @@ class AppStrings {
       'closeButtonText': 'とじる',
       'today': '今日',
       'yesterday': '昨日',
+      'setupWelcome': 'ようこそ！',
+      'setupLanguage': 'ことばをえらんでね',
+      'setupCurrency': 'つかうおかねをえらんでね',
+      'setupTitle': 'なまえをきめてね',
+      'setupTitleHint': '例：じぶんのおかねメモ',
+      'setupStart': 'はじめる',
+      'setupNext': 'つぎへ',
+      'setupFinalTitle': '準備完了！',
+      'setupFinalMessage': '準備ができたよ！\nさっそく使ってみよう',
+      'setupTitleExample': '例：たろうのお小遣い帳、ランチ代の記録、光熱費のメモ、など',
+      'exportLabel': 'エクスポート (CSV)',
+      'exportSubtitle': '記録データを保存・共有します',
+      'importLabel': 'インポート (CSV)',
+      'importSubtitle': '保存したデータを読み込みます',
+      'themeSettingTitle': 'テーマ',
+      'lightMode': 'ライトモード',
+      'darkMode': 'ダークモード',
     },
     'en': {
       'appTitle': 'Money Memo',
@@ -154,6 +171,23 @@ class AppStrings {
       'closeButtonText': 'Close',
       'today': 'Today',
       'yesterday': 'Yesterday',
+      'setupWelcome': 'Welcome!',
+      'setupLanguage': 'Choose your language',
+      'setupCurrency': 'Choose your currency',
+      'setupTitle': 'Choose app title',
+      'setupTitleHint': 'Money Memo',
+      'setupStart': 'Get Started',
+      'setupNext': 'Next',
+      'setupFinalTitle': 'Ready!',
+      'setupFinalMessage': "You're all set!\nLet's get started",
+      'setupTitleExample': 'e.g., John\'s Money Memo, My Expenses, Utility Bills, etc.',
+      'exportLabel': 'Export (CSV)',
+      'exportSubtitle': 'Save and share recorded data',
+      'importLabel': 'Import (CSV)',
+      'importSubtitle': 'Load saved data',
+      'themeSettingTitle': 'Theme',
+      'lightMode': 'Light Mode',
+      'darkMode': 'Dark Mode',
     }
   };
 
@@ -253,6 +287,23 @@ class AppStrings {
   static String get closeButtonText => _get('closeButtonText');
   static String get today => _get('today');
   static String get yesterday => _get('yesterday');
+  static String get setupWelcome => _get('setupWelcome');
+  static String get setupLanguage => _get('setupLanguage');
+  static String get setupCurrency => _get('setupCurrency');
+  static String get setupTitle => _get('setupTitle');
+  static String get setupTitleHint => _get('setupTitleHint');
+  static String get setupStart => _get('setupStart');
+  static String get setupNext => _get('setupNext');
+  static String get setupFinalTitle => _get('setupFinalTitle');
+  static String get setupFinalMessage => _get('setupFinalMessage');
+  static String get setupTitleExample => _get('setupTitleExample');
+  static String get exportLabel => _get('exportLabel');
+  static String get exportSubtitle => _get('exportSubtitle');
+  static String get importLabel => _get('importLabel');
+  static String get importSubtitle => _get('importSubtitle');
+  static String get themeSettingTitle => _get('themeSettingTitle');
+  static String get lightMode => _get('lightMode');
+  static String get darkMode => _get('darkMode');
 
   static const String appVersion = '1.0.0';
 
@@ -304,6 +355,7 @@ class HiveConstants {
   static const String keyDecimalDigits = 'decimalDigits';
   static const String keyLanguage = 'language';
   static const String keyThemeMode = 'themeMode';
+  static const String keyOnboardingCompleted = 'onboardingCompleted';
 }
 
 // MoneyEntryのtypeを表す文字列 (これはmodels/money_entry.dartのextensionで使うことを想定)
