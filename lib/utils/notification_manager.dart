@@ -40,37 +40,41 @@ class NotificationManager {
     if (kIsWeb || (!Platform.isAndroid && !Platform.isIOS && !Platform.isMacOS && !Platform.isLinux)) {
       return;
     }
-    // 既存の未発行通知をすべてキャンセル
-    await _notificationsPlugin.cancelAll();
+    try {
+      // 既存の未発行通知をすべてキャンセル
+      await _notificationsPlugin.cancelAll();
 
-    // 3日後の20:00
-    final day3 = _scheduledTime(3, 20, 0);
-    // 7日後の20:00
-    final day7 = _scheduledTime(7, 20, 0);
+      // 3日後の20:00
+      final day3 = _scheduledTime(3, 20, 0);
+      // 7日後の20:00
+      final day7 = _scheduledTime(7, 20, 0);
 
-    // 3日後のメッセージをランダムに選択（パターンA, B, C）
-    final patterns = [
-      AppStrings.notification3DayPatternA,
-      AppStrings.notification3DayPatternB,
-      AppStrings.notification3DayPatternC,
-    ];
-    final randomMessage = patterns[Random().nextInt(patterns.length)];
+      // 3日後のメッセージをランダムに選択（パターンA, B, C）
+      final patterns = [
+        AppStrings.notification3DayPatternA,
+        AppStrings.notification3DayPatternB,
+        AppStrings.notification3DayPatternC,
+      ];
+      final randomMessage = patterns[Random().nextInt(patterns.length)];
 
-    // 3日後の通知登録
-    await _scheduleNotification(
-      id: 100,
-      title: AppStrings.notificationTitle,
-      body: randomMessage,
-      scheduledDate: day3,
-    );
+      // 3日後の通知登録
+      await _scheduleNotification(
+        id: 100,
+        title: AppStrings.notificationTitle,
+        body: randomMessage,
+        scheduledDate: day3,
+      );
 
-    // 7日後の通知登録
-    await _scheduleNotification(
-      id: 101,
-      title: AppStrings.notificationTitle,
-      body: AppStrings.notification7DayMessage,
-      scheduledDate: day7,
-    );
+      // 7日後の通知登録
+      await _scheduleNotification(
+        id: 101,
+        title: AppStrings.notificationTitle,
+        body: AppStrings.notification7DayMessage,
+        scheduledDate: day7,
+      );
+    } catch (e) {
+      debugPrint('Failed to schedule inactivity notifications: $e');
+    }
   }
 
   /// 指定した日数後の指定時刻を取得

@@ -12,16 +12,21 @@ import 'utils/notification_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 通知機能の初期化
-  await NotificationManager.init();
-  // 初回の通知スケジュール（未記録なら3日後）を設定
-  await NotificationManager.scheduleInactivityNotifications();
+  try {
+    // 通知機能の初期化
+    await NotificationManager.init();
+    // 初回の通知スケジュール（未記録なら3日後）を設定
+    await NotificationManager.scheduleInactivityNotifications();
+  } catch (e) {
+    debugPrint('Notification initialization error: $e');
+  }
 
   await Hive.initFlutter();
 
   Hive.registerAdapter(MoneyEntryAdapter());
   await Hive.openBox<MoneyEntry>(HiveConstants.moneyBoxName);
   await Hive.openBox(HiveConstants.statsBoxName);
+
   
   // 設定保存用のBoxを開く
   final settingsBox = await Hive.openBox(HiveConstants.settingsBoxName);

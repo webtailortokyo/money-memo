@@ -1,0 +1,21 @@
+  ════════════════════════════════════════════
+     FLUTTER LAUNCHER ICONS (v0.13.1)                               
+  ════════════════════════════════════════════
+  
+
+⚠ Warning: flutter_icons has been deprecated please use flutter_launcher_icons instead in your yaml files
+Unhandled exception:
+
+✗ ERROR: InvalidConfigException 
+line 120, column 12: Unsupported value for "windows". type 'bool' is not a subtype of type 'Map<dynamic, dynamic>' in type cast
+    ╷
+120 │   windows: true
+    │            ^^^^
+    ╵
+#0      Config._getConfigFromPubspecYaml (package:flutter_launcher_icons/config/config.dart:95:7)
+#1      Config.loadConfigFromPubSpec (package:flutter_launcher_icons/config/config.dart:59:12)
+#2      loadConfigFileFromArgResults (package:flutter_launcher_icons/main.dart:178:14)
+#3      createIconsFromArguments (package:flutter_launcher_icons/main.dart:82:9)
+#4      main (file:///C:/Users/ohtsu/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_launcher_icons-0.13.1/bin/flutter_launcher_icons.dart:7:26)
+#5      _delayEntrypointInvocation.<anonymous closure> (dart:isolate-patch/isolate_patch.dart:312:33)
+#6      _RawReceivePort._handleMessage (dart:isolate-patch/isolate_patch.dart:193:12)
