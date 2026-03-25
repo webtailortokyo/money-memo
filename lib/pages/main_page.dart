@@ -297,7 +297,7 @@ class _MainPageState extends State<MainPage> {
         boxShadow: amountFocusNode.hasFocus
             ? [
                 BoxShadow(
-                  color: context.appColors.accent.withOpacity(0.3),
+                  color: context.appColors.accent.withValues(alpha: 0.3),
                   blurRadius: 6,
                   spreadRadius: 0,
                 )
@@ -527,7 +527,7 @@ class _MainPageState extends State<MainPage> {
                               boxShadow: memoFocusNode.hasFocus
                                   ? [
                                       BoxShadow(
-                                        color: context.appColors.accent.withOpacity(0.3),
+                                        color: context.appColors.accent.withValues(alpha: 0.3),
                                         blurRadius: 6,
                                         spreadRadius: 0,
                                       )
@@ -645,7 +645,7 @@ class _MainPageState extends State<MainPage> {
                             child: Center(
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: context.appColors.accent.withOpacity(0.5),
+                                color: context.appColors.accent.withValues(alpha: 0.5)
                               ),
                             ),
                           );

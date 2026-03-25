@@ -43,6 +43,7 @@ dependencies:
   flutter_local_notifications: ^17.2.1
   timezone: any
   flutter_timezone: any
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:

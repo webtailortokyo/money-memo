@@ -85,11 +85,12 @@ class CsvHelper {
         await file.writeAsString(csvString);
 
         if (context.mounted) {
-          final box = context.findRenderObject() as RenderBox?;
+          final renderBox = context.findRenderObject() as RenderBox?;
+          // ignore: deprecated_member_use
           await Share.shareXFiles(
             [XFile(path)],
             text: 'お金メモのバックアップデータです',
-            sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+            sharePositionOrigin: renderBox!.localToGlobal(Offset.zero) & renderBox.size,
           );
         }
       }

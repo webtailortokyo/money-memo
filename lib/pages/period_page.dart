@@ -689,7 +689,8 @@ class _PeriodPageState extends State<PeriodPage> {
       }
     }
 
-    // OS讓呎ｺ悶・蜈ｱ譛峨ム繧､繧｢繝ｭ繧ｰ繧定｡ｨ遉ｺ
+    // OS讓呎ｺ悶・蜈ｱ譛峨ム繧訂繧ｰ繧定｡ｨ遉ｺ
+    // ignore: deprecated_member_use
     await Share.share(text.toString().trim());
   }
 }

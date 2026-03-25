@@ -100,12 +100,14 @@ class _SettingsPageState extends State<SettingsPage> {
         // 通知のスケジュールをリセットして再設定
         await NotificationManager.scheduleInactivityNotifications();
 
-        // SetupPageへ遷移
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const SetupPage()),
-          (route) => false,
-        );
+        if (mounted) {
+          // SetupPageへ遷移
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const SetupPage()),
+            (route) => false,
+          );
+        }
       }
     }
   }
@@ -152,7 +154,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: context.appColors.accent.withOpacity(0.2)),
+                    borderSide: BorderSide(color: context.appColors.accent.withValues(alpha: 0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),

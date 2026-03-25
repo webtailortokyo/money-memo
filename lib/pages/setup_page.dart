@@ -290,7 +290,7 @@ class _SetupPageState extends State<SetupPage> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: context.appColors.accent.withOpacity(0.2),
+                  color: context.appColors.accent.withValues(alpha: 0.2),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -308,7 +308,7 @@ class _SetupPageState extends State<SetupPage> {
             child: Text(
               AppStrings.setupTitleExample,
               style: TextStyle(
-                color: context.appColors.mainText.withOpacity(0.7),
+                color: context.appColors.mainText.withValues(alpha: 0.7),
                 fontSize: 13,
               ),
               textAlign: TextAlign.center,
@@ -379,7 +379,7 @@ class _SetupPageState extends State<SetupPage> {
                         shape: BoxShape.circle,
                         color: _currentPage == index
                             ? context.appColors.accent
-                            : context.appColors.accent.withOpacity(0.2),
+                            : context.appColors.accent.withValues(alpha: 0.2),
                       ),
                     );
                   }),

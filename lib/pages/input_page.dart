@@ -5,7 +5,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:developer';
 import 'package:vibration/vibration.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../widgets/feedback_animation.dart';
 import 'package:intl/intl.dart';
 import 'dart:async'; // Timer繧剃ｽｿ縺・◆繧√・import
@@ -156,7 +155,7 @@ class _InputPageState extends State<InputPage> {
       await _playFeedback(selectedType);
       
       // 譁ｰ隕剰ｨ倬鹸縺ｮ蝣ｴ蜷医・縺ｿ繝槭う繝ｫ繧ｹ繝医・繝ｳ蛻､螳壹ｒ陦後≧
-      if (context.mounted && !isEdit) {
+      if (mounted && !isEdit) {
         await MilestoneManager.checkAndShow(context);
       }
     } catch (e) {
@@ -164,9 +163,9 @@ class _InputPageState extends State<InputPage> {
     }
 
     // 通知のスケジュールを更新
-    NotificationManager.scheduleInactivityNotifications();
+    await NotificationManager.scheduleInactivityNotifications();
 
-    if (context.mounted) {
+    if (mounted) {
       Navigator.pop(context);
     }
   }
@@ -225,7 +224,6 @@ class _InputPageState extends State<InputPage> {
       case MoneyType.memo:
         return AppStrings.memoLabelMemo;
     }
-    return '';
   }
 
   String get memoHint {
@@ -237,7 +235,6 @@ class _InputPageState extends State<InputPage> {
       case MoneyType.memo:
         return AppStrings.memoHintMemo;
     }
-    return '';
   }
 
   Widget _typeButtonInner(String label, MoneyType type, Color color) {
@@ -439,7 +436,7 @@ class _InputPageState extends State<InputPage> {
                         boxShadow: memoFocusNode.hasFocus
                             ? [
                                 BoxShadow(
-                                  color: context.appColors.accent.withOpacity(0.3),
+                                  color: context.appColors.accent.withValues(alpha: 0.3),
                                   blurRadius: 6,
                                   spreadRadius: 0,
                                 )
@@ -475,7 +472,7 @@ class _InputPageState extends State<InputPage> {
                         boxShadow: amountFocusNode.hasFocus
                             ? [
                                 BoxShadow(
-                                  color: context.appColors.accent.withOpacity(0.3),
+                                  color: context.appColors.accent.withValues(alpha: 0.3),
                                   blurRadius: 6,
                                   spreadRadius: 0,
                                 )

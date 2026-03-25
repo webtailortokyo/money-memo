@@ -24,7 +24,7 @@ class ValueListenableBuilder2<A, B> extends StatelessWidget {
   final Widget Function(BuildContext context, A a, B b, Widget? child) builder;
   final Widget? child;
 
-  ValueListenableBuilder2({
+  const ValueListenableBuilder2({
     super.key,
     required this.valueListenable1,
     required this.valueListenable2,

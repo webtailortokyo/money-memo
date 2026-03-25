@@ -124,8 +124,11 @@ class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderSt
         curve: const Interval(0, 0.5, curve: Curves.easeInOutSine),
       ),
     )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) _idleController.reverse();
-        else if (status == AnimationStatus.dismissed) _idleController.forward();
+        if (status == AnimationStatus.completed) {
+          _idleController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _idleController.forward();
+        }
       });
 
     _idleTiltAnimation = Tween<double>(begin: -0.05, end: 0.05).animate(
@@ -277,7 +280,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderSt
                               ? []
                               : [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black.withValues(alpha: 0.1),
                                     blurRadius: 15,
                                     spreadRadius: 2,
                                   ),
@@ -368,7 +371,6 @@ class _MilestoneDialogState extends State<MilestoneDialog> with TickerProviderSt
         );
       case MilestoneAnimationType.dance:
       case MilestoneAnimationType.none:
-      default:
         return ScaleTransition(
           scale: _scaleAnimation,
           child: character,
