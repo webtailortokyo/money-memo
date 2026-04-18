@@ -316,6 +316,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 await CsvHelper.importCsv(context);
                 // インポート後に通知を再スケジュール
                 await NotificationManager.scheduleInactivityNotifications();
+                _titleController.text = appTitleNotifier.value;
                 setState(() {});
               },
             ),

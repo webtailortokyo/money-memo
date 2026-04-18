@@ -1,15 +1,15 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 
 import '../models/money_entry.dart';
 import '../constants.dart';
+import '../app_state.dart';
 
 class CsvHelper {
   static const List<String> _csvHeaders = [
@@ -20,6 +20,11 @@ class CsvHelper {
     'createdAt',
     'currency',
     'decimalDigits',
+    'appTitle',
+    'appCurrency',
+    'appDecimalDigits',
+    'appLanguage',
+    'appTheme',
   ];
 
   /// 全データをCSV形式でエクスポートする
@@ -50,6 +55,11 @@ class CsvHelper {
           entry.createdAt.toIso8601String(),
           entry.currency ?? '',
           entry.decimalDigits ?? '',
+          appTitleNotifier.value,
+          currencyNotifier.value,
+          decimalDigitsNotifier.value,
+          languageNotifier.value,
+          appThemeNotifier.value == ThemeMode.dark ? 'dark' : 'light',
         ]);
       }
 
@@ -59,38 +69,26 @@ class CsvHelper {
       final dateStr = DateFormat('yyyyMMdd_HHmmss').format(now);
       final fileName = 'money_memo_backup_$dateStr.csv';
 
-      if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
-        // デスクトップの場合、ファイル保存ダイアログを表示
+      if (!kIsWeb) {
+        final bytes = Uint8List.fromList(utf8.encode(csvString));
         final outputFile = await FilePicker.platform.saveFile(
           dialogTitle: 'CSVファイルを保存',
           fileName: fileName,
           type: FileType.custom,
           allowedExtensions: ['csv'],
+          bytes: bytes,
         );
 
         if (outputFile != null) {
-          final file = File(outputFile);
-          await file.writeAsString(csvString);
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('CSVを保存しました')),
-            );
+          if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+            final file = File(outputFile);
+            await file.writeAsString(csvString);
           }
         }
-      } else {
-        // モバイル（iOS/Android）の場合、アプリ内一時領域に保存してShareダイアログを起動
-        final directory = await getTemporaryDirectory();
-        final path = '${directory.path}/$fileName';
-        final file = File(path);
-        await file.writeAsString(csvString);
 
         if (context.mounted) {
-          final renderBox = context.findRenderObject() as RenderBox?;
-          // ignore: deprecated_member_use
-          await Share.shareXFiles(
-            [XFile(path)],
-            text: 'お金メモのバックアップデータです',
-            sharePositionOrigin: renderBox!.localToGlobal(Offset.zero) & renderBox.size,
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('CSVの保存処理が完了しました')),
           );
         }
       }
@@ -156,6 +154,8 @@ class CsvHelper {
       }
 
       final box = Hive.box<MoneyEntry>(HiveConstants.moneyBoxName);
+      final settingsBox = Hive.box(HiveConstants.settingsBoxName);
+      bool settingsImported = false;
 
       int importedCount = 0;
       for (int i = 1; i < csvData.length; i++) {
@@ -163,6 +163,42 @@ class CsvHelper {
         if (row.length < header.length) continue;
 
         try {
+          if (!settingsImported) {
+             final appTitleIndex = header.indexOf('appTitle');
+             final appCurrencyIndex = header.indexOf('appCurrency');
+             final appDecimalDigitsIndex = header.indexOf('appDecimalDigits');
+             final appLanguageIndex = header.indexOf('appLanguage');
+             final appThemeIndex = header.indexOf('appTheme');
+
+             if (appTitleIndex != -1 && row[appTitleIndex].toString().isNotEmpty) {
+               final title = row[appTitleIndex].toString();
+               settingsBox.put(HiveConstants.keyAppTitle, title);
+               appTitleNotifier.value = title;
+             }
+             if (appCurrencyIndex != -1 && row[appCurrencyIndex].toString().isNotEmpty) {
+               final currency = row[appCurrencyIndex].toString();
+               settingsBox.put(HiveConstants.keyCurrency, currency);
+               currencyNotifier.value = currency;
+             }
+             if (appDecimalDigitsIndex != -1 && row[appDecimalDigitsIndex].toString().isNotEmpty) {
+               final digits = int.tryParse(row[appDecimalDigitsIndex].toString()) ?? 0;
+               settingsBox.put(HiveConstants.keyDecimalDigits, digits);
+               decimalDigitsNotifier.value = digits;
+             }
+             if (appLanguageIndex != -1 && row[appLanguageIndex].toString().isNotEmpty) {
+               final lang = row[appLanguageIndex].toString();
+               settingsBox.put(HiveConstants.keyLanguage, lang);
+               languageNotifier.value = lang;
+             }
+             if (appThemeIndex != -1 && row[appThemeIndex].toString().isNotEmpty) {
+               final themeStr = row[appThemeIndex].toString();
+               final theme = themeStr == 'dark' ? ThemeMode.dark : ThemeMode.light;
+               settingsBox.put(HiveConstants.keyThemeMode, themeStr);
+               appThemeNotifier.value = theme;
+             }
+             settingsImported = true;
+          }
+
           final amountIndex = header.indexOf('amount');
           final memoIndex = header.indexOf('memo');
           final typeIndex = header.indexOf('type');

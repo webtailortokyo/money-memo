@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_timezone/flutter_timezone.dart';
@@ -21,7 +22,7 @@ class NotificationManager {
     tz.setLocalLocation(tz.getLocation(timeZoneName.identifier));
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@drawable/ic_notification');
     
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings();
@@ -32,67 +33,103 @@ class NotificationManager {
     );
     
     await _notificationsPlugin.initialize(initializationSettings);
+
+    // 各プラットフォームの通知権限をリクエスト
+    if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _notificationsPlugin.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+
+      // Android 13以降の通知権限
+      await androidImplementation?.requestNotificationsPermission();
+      // Android 14以降の正確なアラーム権限
+      await androidImplementation?.requestExactAlarmsPermission();
+    } else if (Platform.isIOS) {
+      final IOSFlutterLocalNotificationsPlugin? iosImplementation =
+          _notificationsPlugin.resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>();
+      
+      await iosImplementation?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
   }
 
-  /// 3日後と7日後の通知をスケジュールする
-  /// 記録が行われるたびに既存のスケジュールをリセットして呼び出されることを想定
+  /// 記録が行われるたびに呼ばれ、WorkManagerが参照する「最終アクティブ日時」を更新する
   static Future<void> scheduleInactivityNotifications() async {
     if (kIsWeb || (!Platform.isAndroid && !Platform.isIOS && !Platform.isMacOS && !Platform.isLinux)) {
       return;
     }
     try {
-      // 既存の未発行通知をすべてキャンセル
+      final box = Hive.box(HiveConstants.settingsBoxName);
+      // 最終アクティビティ時刻を現在時刻に更新
+      await box.put(HiveConstants.keyLastActiveTime, DateTime.now().millisecondsSinceEpoch);
+      
+      // ここを基点に通知をやり直すため、すべての通知済みフラグをリセット
+      await box.put(HiveConstants.keyNotifiedMin1, false);
+      await box.put(HiveConstants.keyNotifiedMin3, false);
+      await box.put(HiveConstants.keyNotifiedDay3, false);
+      await box.put(HiveConstants.keyNotifiedDay7, false);
+      await box.put(HiveConstants.keyNotifiedDay14, false);
+      await box.put(HiveConstants.keyNotifiedDay21, false);
+      await box.put(HiveConstants.keyNotifiedDay30, false);
+
+      // 旧システム(AlarmManager)等で残ってしまった未発行の通知をすべてキャンセル
       await _notificationsPlugin.cancelAll();
 
-      // 3日後の20:00
-      final day3 = _scheduledTime(3, 20, 0);
-      // 7日後の20:00
-      final day7 = _scheduledTime(7, 20, 0);
+      if (Platform.isIOS) {
+        // iOSの場合は確実なOSネイティブの予約システム(zonedSchedule)を採用
+        final now = tz.TZDateTime.now(tz.local);
+        final day3 = now.add(const Duration(days: 3));
+        final day7 = now.add(const Duration(days: 7));
+        final day14 = now.add(const Duration(days: 14));
+        final day21 = now.add(const Duration(days: 21));
+        final day30 = now.add(const Duration(days: 30));
 
-      // 3日後のメッセージをランダムに選択（パターンA, B, C）
-      final patterns = [
-        AppStrings.notification3DayPatternA,
-        AppStrings.notification3DayPatternB,
-        AppStrings.notification3DayPatternC,
-      ];
-      final randomMessage = patterns[Random().nextInt(patterns.length)];
+        final patterns = [
+          AppStrings.notification3DayPatternA,
+          AppStrings.notification3DayPatternB,
+          AppStrings.notification3DayPatternC,
+        ];
+        final randomMessage = patterns[Random().nextInt(patterns.length)];
 
-      // 3日後の通知登録
-      await _scheduleNotification(
-        id: 100,
-        title: AppStrings.notificationTitle,
-        body: randomMessage,
-        scheduledDate: day3,
-      );
-
-      // 7日後の通知登録
-      await _scheduleNotification(
-        id: 101,
-        title: AppStrings.notificationTitle,
-        body: AppStrings.notification7DayMessage,
-        scheduledDate: day7,
-      );
+        await _scheduleNotification(id: 103, title: AppStrings.notificationTitle, body: randomMessage, scheduledDate: day3);
+        await _scheduleNotification(id: 107, title: AppStrings.notificationTitle, body: AppStrings.notification7DayMessage, scheduledDate: day7);
+        await _scheduleNotification(id: 114, title: AppStrings.notificationTitle, body: AppStrings.notification14DayMessage, scheduledDate: day14);
+        await _scheduleNotification(id: 121, title: AppStrings.notificationTitle, body: AppStrings.notification21DayMessage, scheduledDate: day21);
+        await _scheduleNotification(id: 130, title: AppStrings.notificationTitle, body: AppStrings.notification30DayMessage, scheduledDate: day30);
+      }
     } catch (e) {
-      debugPrint('Failed to schedule inactivity notifications: $e');
+      debugPrint('Failed to update inactivity timer (Hive): $e');
     }
   }
 
-  /// 指定した日数後の指定時刻を取得
-  static tz.TZDateTime _scheduledTime(int daysLater, int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      now.day,
-      hour,
-      minute,
-    ).add(Duration(days: daysLater));
-    
-    return scheduledDate;
+  /// WorkManager側（バックグラウンド）から呼び出される即時通知用のメソッド
+  static Future<void> showImmediateNotification({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    await _notificationsPlugin.show(
+      id,
+      title,
+      body,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'inactivity_channel',
+          '記録のリマインド',
+          channelDescription: '数日間記録がない場合に通知を送ります',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(),
+      ),
+    );
   }
 
-  /// 個別の通知をスケジュール登録
+  /// iOSなど向けの個別通知スケジュール登録
   static Future<void> _scheduleNotification({
     required int id,
     required String title,
@@ -105,16 +142,9 @@ class NotificationManager {
       body,
       scheduledDate,
       const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'inactivity_channel',
-          '記録のリマインド',
-          channelDescription: '数日間記録がない場合に通知を送ります',
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
         iOS: DarwinNotificationDetails(),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle, // iOSでは影響なし
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );

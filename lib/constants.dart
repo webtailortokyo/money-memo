@@ -105,6 +105,9 @@ class AppStrings {
       'notification3DayPatternB': 'コツコツの習慣、マイペースに続けていきましょう！一言メモだけでも大歓迎ですよ。',
       'notification3DayPatternC': 'おかねメモが少し寂しがっているかも？また一緒に記録できるのを楽しみに待っています！',
       'notification7DayMessage': '1週間が経ちました。また気が向いたときに、いつでもお待ちしています。',
+      'notification14DayMessage': 'おかねメモを開いてから2週間ですね。今月のお金の見直しなど、いつでもお待ちしています！',
+      'notification21DayMessage': 'お久しぶりです！家計簿はマイペースが一番。また記録したくなったらいつでもどうぞ！',
+      'notification30DayMessage': '1ヶ月が経ちました。お金のメモが必要になったら、またいつでも遊びに来てくださいね。',
       'backButtonText': '戻る',
     },
     'en': {
@@ -199,6 +202,9 @@ class AppStrings {
       'notification3DayPatternB': 'Let\'s keep up the habit at your own pace! Even a short memo is very welcome.',
       'notification3DayPatternC': 'Money Memo might be feeling lonely? Hope to see you again soon!',
       'notification7DayMessage': 'It\'s been a week. We\'re always here whenever you\'re ready to record again.',
+      'notification14DayMessage': 'It\'s been two weeks. We\'re always here whenever you want to review your budget!',
+      'notification21DayMessage': 'Long time no see! At your own pace is best. Come back whenever you feel like recording!',
+      'notification30DayMessage': 'One month has passed. If you ever need to memo your money again, feel free to drop by anytime.',
       'backButtonText': 'Back',
     }
   };
@@ -321,6 +327,9 @@ class AppStrings {
   static String get notification3DayPatternB => _get('notification3DayPatternB');
   static String get notification3DayPatternC => _get('notification3DayPatternC');
   static String get notification7DayMessage => _get('notification7DayMessage');
+  static String get notification14DayMessage => _get('notification14DayMessage');
+  static String get notification21DayMessage => _get('notification21DayMessage');
+  static String get notification30DayMessage => _get('notification30DayMessage');
   static String get backButtonText => _get('backButtonText');
 
   static const String appVersion = '1.0.0';
@@ -374,6 +383,16 @@ class HiveConstants {
   static const String keyLanguage = 'language';
   static const String keyThemeMode = 'themeMode';
   static const String keyOnboardingCompleted = 'onboardingCompleted';
+
+  // WorkManager notification tracking keys
+  static const String keyLastActiveTime = 'lastActiveTime';
+  static const String keyNotifiedMin1 = 'notifiedMin1'; // テスト用
+  static const String keyNotifiedMin3 = 'notifiedMin3'; // テスト用
+  static const String keyNotifiedDay3 = 'notifiedDay3';
+  static const String keyNotifiedDay7 = 'notifiedDay7';
+  static const String keyNotifiedDay14 = 'notifiedDay14';
+  static const String keyNotifiedDay21 = 'notifiedDay21';
+  static const String keyNotifiedDay30 = 'notifiedDay30';
 }
 
 // MoneyEntryのtypeを表す文字列 (これはmodels/money_entry.dartのextensionで使うことを想定)

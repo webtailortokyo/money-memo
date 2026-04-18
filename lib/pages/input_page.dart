@@ -115,10 +115,13 @@ class _InputPageState extends State<InputPage> {
   }
 
   Future<void> _save() async {
+    // キーボードを完全に閉じる
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final memo = memoController.text.trim();
     final amountText = amountController.text.trim();
 
-    // 繧ｫ繝ｳ繝槭ｒ縺吶∋縺ｦ蜑企勁
+    // カンマをすべて削除
     final cleanedAmount = amountText.replaceAll(',', '');
 
     // 繝｡繝｢縺ｮ縺ｿ縺ｮ蝣ｴ蜷医・驥鷹｡堺ｸ崎ｦ・

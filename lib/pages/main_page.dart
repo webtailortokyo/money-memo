@@ -98,6 +98,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> _save() async {
+    // キーボードを完全に閉じる
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final memo = memoController.text.trim();
     final amountText = amountController.text.trim();
     final cleanedAmount = amountText.replaceAll(',', '');

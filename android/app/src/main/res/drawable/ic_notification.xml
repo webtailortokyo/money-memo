@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="764"
+    android:viewportHeight="622">
+
+    <!-- Pig silhouette (outline path) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M125.541,163.474 C125.541,163.474 115.039,56.2316 133.005,46.9367 C150.971,37.6419 216.788,100.581 216.788,100.581 C270.38,73.2272 335.739,66.5963 413.49,69.1344 C577.865,74.5 715.545,195.46 695.851,349.639 C681.945,458.5 634.262,518.368 538.562,551.461 C538.562,551.461 537.058,605.87 515.945,605.577 C495.722,605.296 495.408,554.517 495.408,554.517 C462.985,557.049 427.928,557.482 391.23,557.482 C365.64,557.482 342.47,558.899 319.988,557.482 C319.988,557.482 317.568,611.624 297.734,612.976 C276.711,614.409 276.026,551.461 276.026,551.461 C182.509,539.591 121.638,507.928 93.4129,437.245 L23.1854,437.245 C1.95725,364.341 6.35109,332.848 23.1854,281.862 L77.6956,281.862 C84.4352,229.704 96.6118,195.479 125.541,163.474 Z" />
+    
+    <!-- Cutout for the eye (approximated path for the ellipse using bezier curves) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 159.865 216 
+                          C 169.253 216 176.865 229.431 176.865 246 
+                          C 176.865 262.568 169.253 276 159.865 276 
+                          C 150.477 276 142.865 262.568 142.865 246 
+                          C 142.865 229.431 150.477 216 159.865 216 Z" />
+                          
+    <!-- We can't actually do a true "cutout" without fillType="evenOdd" which might break on some devices,
+         so a standard workaround is to make the background a separate path, but Android 14 icons apply a tint exactly as a mask.
+         Therefore, any opaque color becomes WHITE. So we'll just leave the eye solid, which makes it a full silhouette! -->
+    
+</vector>
