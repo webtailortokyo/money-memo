@@ -320,6 +320,91 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {});
               },
             ),
+            const Divider(height: 32),
+
+            // 通知デバッグ機能
+            _SectionHeader(title: 'デバッグ・テスト'),
+            ListTile(
+              leading: Icon(Icons.schedule, color: context.appColors.accent),
+              title: Text(
+                'スケジュール予約の確認',
+                style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+              ),
+              subtitle: const Text('現在OSに予約されている未来の通知数を確認します。'),
+              onTap: () async {
+                try {
+                  final pending = await NotificationManager.getPendingNotifications();
+                  if (context.mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('予約済みの通知'),
+                        content: Text(
+                          pending.isEmpty 
+                              ? '現在システムに予約されている通知はありません。' 
+                              : '現在【 ${pending.length} 件 】の通知がシステムに予約されています！\n\nOSの都合で数分遅れる可能性はありますが、設定した日時に確実にお知らせされます。'
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('エラー'),
+                        content: Text('予約確認中にエラーが発生しました:\n$e'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.notifications_active, color: context.appColors.accent),
+              title: Text(
+                '通知機能の即時テスト',
+                style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+              ),
+              subtitle: const Text('タップしてすぐに通知が届けば、システムは正常に動作しています。'),
+              onTap: () async {
+                try {
+                  await NotificationManager.showImmediateNotification(
+                    id: 999,
+                    title: '通知テスト成功！',
+                    body: 'アイコンと通知システムは正常に機能しています！',
+                  );
+                } catch (e) {
+                  if (context.mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('エラー'),
+                        content: Text('通知に失敗しました:\n$e'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
             
             // 繧｢繝励Μ縺ｫ縺､縺・※
             _SectionHeader(title: AppStrings.appInfoTitle),

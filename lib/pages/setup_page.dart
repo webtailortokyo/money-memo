@@ -20,6 +20,14 @@ class _SetupPageState extends State<SetupPage> {
   int _currentPage = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationManager.requestPermissions();
+    });
+  }
+
+  @override
   void dispose() {
     _pageController.dispose();
     _titleController.dispose();

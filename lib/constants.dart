@@ -386,8 +386,7 @@ class HiveConstants {
 
   // WorkManager notification tracking keys
   static const String keyLastActiveTime = 'lastActiveTime';
-  static const String keyNotifiedMin1 = 'notifiedMin1'; // テスト用
-  static const String keyNotifiedMin3 = 'notifiedMin3'; // テスト用
+
   static const String keyNotifiedDay3 = 'notifiedDay3';
   static const String keyNotifiedDay7 = 'notifiedDay7';
   static const String keyNotifiedDay14 = 'notifiedDay14';

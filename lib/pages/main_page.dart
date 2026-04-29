@@ -20,6 +20,7 @@ import '../utils/input_formatter.dart';
 import '../constants.dart';
 import '../utils/milestone_manager.dart';
 import '../utils/format_utils.dart';
+import '../utils/notification_manager.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -51,6 +52,11 @@ class _MainPageState extends State<MainPage> {
     amountFocusNode.addListener(() => setState(() {}));
     memoFocusNode.addListener(() => setState(() {}));
     _scrollController.addListener(_onScroll);
+
+    // 初回起動時や権限未取得時にダイアログを出す
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationManager.requestPermissions();
+    });
   }
 
   void _onScroll() {

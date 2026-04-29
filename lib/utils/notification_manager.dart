@@ -22,7 +22,7 @@ class NotificationManager {
     tz.setLocalLocation(tz.getLocation(timeZoneName.identifier));
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@drawable/ic_notification');
+        AndroidInitializationSettings('ic_notification');
     
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings();
@@ -34,7 +34,15 @@ class NotificationManager {
     
     await _notificationsPlugin.initialize(initializationSettings);
 
-    // 各プラットフォームの通知権限をリクエスト
+    // 初期化時は権限リクエストを分離（UI構築後に呼ぶため）
+  }
+
+  /// UI構築後（Activityアタッチ後）に呼び出すべき権限リクエスト
+  static Future<void> requestPermissions() async {
+    if (kIsWeb || (!Platform.isAndroid && !Platform.isIOS && !Platform.isMacOS && !Platform.isLinux)) {
+      return;
+    }
+    
     if (Platform.isAndroid) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
           _notificationsPlugin.resolvePlatformSpecificImplementation<
@@ -42,8 +50,7 @@ class NotificationManager {
 
       // Android 13以降の通知権限
       await androidImplementation?.requestNotificationsPermission();
-      // Android 14以降の正確なアラーム権限
-      await androidImplementation?.requestExactAlarmsPermission();
+      // ※「設定画面に飛ぶ」原因となっていた正確なアラーム権限の要求は削除しました
     } else if (Platform.isIOS) {
       final IOSFlutterLocalNotificationsPlugin? iosImplementation =
           _notificationsPlugin.resolvePlatformSpecificImplementation<
@@ -68,8 +75,7 @@ class NotificationManager {
       await box.put(HiveConstants.keyLastActiveTime, DateTime.now().millisecondsSinceEpoch);
       
       // ここを基点に通知をやり直すため、すべての通知済みフラグをリセット
-      await box.put(HiveConstants.keyNotifiedMin1, false);
-      await box.put(HiveConstants.keyNotifiedMin3, false);
+
       await box.put(HiveConstants.keyNotifiedDay3, false);
       await box.put(HiveConstants.keyNotifiedDay7, false);
       await box.put(HiveConstants.keyNotifiedDay14, false);
@@ -79,10 +85,10 @@ class NotificationManager {
       // 旧システム(AlarmManager)等で残ってしまった未発行の通知をすべてキャンセル
       await _notificationsPlugin.cancelAll();
 
-      if (Platform.isIOS) {
-        // iOSの場合は確実なOSネイティブの予約システム(zonedSchedule)を採用
+      if (Platform.isIOS || Platform.isAndroid) {
+        // 全プラットフォームで確実なOSネイティブの予約システム(zonedSchedule)を採用
         final now = tz.TZDateTime.now(tz.local);
-        final day3 = now.add(const Duration(days: 3));
+        final day3 = now.add(const Duration(days: 3)); // 本来の3日後に戻しました
         final day7 = now.add(const Duration(days: 7));
         final day14 = now.add(const Duration(days: 14));
         final day21 = now.add(const Duration(days: 21));
@@ -129,7 +135,7 @@ class NotificationManager {
     );
   }
 
-  /// iOSなど向けの個別通知スケジュール登録
+  /// 全プラットフォーム向けの個別通知スケジュール登録
   static Future<void> _scheduleNotification({
     required int id,
     required String title,
@@ -142,11 +148,23 @@ class NotificationManager {
       body,
       scheduledDate,
       const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'inactivity_channel',
+          '記録のリマインド',
+          channelDescription: '数日間記録がない場合に通知を送ります',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
         iOS: DarwinNotificationDetails(),
       ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle, // iOSでは影響なし
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );
+  }
+
+  /// 現在システムに予約されている通知の数を取得する（デバッグ・確認用）
+  static Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    return await _notificationsPlugin.pendingNotificationRequests();
   }
 }
