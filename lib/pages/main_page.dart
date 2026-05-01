@@ -15,6 +15,7 @@ import '../theme.dart';
 import '../models/money_entry.dart';
 import '../models/money_type.dart';
 import '../widgets/money_entry_card.dart';
+import '../widgets/proverb_bubble.dart';
 import '../utils/sort_entries.dart';
 import '../utils/input_formatter.dart';
 import '../constants.dart';
@@ -454,6 +455,8 @@ class _MainPageState extends State<MainPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const ProverbBubble(),
+                          const SizedBox(height: AppNumbers.smallSpacing),
                           InkWell(
                             onTap: _pickDate,
                             child: Container(
