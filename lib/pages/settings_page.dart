@@ -7,6 +7,7 @@ import 'setup_page.dart';
 import '../theme.dart';
 import '../utils/csv_helper.dart';
 import '../utils/notification_manager.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -28,6 +29,29 @@ class _SettingsPageState extends State<SettingsPage> {
   void dispose() {
     _titleController.dispose();
     super.dispose();
+  }
+
+  Future<void> _launchURL(String urlString) async {
+    final uri = Uri.parse(urlString);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        // canLaunchUrlがfalseの場合は直接launchUrlを試みる
+        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+        if (!launched && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('ブラウザを開けませんでした')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('エラーが発生しました')),
+        );
+      }
+    }
   }
 
   void _updateTitle(String newTitle) {
@@ -327,6 +351,28 @@ class _SettingsPageState extends State<SettingsPage> {
             ListTile(
               title: Text(AppStrings.versionLabel),
               trailing: Text(AppStrings.appVersion),
+            ),
+            ListTile(
+              title: Text(
+                AppStrings.privacyPolicy,
+                style: TextStyle(
+                  color: context.appColors.accent,
+                  decoration: TextDecoration.underline,
+                  decorationColor: context.appColors.accent,
+                ),
+              ),
+              onTap: () => _launchURL('https://app.webtailor.work/privacy/'),
+            ),
+            ListTile(
+              title: Text(
+                AppStrings.officialWebsite,
+                style: TextStyle(
+                  color: context.appColors.accent,
+                  decoration: TextDecoration.underline,
+                  decorationColor: context.appColors.accent,
+                ),
+              ),
+              onTap: () => _launchURL('https://app.webtailor.work/money-memo/'),
             ),
             SizedBox(height: 32),
           ],

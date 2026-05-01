@@ -109,6 +109,8 @@ class AppStrings {
       'notification21DayMessage': 'お久しぶりです！家計簿はマイペースが一番。また記録したくなったらいつでもどうぞ！',
       'notification30DayMessage': '1ヶ月が経ちました。お金のメモが必要になったら、またいつでも遊びに来てくださいね。',
       'backButtonText': '戻る',
+      'privacyPolicy': 'プライバシーポリシー',
+      'officialWebsite': '公式サイト',
     },
     'en': {
       'appTitle': 'Money Memo',
@@ -206,6 +208,8 @@ class AppStrings {
       'notification21DayMessage': 'Long time no see! At your own pace is best. Come back whenever you feel like recording!',
       'notification30DayMessage': 'One month has passed. If you ever need to memo your money again, feel free to drop by anytime.',
       'backButtonText': 'Back',
+      'privacyPolicy': 'Privacy Policy',
+      'officialWebsite': 'Official Website',
     }
   };
 
@@ -331,6 +335,8 @@ class AppStrings {
   static String get notification21DayMessage => _get('notification21DayMessage');
   static String get notification30DayMessage => _get('notification30DayMessage');
   static String get backButtonText => _get('backButtonText');
+  static String get privacyPolicy => _get('privacyPolicy');
+  static String get officialWebsite => _get('officialWebsite');
 
   static const String appVersion = '1.0.0';
 
