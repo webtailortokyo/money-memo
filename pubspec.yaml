@@ -75,6 +75,7 @@ flutter:
     - assets/sounds/
     - assets/lottie/
     - assets/img/
+    - assets/adi-registration.properties
 
   fonts:
     - family: Rounded Mplus 1c

@@ -1,16 +1,52 @@
-# money_memo
+# おかねメモ (Okane Memo)
 
-A new Flutter project.
+A simple and friendly pocket money tracker designed especially for children.
 
-## Getting Started
+## Overview
 
-This project is a starting point for a Flutter application.
+Okane Memo is a mobile app that helps children easily record their income and expenses. It was originally created to support kids who may find traditional money management difficult, especially when exact balances and complicated calculations become overwhelming.
 
-A few resources to get you started if this is your first Flutter project:
+The app focuses on simplicity, clarity, and ease of use, making money tracking a stress-free daily habit.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Features
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* Record income and expenses quickly
+* View transaction history in an easy-to-understand format
+* Simple and intuitive interface designed for children
+* Helps build healthy money management habits
+* Designed to reduce the stress often associated with traditional budgeting tools
+
+## Why I Built This App
+
+I created Okane Memo for my child, who found conventional allowance trackers frustrating. Even a small discrepancy between recorded and actual money could become discouraging.
+
+Rather than emphasizing exact balances, Okane Memo focuses on the habit of recording money movements. This approach makes money management more accessible, enjoyable, and sustainable.
+
+## Target Users
+
+* Children learning how to manage money
+* Parents teaching financial literacy
+* Anyone looking for a simple and straightforward expense tracker
+
+## Technology Stack
+
+* Flutter
+* Dart
+* Local data storage
+
+## Platform
+
+* iOS
+* Android
+
+## Status
+
+Currently in active development.
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+Made with care to help children develop confidence in managing money.
