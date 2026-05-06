@@ -461,11 +461,14 @@ class _InputPageState extends State<InputPage> {
                         focusNode: memoFocusNode,
                         controller: memoController,
                         maxLines: null,
+                        cursorColor: _activeBorderColor,
                         decoration: InputDecoration(
                           hintText: memoHint,
                           filled: false,
                           contentPadding: const EdgeInsets.symmetric(horizontal: AppNumbers.defaultPadding),
                           border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
                         ),
                       ),
                     ),
@@ -498,6 +501,7 @@ class _InputPageState extends State<InputPage> {
                         controller: amountController,
                         enabled: selectedType != MoneyType.memo,
                         keyboardType: TextInputType.number,
+                        cursorColor: _activeBorderColor,
                         inputFormatters: [
                           ThousandsSeparatorInputFormatter(
                             initialDecimalDigits: isEdit ? widget.entry!.decimalDigits : null,
@@ -526,6 +530,8 @@ class _InputPageState extends State<InputPage> {
                             ),
                           ),
                           border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
                         ),
                       ),
                     ),
