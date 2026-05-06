@@ -240,6 +240,17 @@ class _InputPageState extends State<InputPage> {
     }
   }
 
+  Color get _activeBorderColor {
+    switch (selectedType) {
+      case MoneyType.increase:
+        return context.appColors.increaseAmount;
+      case MoneyType.decrease:
+        return context.appColors.decreaseAmount;
+      case MoneyType.memo:
+        return context.appColors.memo;
+    }
+  }
+
   Widget _typeButtonInner(String label, MoneyType type, Color color) {
     final selected = selectedType == type;
 
@@ -433,13 +444,13 @@ class _InputPageState extends State<InputPage> {
                         color: context.appColors.inputBg,
                         borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
                         border: Border.all(
-                          color: memoFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
+                          color: memoFocusNode.hasFocus ? _activeBorderColor : Colors.grey.shade300,
                           width: 1.5,
                         ),
                         boxShadow: memoFocusNode.hasFocus
                             ? [
                                 BoxShadow(
-                                  color: context.appColors.accent.withValues(alpha: 0.3),
+                                  color: _activeBorderColor.withValues(alpha: 0.3),
                                   blurRadius: 6,
                                   spreadRadius: 0,
                                 )
@@ -469,13 +480,13 @@ class _InputPageState extends State<InputPage> {
                             : context.appColors.inputBg,
                         borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
                         border: Border.all(
-                          color: amountFocusNode.hasFocus ? context.appColors.accent : Colors.grey.shade300,
+                          color: amountFocusNode.hasFocus ? _activeBorderColor : Colors.grey.shade300,
                           width: 1.5,
                         ),
                         boxShadow: amountFocusNode.hasFocus
                             ? [
                                 BoxShadow(
-                                  color: context.appColors.accent.withValues(alpha: 0.3),
+                                  color: _activeBorderColor.withValues(alpha: 0.3),
                                   blurRadius: 6,
                                   spreadRadius: 0,
                                 )
