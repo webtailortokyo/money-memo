@@ -53,11 +53,6 @@ class _MainPageState extends State<MainPage> {
     amountFocusNode.addListener(() => setState(() {}));
     memoFocusNode.addListener(() => setState(() {}));
     _scrollController.addListener(_onScroll);
-
-    // 初回起動時や権限未取得時にダイアログを出す
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      NotificationManager.requestPermissions();
-    });
   }
 
   void _onScroll() {

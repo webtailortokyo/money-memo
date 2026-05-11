@@ -24,7 +24,11 @@ class NotificationManager {
         AndroidInitializationSettings('ic_notification');
     
     const DarwinInitializationSettings initializationSettingsIOS =
-        DarwinInitializationSettings();
+        DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
     
     const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
