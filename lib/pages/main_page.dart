@@ -423,6 +423,16 @@ class _MainPageState extends State<MainPage> {
             ),
             actions: [
               IconButton(
+                icon: Icon(Icons.bar_chart, color: context.appColors.accent),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PeriodPage()),
+                  );
+                },
+                tooltip: AppStrings.periodPageTitle,
+              ),
+              IconButton(
                 icon: Icon(Icons.settings, color: context.appColors.accent),
                 onPressed: () {
                   Navigator.push(
@@ -430,25 +440,12 @@ class _MainPageState extends State<MainPage> {
                     MaterialPageRoute(builder: (_) => const SettingsPage()),
                   );
                 },
+                tooltip: AppStrings.settingsTitle,
               ),
               SizedBox(width: 8),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const PeriodPage()),
-              );
-            },
-            label: Text(
-              AppStrings.periodPageTitle,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            icon: Icon(Icons.history, color: Colors.white),
-            backgroundColor: context.appColors.accent,
-            foregroundColor: Colors.white,
-          ),
+
     
           body: SafeArea(
               child: CustomScrollView(
