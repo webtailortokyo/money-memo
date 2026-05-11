@@ -120,6 +120,8 @@ class AppStrings {
       'backButtonText': '戻る',
       'privacyPolicy': 'プライバシーポリシー',
       'officialWebsite': '公式サイト',
+      'incomeLabel': '収入',
+      'expenseLabel': '支出',
     },
     'en': {
       'appTitle': 'Money Memo',
@@ -228,6 +230,8 @@ class AppStrings {
       'backButtonText': 'Back',
       'privacyPolicy': 'Privacy Policy',
       'officialWebsite': 'Official Website',
+      'incomeLabel': 'Income',
+      'expenseLabel': 'Expense',
     }
   };
 
@@ -364,6 +368,8 @@ class AppStrings {
   static String get backButtonText => _get('backButtonText');
   static String get privacyPolicy => _get('privacyPolicy');
   static String get officialWebsite => _get('officialWebsite');
+  static String get incomeLabel => _get('incomeLabel');
+  static String get expenseLabel => _get('expenseLabel');
 
   static const String appVersion = '1.0.0';
 

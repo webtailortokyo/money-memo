@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 import '../models/money_entry.dart';
 import '../theme.dart';
@@ -38,11 +39,13 @@ class _PeriodPageState extends State<PeriodPage> {
 
   DateTime targetDate = DateTime(DateTime.now().year, DateTime.now().month);
   PeriodViewMode viewMode = PeriodViewMode.monthly;
+  String? selectedCurrency;
 
   @override
   void initState() {
     super.initState();
     box = Hive.box<MoneyEntry>(HiveConstants.moneyBoxName);
+    selectedCurrency = currencyNotifier.value;
   }
 
   void _changePeriod(int offset) {
@@ -130,11 +133,11 @@ class _PeriodPageState extends State<PeriodPage> {
                 }
 
                 final entries = sortedEntries(box);
-                final List<MoneyEntry> filtered;
+                final List<MoneyEntry> periodFiltered;
                 final String periodLabel;
 
                 if (viewMode == PeriodViewMode.monthly) {
-                  filtered = entries.where((e) {
+                  periodFiltered = entries.where((e) {
                     return e.date.year == targetDate.year &&
                         e.date.month == targetDate.month;
                   }).toList();
@@ -145,7 +148,7 @@ class _PeriodPageState extends State<PeriodPage> {
                         '${targetDate.year}${AppStrings.yearLabel}${targetDate.month}${AppStrings.monthLabel}';
                   }
                 } else {
-                  filtered = entries.where((e) {
+                  periodFiltered = entries.where((e) {
                     return e.date.year == targetDate.year;
                   }).toList();
                   if (languageNotifier.value == 'en') {
@@ -155,9 +158,36 @@ class _PeriodPageState extends State<PeriodPage> {
                   }
                 }
 
+                final Set<String> availableCurrencies = {currencyNotifier.value};
+                for (final e in box.values) {
+                  if (e.type != MoneyEntryTypes.memo) {
+                    availableCurrencies.add(e.currency ?? currencyNotifier.value);
+                  }
+                }
+                final sortedCurrencies = availableCurrencies.toList()..sort();
+                if (!sortedCurrencies.contains(selectedCurrency)) {
+                  selectedCurrency = sortedCurrencies.first;
+                }
+
+                final List<MoneyEntry> filtered = periodFiltered.where((e) {
+                  if (e.type == MoneyEntryTypes.memo) return true;
+                  final sym = e.currency ?? currencyNotifier.value;
+                  return sym == selectedCurrency;
+                }).toList();
+
+                int currentDecimalDigits = decimalDigitsNotifier.value;
+                for (final e in filtered) {
+                  if (e.type != MoneyEntryTypes.memo && e.decimalDigits != null) {
+                    currentDecimalDigits = e.decimalDigits!;
+                    break;
+                  }
+                }
+
                 final Map<String, CurrencySummary> totals = {};
                 for (final e in filtered) {
-                  final sym = e.currency ?? 'ﾂ･';
+                  if (e.type == MoneyEntryTypes.memo) continue;
+
+                  final sym = e.currency ?? currencyNotifier.value;
                   final digits = e.decimalDigits ?? 0;
                   final key = '$sym-$digits';
 
@@ -192,6 +222,57 @@ class _PeriodPageState extends State<PeriodPage> {
                         ],
                       ),
                       SizedBox(height: 12),
+
+                      /// 🔽 追加：通貨フィルター
+                      if (sortedCurrencies.length > 1) ...[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              languageNotifier.value == 'en' ? 'Currency: ' : '表示通貨: ',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: context.appColors.mainText.withValues(alpha: 0.7),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                              decoration: BoxDecoration(
+                                color: context.appColors.inputBg,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey.shade300, width: 1.0),
+                              ),
+                              height: 32,
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: selectedCurrency,
+                                  icon: Icon(Icons.arrow_drop_down, color: context.appColors.accent, size: 20),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: context.appColors.mainText,
+                                  ),
+                                  items: sortedCurrencies.map((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  onChanged: (newValue) {
+                                    if (newValue != null) {
+                                      setState(() {
+                                        selectedCurrency = newValue;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12),
+                      ],
 
                       /// 隼 譛滄俣驕ｸ謚・
                       Container(
@@ -432,8 +513,10 @@ class _PeriodPageState extends State<PeriodPage> {
                             },
                           ),
                         )
-                      else
+                      else ...[
+                        _buildYearlyGraph(filtered, currentDecimalDigits),
                         ..._buildYearlyMonthlyList(filtered),
+                      ]
                     ],
                   ),
                 );
@@ -481,6 +564,180 @@ class _PeriodPageState extends State<PeriodPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildYearlyGraph(List<MoneyEntry> yearlyEntries, int decimalDigits) {
+    if (yearlyEntries.isEmpty) return const SizedBox.shrink();
+
+    final Map<int, double> monthlyIncome = {};
+    final Map<int, double> monthlyExpense = {};
+    for (int i = 1; i <= 12; i++) {
+      monthlyIncome[i] = 0;
+      monthlyExpense[i] = 0;
+    }
+
+    double maxAmount = 0;
+
+    for (final e in yearlyEntries) {
+      if (e.type == MoneyEntryTypes.increase) {
+        monthlyIncome[e.date.month] = (monthlyIncome[e.date.month] ?? 0) + e.amount;
+      } else if (e.type == MoneyEntryTypes.decrease) {
+        monthlyExpense[e.date.month] = (monthlyExpense[e.date.month] ?? 0) + e.amount;
+      }
+    }
+
+    for (int i = 1; i <= 12; i++) {
+      if (monthlyIncome[i]! > maxAmount) maxAmount = monthlyIncome[i]!;
+      if (monthlyExpense[i]! > maxAmount) maxAmount = monthlyExpense[i]!;
+    }
+
+    if (maxAmount == 0) return const SizedBox.shrink();
+
+    final interval = maxAmount / 4 > 0 ? maxAmount / 4 : 1.0;
+
+    return Container(
+      height: 250,
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(top: 16, bottom: 16, left: 0, right: 16),
+      decoration: BoxDecoration(
+        color: context.appColors.inputBg,
+        borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
+        border: Border.all(color: Colors.grey.shade300, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _buildLegend(context.appColors.increaseAmount, AppStrings.incomeLabel),
+              const SizedBox(width: 16),
+              _buildLegend(context.appColors.decreaseAmount, AppStrings.expenseLabel),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Expanded(
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                maxY: maxAmount * 1.1,
+                barTouchData: BarTouchData(
+                  enabled: true,
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (group) => Colors.blueGrey,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      final isIncome = rodIndex == 0;
+                      final label = isIncome ? AppStrings.incomeLabel : AppStrings.expenseLabel;
+                      return BarTooltipItem(
+                        '$label\n$selectedCurrency${formatAmount(rod.toY, decimalDigits: decimalDigits)}',
+                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      );
+                    },
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            '${value.toInt()}',
+                            style: TextStyle(
+                              color: context.appColors.mainText,
+                              fontSize: 10,
+                            ),
+                          ),
+                        );
+                      },
+                      reservedSize: 28,
+                    ),
+                  ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 46,
+                      getTitlesWidget: (value, meta) {
+                        if (value == 0 || value == maxAmount * 1.1) return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Text(
+                            formatAmount(value, decimalDigits: decimalDigits),
+                            style: TextStyle(
+                              color: context.appColors.mainText,
+                              fontSize: 10,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: interval,
+                  getDrawingHorizontalLine: (value) => FlLine(
+                    color: Colors.grey.withValues(alpha: 0.2),
+                    strokeWidth: 1,
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                barGroups: List.generate(12, (index) {
+                  final month = index + 1;
+                  return BarChartGroupData(
+                    x: month,
+                    barRods: [
+                      BarChartRodData(
+                        toY: monthlyIncome[month] ?? 0,
+                        color: context.appColors.increaseAmount,
+                        width: 6,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      ),
+                      BarChartRodData(
+                        toY: monthlyExpense[month] ?? 0,
+                        color: context.appColors.decreaseAmount,
+                        width: 6,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegend(Color color, String text) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: TextStyle(
+            color: context.appColors.mainText,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 
