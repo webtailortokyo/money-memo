@@ -493,12 +493,19 @@ class _PeriodPageState extends State<PeriodPage> {
 
   List<Widget> _buildYearlyMonthlyList(List<MoneyEntry> yearlyEntries) {
     final Map<int, Map<String, CurrencySummary>> monthlyCurrencySums = {};
+    final Map<int, List<MoneyEntry>> monthlyMemos = {};
     for (int i = 1; i <= 12; i++) {
       monthlyCurrencySums[i] = {};
+      monthlyMemos[i] = [];
     }
 
     for (final e in yearlyEntries) {
-      final sym = e.currency ?? 'ﾂ･';
+      if (e.type == MoneyEntryTypes.memo) {
+        monthlyMemos[e.date.month]!.add(e);
+        continue;
+      }
+
+      final sym = e.currency ?? '¥';
       final digits = e.decimalDigits ?? 0;
       final key = '$sym-$digits';
 
@@ -512,11 +519,18 @@ class _PeriodPageState extends State<PeriodPage> {
       }
     }
 
-    return monthlyCurrencySums.entries.where((entry) => entry.value.isNotEmpty).map((
-      entry,
-    ) {
-      final month = entry.key;
-      final summaries = _sortSummaries(entry.value.values);
+    final Set<int> activeMonths = {
+      ...monthlyCurrencySums.keys.where((m) => monthlyCurrencySums[m]!.isNotEmpty),
+      ...monthlyMemos.keys.where((m) => monthlyMemos[m]!.isNotEmpty),
+    };
+
+    final sortedActiveMonths = activeMonths.toList()..sort();
+
+    return sortedActiveMonths.map((month) {
+      final sums = monthlyCurrencySums[month]!;
+      final memos = monthlyMemos[month]!;
+      memos.sort((a, b) => a.date.compareTo(b.date)); // 古い日付順にソート
+      final summaries = _sortSummaries(sums.values);
       return Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),
@@ -525,41 +539,72 @@ class _PeriodPageState extends State<PeriodPage> {
           borderRadius: BorderRadius.circular(AppNumbers.cardBorderRadius),
           border: Border.all(color: Colors.grey.shade300, width: 1.5),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              _formatMonth(month),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            Row(
+              children: [
+                Text(
+                  _formatMonth(month),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const Spacer(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: summaries
+                      .map(
+                        (s) => Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            if (s.increase > 0)
+                              Text(
+                                '+${s.symbol}${formatAmount(s.increase, decimalDigits: s.decimalDigits)}',
+                                style: TextStyle(
+                                  color: context.appColors.increaseAmount,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            if (s.decrease > 0)
+                              Text(
+                                '-${s.symbol}${formatAmount(s.decrease, decimalDigits: s.decimalDigits)}',
+                                style: TextStyle(
+                                  color: context.appColors.decreaseAmount,
+                                  fontSize: 13,
+                                ),
+                              ),
+                          ],
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
             ),
-            const Spacer(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: summaries
-                  .map(
-                    (s) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (s.increase > 0)
-                          Text(
-                            '+${s.symbol}${formatAmount(s.increase, decimalDigits: s.decimalDigits)}',
-                            style: TextStyle(
-                              color: context.appColors.increaseAmount,
-                              fontSize: 13,
-                            ),
+            if (memos.isNotEmpty) ...[
+              const Divider(height: 16, thickness: 1),
+              ...memos.map((memo) {
+                final dateStr = languageNotifier.value == 'en' 
+                    ? DateFormat.Md('en_US').format(memo.date)
+                    : '${memo.date.month}/${memo.date.day}';
+                return Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('・', style: TextStyle(color: context.appColors.mainText)),
+                      Expanded(
+                        child: Text(
+                          '$dateStr: ${memo.memo}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: context.appColors.mainText,
                           ),
-                        if (s.decrease > 0)
-                          Text(
-                            '-${s.symbol}${formatAmount(s.decrease, decimalDigits: s.decimalDigits)}',
-                            style: TextStyle(
-                              color: context.appColors.decreaseAmount,
-                              fontSize: 13,
-                            ),
-                          ),
-                      ],
-                    ),
-                  )
-                  .toList(),
-            ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
           ],
         ),
       );
@@ -653,7 +698,14 @@ class _PeriodPageState extends State<PeriodPage> {
       text.writeln(AppStrings.monthlySummaryTitle);
 
       final Map<int, Map<String, CurrencySummary>> monthlyCurrencySums = {};
+      final Map<int, List<MoneyEntry>> monthlyMemos = {};
+      
       for (final e in filtered) {
+        if (e.type == MoneyEntryTypes.memo) {
+          monthlyMemos.putIfAbsent(e.date.month, () => []).add(e);
+          continue;
+        }
+
         final sym = e.currency ?? 'ﾂ･';
         final digits = e.decimalDigits ?? 0;
         final key = '$sym-$digits';
@@ -670,20 +722,46 @@ class _PeriodPageState extends State<PeriodPage> {
         }
       }
 
-      final sortedMonths = monthlyCurrencySums.keys.toList()..sort();
-      for (final m in sortedMonths) {
-        final summaries = _sortSummaries(monthlyCurrencySums[m]!.values);
-        final monthName = _formatMonth(m);
-        for (final s in summaries) {
-          final inc = formatAmount(s.increase, decimalDigits: s.decimalDigits);
-          final dec = formatAmount(s.decrease, decimalDigits: s.decimalDigits);
+      final Set<int> allMonths = {
+        ...monthlyCurrencySums.keys,
+        ...monthlyMemos.keys,
+      };
+      final sortedMonths = allMonths.toList()..sort();
 
-          if (s.increase > 0 && s.decrease > 0) {
-            text.writeln('$monthName +${s.symbol}$inc / -${s.symbol}$dec');
-          } else if (s.increase > 0) {
-            text.writeln('$monthName +${s.symbol}$inc');
-          } else if (s.decrease > 0) {
-            text.writeln('$monthName -${s.symbol}$dec');
+      for (final m in sortedMonths) {
+        final monthName = _formatMonth(m);
+        bool hasValues = false;
+
+        if (monthlyCurrencySums.containsKey(m)) {
+          final summaries = _sortSummaries(monthlyCurrencySums[m]!.values);
+          for (final s in summaries) {
+            final inc = formatAmount(s.increase, decimalDigits: s.decimalDigits);
+            final dec = formatAmount(s.decrease, decimalDigits: s.decimalDigits);
+
+            if (s.increase > 0 && s.decrease > 0) {
+              text.writeln('$monthName +${s.symbol}$inc / -${s.symbol}$dec');
+              hasValues = true;
+            } else if (s.increase > 0) {
+              text.writeln('$monthName +${s.symbol}$inc');
+              hasValues = true;
+            } else if (s.decrease > 0) {
+              text.writeln('$monthName -${s.symbol}$dec');
+              hasValues = true;
+            }
+          }
+        }
+
+        if (monthlyMemos.containsKey(m)) {
+          if (!hasValues) {
+            text.writeln(monthName);
+          }
+          final sortedMemos = List<MoneyEntry>.from(monthlyMemos[m]!)
+            ..sort((a, b) => a.date.compareTo(b.date)); // 古い日付順にソート
+          for (final memo in sortedMemos) {
+            final dateStr = isEn 
+                ? DateFormat.Md('en_US').format(memo.date)
+                : '${memo.date.month}/${memo.date.day}';
+            text.writeln('  ・$dateStr: ${memo.memo}');
           }
         }
       }
