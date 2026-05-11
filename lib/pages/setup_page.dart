@@ -19,12 +19,17 @@ class _SetupPageState extends State<SetupPage> {
   final TextEditingController _titleController = TextEditingController();
   int _currentPage = 0;
 
+  // 通知設定用のステート
+  bool? _wantsNotification = true;
+  String _notificationFrequency = 'daily';
+  TimeOfDay _notificationTime = const TimeOfDay(hour: 20, minute: 0);
+  int _notificationDayOfWeek = 1; // 月曜
+  int _notificationDayOfMonth = 1;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      NotificationManager.requestPermissions();
-    });
+    // 権限リクエストは完了直前に呼び出すよう変更
   }
 
   @override
@@ -34,8 +39,39 @@ class _SetupPageState extends State<SetupPage> {
     super.dispose();
   }
 
+  List<Widget> get _buildPages {
+    final pages = [
+      _buildLanguageStep(),
+      _buildCurrencyStep(),
+      _buildTitleStep(),
+      _buildNotificationToggleStep(),
+    ];
+    if (_wantsNotification == true) {
+      pages.add(_buildNotificationDetailStep());
+    }
+    pages.add(_buildFinalStep());
+    return pages;
+  }
+
   void _nextPage() {
-    if (_currentPage < 3) {
+    final pagesCount = _buildPages.length;
+    final currentWidget = _buildPages[_currentPage];
+
+    // 通知トグル画面で未選択の場合は進めない
+    if (currentWidget.key == const ValueKey('notificationToggleStep')) {
+      if (_wantsNotification == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('選択してください')),
+        );
+        return;
+      }
+      if (_wantsNotification == true) {
+        // 「はい」を選んで次へ進むときに権限を要求する
+        NotificationManager.requestPermissions();
+      }
+    }
+
+    if (_currentPage < pagesCount - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -66,11 +102,23 @@ class _SetupPageState extends State<SetupPage> {
       appTitleNotifier.value = AppStrings.appTitle;
     }
 
+    // 通知設定の保存
+    if (_wantsNotification == true) {
+      await settingsBox.put(HiveConstants.keyPeriodicNotificationEnabled, true);
+      await settingsBox.put(HiveConstants.keyPeriodicNotificationFrequency, _notificationFrequency);
+      await settingsBox.put(HiveConstants.keyPeriodicNotificationTimeHour, _notificationTime.hour);
+      await settingsBox.put(HiveConstants.keyPeriodicNotificationTimeMinute, _notificationTime.minute);
+      await settingsBox.put(HiveConstants.keyPeriodicNotificationDayOfWeek, _notificationDayOfWeek);
+      await settingsBox.put(HiveConstants.keyPeriodicNotificationDayOfMonth, _notificationDayOfMonth);
+    } else {
+      await settingsBox.put(HiveConstants.keyPeriodicNotificationEnabled, false);
+    }
+
     // オンボーディング完了フラグをセット
     await settingsBox.put(HiveConstants.keyOnboardingCompleted, true);
 
     // 通知のスケジュールを設定
-    await NotificationManager.scheduleInactivityNotifications();
+    await NotificationManager.schedulePeriodicNotification();
 
     if (mounted) {
       Navigator.pushReplacement(
@@ -85,6 +133,7 @@ class _SetupPageState extends State<SetupPage> {
     return ValueListenableBuilder<String>(
       valueListenable: languageNotifier,
       builder: (context, lang, child) {
+        final pages = _buildPages;
         return SelectionArea(
           child: Scaffold(
             backgroundColor: context.appColors.background,
@@ -100,15 +149,10 @@ class _SetupPageState extends State<SetupPage> {
                           _currentPage = page;
                         });
                       },
-                      children: [
-                        _buildLanguageStep(),
-                        _buildCurrencyStep(),
-                        _buildTitleStep(),
-                        _buildFinalStep(),
-                      ],
+                      children: pages,
                     ),
                   ),
-                  _buildBottomBar(),
+                  _buildBottomBar(pages.length),
                 ],
               ),
             ),
@@ -119,12 +163,14 @@ class _SetupPageState extends State<SetupPage> {
   }
 
   Widget _buildStepContainer({
+    Key? key,
     required Widget titleWidget,
     required String svgPath,
     required Widget content,
     double? svgHeight,
   }) {
     return Padding(
+      key: key,
       padding: const EdgeInsets.all(24.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -327,6 +373,151 @@ class _SetupPageState extends State<SetupPage> {
     );
   }
 
+  Widget _buildNotificationToggleStep() {
+    return _buildStepContainer(
+      key: const ValueKey('notificationToggleStep'),
+      titleWidget: Text(
+        AppStrings.setupNotificationTitle,
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: context.appColors.accent,
+        ),
+        textAlign: TextAlign.center,
+      ),
+      svgPath: 'assets/img/a_pig_holding_a_piggy_bank.svg',
+      svgHeight: 140,
+      content: Column(
+        children: [
+          SegmentedButton<bool>(
+            segments: [
+              ButtonSegment(
+                value: true,
+                label: Text(AppStrings.setupNotificationYes),
+              ),
+              ButtonSegment(
+                value: false,
+                label: Text(AppStrings.setupNotificationNo),
+              ),
+            ],
+            selected: _wantsNotification != null ? {_wantsNotification!} : <bool>{},
+            emptySelectionAllowed: true,
+            onSelectionChanged: (Set<bool> newSelection) {
+              setState(() {
+                _wantsNotification = newSelection.isNotEmpty ? newSelection.first : null;
+              });
+            },
+            showSelectedIcon: false,
+            style: SegmentedButton.styleFrom(
+              selectedBackgroundColor: context.appColors.accent,
+              selectedForegroundColor: Colors.white,
+              foregroundColor: context.appColors.accent,
+              side: BorderSide(color: context.appColors.accent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationDetailStep() {
+    return _buildStepContainer(
+      key: const ValueKey('notificationDetailStep'),
+      titleWidget: Text(
+        AppStrings.settingsNotificationEdit,
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: context.appColors.accent,
+        ),
+        textAlign: TextAlign.center,
+      ),
+      svgPath: 'assets/img/think_pose.svg',
+      svgHeight: 120,
+      content: Column(
+        children: [
+          Text(
+            AppStrings.setupNotificationFrequency,
+            style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          SegmentedButton<String>(
+            segments: [
+              ButtonSegment(value: 'daily', label: Text(AppStrings.setupNotificationDaily)),
+              ButtonSegment(value: 'weekly', label: Text(AppStrings.setupNotificationWeekly)),
+              ButtonSegment(value: 'monthly', label: Text(AppStrings.setupNotificationMonthly)),
+            ],
+            selected: {_notificationFrequency},
+            onSelectionChanged: (Set<String> newSelection) {
+              setState(() {
+                _notificationFrequency = newSelection.first;
+              });
+            },
+            showSelectedIcon: false,
+            style: SegmentedButton.styleFrom(
+              selectedBackgroundColor: context.appColors.accent,
+              selectedForegroundColor: Colors.white,
+              foregroundColor: context.appColors.accent,
+              side: BorderSide(color: context.appColors.accent),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          if (_notificationFrequency == 'weekly') ...[
+            Text(AppStrings.setupNotificationDayOfWeek, style: TextStyle(color: context.appColors.mainText)),
+            const SizedBox(height: 8),
+            DropdownButton<int>(
+              value: _notificationDayOfWeek,
+              items: [
+                DropdownMenuItem(value: 1, child: Text('月曜日')),
+                DropdownMenuItem(value: 2, child: Text('火曜日')),
+                DropdownMenuItem(value: 3, child: Text('水曜日')),
+                DropdownMenuItem(value: 4, child: Text('木曜日')),
+                DropdownMenuItem(value: 5, child: Text('金曜日')),
+                DropdownMenuItem(value: 6, child: Text('土曜日')),
+                DropdownMenuItem(value: 7, child: Text('日曜日')),
+              ],
+              onChanged: (val) {
+                if (val != null) setState(() => _notificationDayOfWeek = val);
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          if (_notificationFrequency == 'monthly') ...[
+            Text(AppStrings.setupNotificationDayOfMonth, style: TextStyle(color: context.appColors.mainText)),
+            const SizedBox(height: 8),
+            DropdownButton<int>(
+              value: _notificationDayOfMonth,
+              items: List.generate(28, (index) {
+                return DropdownMenuItem(value: index + 1, child: Text('${index + 1}日'));
+              }),
+              onChanged: (val) {
+                if (val != null) setState(() => _notificationDayOfMonth = val);
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          Text(AppStrings.setupNotificationTime, style: TextStyle(color: context.appColors.mainText)),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: () async {
+              final time = await showTimePicker(
+                context: context,
+                initialTime: _notificationTime,
+              );
+              if (time != null) {
+                setState(() => _notificationTime = time);
+              }
+            },
+            child: Text('${_notificationTime.hour.toString().padLeft(2, '0')}:${_notificationTime.minute.toString().padLeft(2, '0')}'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFinalStep() {
     return _buildStepContainer(
       titleWidget: Text(
@@ -351,7 +542,7 @@ class _SetupPageState extends State<SetupPage> {
     );
   }
 
-  Widget _buildBottomBar() {
+  Widget _buildBottomBar(int pagesCount) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Row(
@@ -378,7 +569,7 @@ class _SetupPageState extends State<SetupPage> {
                   ),
                 )
               : Row(
-                  children: List.generate(4, (index) {
+                  children: List.generate(pagesCount, (index) {
                     return Container(
                       margin: const EdgeInsets.only(right: 8),
                       width: 12,
@@ -404,7 +595,7 @@ class _SetupPageState extends State<SetupPage> {
               ),
             ),
             child: Text(
-              _currentPage == 3 ? AppStrings.setupStart : AppStrings.setupNext,
+              _currentPage == pagesCount - 1 ? AppStrings.setupStart : AppStrings.setupNext,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),

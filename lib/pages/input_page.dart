@@ -108,8 +108,7 @@ class _InputPageState extends State<InputPage> {
       SnackBar(content: Text(AppStrings.deleteSuccessMessage)),
     );
 
-    // 通知のスケジュールを更新
-    NotificationManager.scheduleInactivityNotifications();
+    // Activity記録は削除
 
     Navigator.pop(context);
   }
@@ -165,8 +164,7 @@ class _InputPageState extends State<InputPage> {
       log('Feedback error: $e');
     }
 
-    // 通知のスケジュールを更新
-    await NotificationManager.scheduleInactivityNotifications();
+    // Activity記録は削除
 
     if (mounted) {
       Navigator.pop(context);

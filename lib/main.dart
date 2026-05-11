@@ -24,11 +24,8 @@ void main() async {
     // 設定保存用のBoxを開く
     final settingsBox = await Hive.openBox(HiveConstants.settingsBoxName);
 
-    // 通知機能の初期化
+    // 通知機能の初期化（内部で定期通知の再スケジュールも行われる）
     await NotificationManager.init();
-    
-    // アプリ起動時にLastActiveTimeを更新し、通知フラグをリセット（スケジュールもここで登録）
-    await NotificationManager.scheduleInactivityNotifications();
   } catch (e) {
     debugPrint('Initialization error: $e');
   }

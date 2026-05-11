@@ -7,6 +7,7 @@ import 'setup_page.dart';
 import '../theme.dart';
 import '../utils/csv_helper.dart';
 import '../utils/notification_manager.dart';
+import 'notification_settings_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -122,7 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
         );
         
         // 通知のスケジュールをリセットして再設定
-        await NotificationManager.scheduleInactivityNotifications();
+        await NotificationManager.schedulePeriodicNotification();
 
         if (mounted) {
           // SetupPageへ遷移
@@ -253,7 +254,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       box.put(HiveConstants.keyLanguage, newLang);
                       
                       // 言語変更に合わせて通知メッセージも更新（再スケジュール）
-                      NotificationManager.scheduleInactivityNotifications();
+                      NotificationManager.schedulePeriodicNotification();
 
                       setState(() {});
                     },
@@ -308,6 +309,25 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             
             const Divider(height: 32),
+            
+            // 通知設定
+            _SectionHeader(title: AppStrings.settingsNotificationTitle),
+            ListTile(
+              leading: Icon(Icons.notifications, color: context.appColors.accent),
+              title: Text(
+                AppStrings.settingsNotificationEdit,
+                style: TextStyle(color: context.appColors.mainText, fontWeight: FontWeight.bold),
+              ),
+              trailing: Icon(Icons.chevron_right, color: context.appColors.accent),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotificationSettingsPage()),
+                );
+              },
+            ),
+  
+            const Divider(height: 32),
   
             // データ管理
             _SectionHeader(title: AppStrings.dataManagementTitle),
@@ -339,7 +359,7 @@ class _SettingsPageState extends State<SettingsPage> {
               onTap: () async {
                 await CsvHelper.importCsv(context);
                 // インポート後に通知を再スケジュール
-                await NotificationManager.scheduleInactivityNotifications();
+                await NotificationManager.schedulePeriodicNotification();
                 _titleController.text = appTitleNotifier.value;
                 setState(() {});
               },

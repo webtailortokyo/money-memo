@@ -25,7 +25,7 @@ class AppStrings {
       'memoLabelDecrease': '何に？',
       'memoLabelIncrease': '何で？',
       'memoHintDecrease': '例：アイス、ゲーム',
-      'memoHintIncrease': '例：お小遣い、プレゼント',
+      'memoHintIncrease': '例：おこづかい、プレゼント',
       'memoLabelMemo': '内容は？',
       'memoHintMemo': '例：なんでもメモ',
       'typeSelectionTitle': '減った？ 増えた？ メモ？',
@@ -92,7 +92,7 @@ class AppStrings {
       'setupNext': 'つぎへ',
       'setupFinalTitle': '準備完了！',
       'setupFinalMessage': '準備ができたよ！\nさっそく使ってみよう',
-      'setupTitleExample': '例：たろうのおこづかいちょう、ランチ代の記録、光熱費のメモ、など',
+      'setupTitleExample': '例：おこづかいちょう、ランチ代の記録、光熱費のメモ、など',
       'exportLabel': 'エクスポート (CSV)',
       'exportSubtitle': '記録データを保存・共有します',
       'importLabel': 'インポート (CSV)',
@@ -101,13 +101,22 @@ class AppStrings {
       'lightMode': 'ライトモード',
       'darkMode': 'ダークモード',
       'notificationTitle': 'おかねメモ',
-      'notification3DayPatternA': '最近お変わりありませんか？気が向いたときに、今日一日の小さな出来事もメモしてみてくださいね。',
-      'notification3DayPatternB': 'コツコツの習慣、マイペースに続けていきましょう！一言メモだけでも大歓迎ですよ。',
-      'notification3DayPatternC': 'おかねメモが少し寂しがっているかも？また一緒に記録できるのを楽しみに待っています！',
-      'notification7DayMessage': '1週間が経ちました。また気が向いたときに、いつでもお待ちしています。',
-      'notification14DayMessage': 'おかねメモを開いてから2週間ですね。今月のお金の見直しなど、いつでもお待ちしています！',
-      'notification21DayMessage': 'お久しぶりです！家計簿はマイペースが一番。また記録したくなったらいつでもどうぞ！',
-      'notification30DayMessage': '1ヶ月が経ちました。お金のメモが必要になったら、またいつでも遊びに来てくださいね。',
+      'notificationDailyMessage': '今日のお金をメモしてみましょう',
+      'notificationWeeklyMessage': 'お金チェックの時間です',
+      'notificationMonthlyMessage': '今月のお金を振り返ってみませんか？',
+      'setupNotificationTitle': '定期的に通知が来るように設定しますか？',
+      'setupNotificationYes': 'はい',
+      'setupNotificationNo': 'いいえ',
+      'setupNotificationFrequency': '通知の頻度',
+      'setupNotificationDaily': '毎日',
+      'setupNotificationWeekly': '毎週',
+      'setupNotificationMonthly': '毎月',
+      'setupNotificationTime': '時間',
+      'setupNotificationDayOfWeek': '曜日',
+      'setupNotificationDayOfMonth': '日付',
+      'setupNotificationOn': '通知をONにする',
+      'settingsNotificationTitle': '定期的な通知',
+      'settingsNotificationEdit': '通知の設定',
       'backButtonText': '戻る',
       'privacyPolicy': 'プライバシーポリシー',
       'officialWebsite': '公式サイト',
@@ -191,7 +200,7 @@ class AppStrings {
       'setupNext': 'Next',
       'setupFinalTitle': 'Ready!',
       'setupFinalMessage': "You're all set!\nLet's get started",
-      'setupTitleExample': 'e.g., John\'s Money Memo, My Expenses, Utility Bills, etc.',
+      'setupTitleExample': 'e.g., Money Memo, My Expenses, Utility Bills, etc.',
       'exportLabel': 'Export (CSV)',
       'exportSubtitle': 'Save and share recorded data',
       'importLabel': 'Import (CSV)',
@@ -200,13 +209,22 @@ class AppStrings {
       'lightMode': 'Light Mode',
       'darkMode': 'Dark Mode',
       'notificationTitle': 'Money Memo',
-      'notification3DayPatternA': 'How are you lately? Please open it again when you feel like it and record small things.',
-      'notification3DayPatternB': 'Let\'s keep up the habit at your own pace! Even a short memo is very welcome.',
-      'notification3DayPatternC': 'Money Memo might be feeling lonely? Hope to see you again soon!',
-      'notification7DayMessage': 'It\'s been a week. We\'re always here whenever you\'re ready to record again.',
-      'notification14DayMessage': 'It\'s been two weeks. We\'re always here whenever you want to review your budget!',
-      'notification21DayMessage': 'Long time no see! At your own pace is best. Come back whenever you feel like recording!',
-      'notification30DayMessage': 'One month has passed. If you ever need to memo your money again, feel free to drop by anytime.',
+      'notificationDailyMessage': 'Let\'s record today\'s money',
+      'notificationWeeklyMessage': 'It\'s time for your money check',
+      'notificationMonthlyMessage': 'Why not reflect on this month\'s money?',
+      'setupNotificationTitle': 'Do you want to set up periodic notifications?',
+      'setupNotificationYes': 'Yes',
+      'setupNotificationNo': 'No',
+      'setupNotificationFrequency': 'Notification Frequency',
+      'setupNotificationDaily': 'Daily',
+      'setupNotificationWeekly': 'Weekly',
+      'setupNotificationMonthly': 'Monthly',
+      'setupNotificationTime': 'Time',
+      'setupNotificationDayOfWeek': 'Day of Week',
+      'setupNotificationDayOfMonth': 'Date',
+      'setupNotificationOn': 'Turn ON Notifications',
+      'settingsNotificationTitle': 'Periodic Notifications',
+      'settingsNotificationEdit': 'Notification Settings',
       'backButtonText': 'Back',
       'privacyPolicy': 'Privacy Policy',
       'officialWebsite': 'Official Website',
@@ -327,13 +345,22 @@ class AppStrings {
   static String get lightMode => _get('lightMode');
   static String get darkMode => _get('darkMode');
   static String get notificationTitle => _get('notificationTitle');
-  static String get notification3DayPatternA => _get('notification3DayPatternA');
-  static String get notification3DayPatternB => _get('notification3DayPatternB');
-  static String get notification3DayPatternC => _get('notification3DayPatternC');
-  static String get notification7DayMessage => _get('notification7DayMessage');
-  static String get notification14DayMessage => _get('notification14DayMessage');
-  static String get notification21DayMessage => _get('notification21DayMessage');
-  static String get notification30DayMessage => _get('notification30DayMessage');
+  static String get notificationDailyMessage => _get('notificationDailyMessage');
+  static String get notificationWeeklyMessage => _get('notificationWeeklyMessage');
+  static String get notificationMonthlyMessage => _get('notificationMonthlyMessage');
+  static String get setupNotificationTitle => _get('setupNotificationTitle');
+  static String get setupNotificationYes => _get('setupNotificationYes');
+  static String get setupNotificationNo => _get('setupNotificationNo');
+  static String get setupNotificationFrequency => _get('setupNotificationFrequency');
+  static String get setupNotificationDaily => _get('setupNotificationDaily');
+  static String get setupNotificationWeekly => _get('setupNotificationWeekly');
+  static String get setupNotificationMonthly => _get('setupNotificationMonthly');
+  static String get setupNotificationTime => _get('setupNotificationTime');
+  static String get setupNotificationDayOfWeek => _get('setupNotificationDayOfWeek');
+  static String get setupNotificationDayOfMonth => _get('setupNotificationDayOfMonth');
+  static String get setupNotificationOn => _get('setupNotificationOn');
+  static String get settingsNotificationTitle => _get('settingsNotificationTitle');
+  static String get settingsNotificationEdit => _get('settingsNotificationEdit');
   static String get backButtonText => _get('backButtonText');
   static String get privacyPolicy => _get('privacyPolicy');
   static String get officialWebsite => _get('officialWebsite');
@@ -390,14 +417,13 @@ class HiveConstants {
   static const String keyThemeMode = 'themeMode';
   static const String keyOnboardingCompleted = 'onboardingCompleted';
 
-  // WorkManager notification tracking keys
-  static const String keyLastActiveTime = 'lastActiveTime';
-
-  static const String keyNotifiedDay3 = 'notifiedDay3';
-  static const String keyNotifiedDay7 = 'notifiedDay7';
-  static const String keyNotifiedDay14 = 'notifiedDay14';
-  static const String keyNotifiedDay21 = 'notifiedDay21';
-  static const String keyNotifiedDay30 = 'notifiedDay30';
+  // Periodic notification keys
+  static const String keyPeriodicNotificationEnabled = 'periodicNotificationEnabled';
+  static const String keyPeriodicNotificationFrequency = 'periodicNotificationFrequency'; // 'daily', 'weekly', 'monthly'
+  static const String keyPeriodicNotificationTimeHour = 'periodicNotificationTimeHour';
+  static const String keyPeriodicNotificationTimeMinute = 'periodicNotificationTimeMinute';
+  static const String keyPeriodicNotificationDayOfWeek = 'periodicNotificationDayOfWeek'; // 1-7
+  static const String keyPeriodicNotificationDayOfMonth = 'periodicNotificationDayOfMonth'; // 1-28
 }
 
 // MoneyEntryのtypeを表す文字列 (これはmodels/money_entry.dartのextensionで使うことを想定)
