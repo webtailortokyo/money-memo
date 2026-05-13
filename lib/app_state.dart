@@ -17,6 +17,9 @@ final languageNotifier = ValueNotifier<String>('ja');
 // テーマ設定 (ThemeMode.light または ThemeMode.dark)
 final appThemeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 
+// カスタム単位のリスト
+final customUnitsNotifier = ValueNotifier<List<String>>([]);
+
 /// 二つの ValueListenable を同時に監視するためのヘルパークラス
 class ValueListenableBuilder2<A, B> extends StatelessWidget {
   final ValueListenable<A> valueListenable1;

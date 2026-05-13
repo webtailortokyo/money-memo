@@ -22,7 +22,7 @@ void main() async {
     await Hive.openBox(HiveConstants.statsBoxName);
     
     // 設定保存用のBoxを開く
-    final settingsBox = await Hive.openBox(HiveConstants.settingsBoxName);
+    await Hive.openBox(HiveConstants.settingsBoxName);
 
     // 通知機能の初期化（内部で定期通知の再スケジュールも行われる）
     await NotificationManager.init();
@@ -58,6 +58,10 @@ void main() async {
   }
 
   final onboardingCompleted = settingsBox.get(HiveConstants.keyOnboardingCompleted, defaultValue: false) as bool;
+  final savedCustomUnits = settingsBox.get(HiveConstants.keyCustomUnits) as List?;
+  if (savedCustomUnits != null) {
+    customUnitsNotifier.value = List<String>.from(savedCustomUnits);
+  }
 
   // 言語が変わったとき、タイトルがデフォルト（空）なら AppStrings.appTitle に更新する
   languageNotifier.addListener(() {

@@ -17,3 +17,15 @@ String formatAmount(num value, {int? decimalDigits}) {
   );
   return formatter.format(value.abs()).trim();
 }
+
+bool isSuffixUnit(String symbol) {
+  if (symbol.isEmpty) return false;
+  final s = symbol.trim();
+  // 通貨記号（プレフィックス）として扱うものを定義
+  final prefixes = ['¥', '\$', '€', '£', '₽', '₩'];
+  if (prefixes.contains(s)) {
+    return false;
+  }
+  // それ以外（kg, 回, 自作単位など）はすべてサフィックスとする
+  return true;
+}

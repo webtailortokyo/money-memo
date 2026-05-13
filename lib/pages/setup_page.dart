@@ -26,6 +26,9 @@ class _SetupPageState extends State<SetupPage> {
   int _notificationDayOfWeek = 1; // 月曜
   int _notificationDayOfMonth = 1;
 
+  bool _isOtherUnitMode = false;
+  final TextEditingController _customUnitController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -36,14 +39,15 @@ class _SetupPageState extends State<SetupPage> {
   void dispose() {
     _pageController.dispose();
     _titleController.dispose();
+    _customUnitController.dispose();
     super.dispose();
   }
 
   List<Widget> get _buildPages {
     final pages = [
       _buildLanguageStep(),
-      _buildCurrencyStep(),
       _buildTitleStep(),
+      _buildCurrencyStep(),
       _buildNotificationToggleStep(),
     ];
     if (_wantsNotification == true) {
@@ -249,7 +253,7 @@ class _SetupPageState extends State<SetupPage> {
   Widget _buildCurrencyStep() {
     return _buildStepContainer(
       titleWidget: Text(
-        AppStrings.currencySettingTitle,
+        _isOtherUnitMode ? AppStrings.nonMoneyUnits : AppStrings.currencySettingTitle,
         style: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
@@ -257,50 +261,184 @@ class _SetupPageState extends State<SetupPage> {
         ),
         textAlign: TextAlign.center,
       ),
-      svgPath: 'assets/img/piggy_bank.svg',
-      svgHeight: 140, // 小さくする
-      content: Column(
-        children: [
-          Text(
-            AppStrings.setupCurrency,
-            style: TextStyle(color: context.appColors.mainText),
-          ),
-          const SizedBox(height: 20),
-          ValueListenableBuilder<String>(
-            valueListenable: currencyNotifier,
-            builder: (context, symbol, child) {
-              return SegmentedButton<String>(
-                segments: [
-                  ButtonSegment(
-                    value: '¥',
-                    label: Text(
-                      languageNotifier.value == 'ja' ? '円(¥)' : 'JPY(¥)',
-                    ),
+      svgPath: _isOtherUnitMode ? 'assets/img/joy_pose.svg' : 'assets/img/piggy_bank.svg',
+      svgHeight: 140,
+      content: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        child: _isOtherUnitMode ? _buildOtherUnitsContent() : _buildCurrencyContent(),
+      ),
+    );
+  }
+
+  Widget _buildCurrencyContent() {
+    return Column(
+      key: const ValueKey('currencyContent'),
+      children: [
+        Text(
+          AppStrings.setupCurrency,
+          style: TextStyle(color: context.appColors.mainText),
+        ),
+        const SizedBox(height: 20),
+        ValueListenableBuilder<String>(
+          valueListenable: currencyNotifier,
+          builder: (context, symbol, child) {
+            return SegmentedButton<String>(
+              segments: [
+                ButtonSegment(
+                  value: '¥',
+                  label: Text(
+                    languageNotifier.value == 'ja' ? '円(¥)' : 'JPY(¥)',
                   ),
-                  const ButtonSegment(value: '\$', label: Text('USD(\$)')),
-                  const ButtonSegment(value: '€', label: Text('EUR(€)')),
-                ],
-                selected: {symbol},
-                onSelectionChanged: (Set<String> newSelection) {
-                  final newSymbol = newSelection.first;
-                  final newDigits = newSymbol == '¥' ? 0 : 2;
-
-                  currencyNotifier.value = newSymbol;
-                  decimalDigitsNotifier.value = newDigits;
-
-                  final box = Hive.box(HiveConstants.settingsBoxName);
-                  box.put(HiveConstants.keyCurrency, newSymbol);
-                  box.put(HiveConstants.keyDecimalDigits, newDigits);
-                },
-                showSelectedIcon: false,
-                style: SegmentedButton.styleFrom(
-                  selectedBackgroundColor: context.appColors.accent,
-                  selectedForegroundColor: Colors.white,
-                  foregroundColor: context.appColors.accent,
-                  side: BorderSide(color: context.appColors.accent),
                 ),
-              );
+                const ButtonSegment(value: '\$', label: Text('USD(\$)')),
+                const ButtonSegment(value: '€', label: Text('EUR(€)')),
+              ],
+              selected: {symbol},
+              onSelectionChanged: (Set<String> newSelection) {
+                final newSymbol = newSelection.first;
+                final newDigits = newSymbol == '¥' ? 0 : 2;
+
+                currencyNotifier.value = newSymbol;
+                decimalDigitsNotifier.value = newDigits;
+
+                final box = Hive.box(HiveConstants.settingsBoxName);
+                box.put(HiveConstants.keyCurrency, newSymbol);
+                box.put(HiveConstants.keyDecimalDigits, newDigits);
+              },
+              showSelectedIcon: false,
+              style: SegmentedButton.styleFrom(
+                selectedBackgroundColor: context.appColors.accent,
+                selectedForegroundColor: Colors.white,
+                foregroundColor: context.appColors.accent,
+                side: BorderSide(color: context.appColors.accent),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 24),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              _isOtherUnitMode = true;
+            });
+          },
+          style: TextButton.styleFrom(
+            foregroundColor: context.appColors.accent.withValues(alpha: 0.7),
+            visualDensity: VisualDensity.compact,
+          ),
+          child: Text(
+            AppStrings.otherUnits,
+            style: const TextStyle(fontSize: 13, decoration: TextDecoration.underline),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtherUnitsContent() {
+    final standardOtherUnits = [
+      AppStrings.unitKg,
+      AppStrings.unitKm,
+      AppStrings.unitCount,
+      AppStrings.unitStep,
+      AppStrings.unitMinute,
+      AppStrings.unitHour,
+      'pts',
+    ];
+
+    return Column(
+      key: const ValueKey('otherUnitsContent'),
+      children: [
+        Text(
+          AppStrings.otherUnits,
+          style: TextStyle(color: context.appColors.mainText),
+        ),
+        const SizedBox(height: 16),
+        ValueListenableBuilder<List<String>>(
+          valueListenable: customUnitsNotifier,
+          builder: (context, customUnits, child) {
+            final allUnits = [
+              ...standardOtherUnits,
+              ...customUnits,
+              AppStrings.customUnit,
+            ];
+
+            return Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: allUnits.map((unit) {
+                final isCustomTrigger = unit == AppStrings.customUnit;
+                final isSelected = currencyNotifier.value == unit;
+
+                return ChoiceChip(
+                  label: Text(unit),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      if (isCustomTrigger) {
+                        _showCustomUnitDialog();
+                      } else {
+                        _updateUnit(unit, 0);
+                      }
+                    }
+                  },
+                  selectedColor: context.appColors.accent,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : context.appColors.accent,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  void _updateUnit(String unit, int digits) {
+    currencyNotifier.value = unit;
+    decimalDigitsNotifier.value = digits;
+    final box = Hive.box(HiveConstants.settingsBoxName);
+    box.put(HiveConstants.keyCurrency, unit);
+    box.put(HiveConstants.keyDecimalDigits, digits);
+    setState(() {});
+  }
+  void _showCustomUnitDialog() {
+    _customUnitController.clear();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppStrings.customUnit),
+        content: TextField(
+          controller: _customUnitController,
+          decoration: InputDecoration(hintText: AppStrings.nonMoneyUnits),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancelButtonText),
+          ),
+          TextButton(
+            onPressed: () {
+              final val = _customUnitController.text.trim();
+              if (val.isNotEmpty) {
+                // リストにまだなければ追加
+                if (!customUnitsNotifier.value.contains(val)) {
+                  final newList = [...customUnitsNotifier.value, val];
+                  customUnitsNotifier.value = newList;
+                  
+                  // Hiveに保存
+                  Hive.box(HiveConstants.settingsBoxName).put(HiveConstants.keyCustomUnits, newList);
+                }
+                _updateUnit(val, 0);
+              }
+              Navigator.pop(context);
             },
+            child: Text('OK'),
           ),
         ],
       ),

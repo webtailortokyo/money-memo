@@ -21,7 +21,6 @@ import '../utils/input_formatter.dart';
 import '../constants.dart';
 import '../utils/milestone_manager.dart';
 import '../utils/format_utils.dart';
-import '../utils/notification_manager.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -107,7 +106,8 @@ class _MainPageState extends State<MainPage> {
     final amountText = amountController.text.trim();
     final cleanedAmount = amountText.replaceAll(',', '');
 
-    if (memo.isEmpty || (selectedType != MoneyType.memo && amountText.isEmpty)) {
+    final amountRequired = selectedType != MoneyType.memo;
+    if ((amountRequired && amountText.isEmpty) || (!amountRequired && memo.isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.inputErrorSnackbarMessage)),
       );
@@ -302,9 +302,7 @@ class _MainPageState extends State<MainPage> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: selectedType == MoneyType.memo 
-            ? context.appColors.memoBg 
-            : context.appColors.inputBg,
+        color: selectedType == MoneyType.memo ? context.appColors.memoBg : context.appColors.inputBg,
         borderRadius: BorderRadius.circular(AppNumbers.defaultPadding),
         border: Border.all(
           color: amountFocusNode.hasFocus ? _activeBorderColor : Colors.grey.shade300,
@@ -320,47 +318,59 @@ class _MainPageState extends State<MainPage> {
               ]
             : [],
       ),
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              left: AppNumbers.defaultPadding,
-              right: 4,
-            ),
-            child: ValueListenableBuilder<String>(
-              valueListenable: currencyNotifier,
-              builder: (context, symbol, child) => Text(
-                symbol,
-                style: TextStyle(
-                  color: selectedType == MoneyType.memo ? Colors.grey : context.appColors.mainText,
+      child: ValueListenableBuilder<String>(
+        valueListenable: currencyNotifier,
+        builder: (context, symbol, child) {
+          final isSuffix = isSuffixUnit(symbol);
+          return Row(
+            children: [
+              if (!isSuffix)
+                Padding(
+                  padding: const EdgeInsets.only(left: AppNumbers.defaultPadding, right: 4),
+                  child: Text(
+                    symbol,
+                    style: TextStyle(
+                      color: selectedType == MoneyType.memo ? Colors.grey : context.appColors.mainText,
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: TextField(
+                  focusNode: amountFocusNode,
+                  controller: amountController,
+                  enabled: selectedType != MoneyType.memo,
+                  keyboardType: TextInputType.number,
+                  cursorColor: _activeBorderColor,
+                  textAlign: isSuffix ? TextAlign.right : TextAlign.left,
+                  inputFormatters: [
+                    ThousandsSeparatorInputFormatter(),
+                  ],
+                  decoration: const InputDecoration(
+                    hintText: '0',
+                    filled: false,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: AppNumbers.defaultPadding,
+                      vertical: AppNumbers.defaultPadding,
+                    ),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
                 ),
               ),
-            ),
-          ),
-          Expanded(
-            child: TextField(
-              focusNode: amountFocusNode,
-              controller: amountController,
-              enabled: selectedType != MoneyType.memo,
-              keyboardType: TextInputType.number,
-              cursorColor: _activeBorderColor,
-              inputFormatters: [
-                ThousandsSeparatorInputFormatter(),
-              ],
-              decoration: const InputDecoration(
-                hintText: '0',
-                filled: false,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 0,
-                  vertical: AppNumbers.defaultPadding,
+              if (isSuffix)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4, right: AppNumbers.defaultPadding),
+                  child: Text(
+                    symbol,
+                    style: TextStyle(
+                      color: selectedType == MoneyType.memo ? Colors.grey : context.appColors.mainText,
+                    ),
+                  ),
                 ),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-              ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }

@@ -629,8 +629,12 @@ class _PeriodPageState extends State<PeriodPage> {
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       final isIncome = rodIndex == 0;
                       final label = isIncome ? AppStrings.incomeLabel : AppStrings.expenseLabel;
+                      final sym = selectedCurrency ?? '';
+                      final isSuffix = isSuffixUnit(sym);
+                      final amountStr = formatAmount(rod.toY, decimalDigits: decimalDigits);
+                      final displayValue = isSuffix ? '$amountStr $sym' : '$sym$amountStr';
                       return BarTooltipItem(
-                        '$label\n$selectedCurrency${formatAmount(rod.toY, decimalDigits: decimalDigits)}',
+                        '$label\n$displayValue',
                         const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       );
                     },
@@ -815,7 +819,9 @@ class _PeriodPageState extends State<PeriodPage> {
                           children: [
                             if (s.increase > 0)
                               Text(
-                                '+${s.symbol}${formatAmount(s.increase, decimalDigits: s.decimalDigits)}',
+                                isSuffixUnit(s.symbol)
+                                    ? '+${formatAmount(s.increase, decimalDigits: s.decimalDigits)} ${s.symbol}'
+                                    : '+${s.symbol}${formatAmount(s.increase, decimalDigits: s.decimalDigits)}',
                                 style: TextStyle(
                                   color: context.appColors.increaseAmount,
                                   fontSize: 13,
@@ -823,7 +829,9 @@ class _PeriodPageState extends State<PeriodPage> {
                               ),
                             if (s.decrease > 0)
                               Text(
-                                '-${s.symbol}${formatAmount(s.decrease, decimalDigits: s.decimalDigits)}',
+                                isSuffixUnit(s.symbol)
+                                    ? '-${formatAmount(s.decrease, decimalDigits: s.decimalDigits)} ${s.symbol}'
+                                    : '-${s.symbol}${formatAmount(s.decrease, decimalDigits: s.decimalDigits)}',
                                 style: TextStyle(
                                   color: context.appColors.decreaseAmount,
                                   fontSize: 13,
@@ -922,6 +930,7 @@ class _PeriodPageState extends State<PeriodPage> {
     final sortedSummaries = _sortSummaries(totals.values);
     for (final summary in sortedSummaries) {
       text.writeln(_getCurrencyCode(summary.symbol));
+      final isSuffix = isSuffixUnit(summary.symbol);
       final inc = formatAmount(
         summary.increase,
         decimalDigits: summary.decimalDigits,
@@ -930,8 +939,11 @@ class _PeriodPageState extends State<PeriodPage> {
         summary.decrease,
         decimalDigits: summary.decimalDigits,
       );
-      text.writeln('${AppStrings.shareIncreaseLabel}${summary.symbol}$inc');
-      text.writeln('${AppStrings.shareDecreaseLabel}${summary.symbol}$dec');
+      final incDisplay = isSuffix ? '$inc ${summary.symbol}' : '${summary.symbol}$inc';
+      final decDisplay = isSuffix ? '$dec ${summary.symbol}' : '${summary.symbol}$dec';
+      
+      text.writeln('${AppStrings.shareIncreaseLabel}$incDisplay');
+      text.writeln('${AppStrings.shareDecreaseLabel}$decDisplay');
       text.writeln('');
     }
 
@@ -943,12 +955,13 @@ class _PeriodPageState extends State<PeriodPage> {
           text.writeln('${formatDate(e.date)} ${e.memo}');
           continue;
         }
-        final sym = e.currency ?? 'ﾂ･';
+        final sym = e.currency ?? '¥';
         final digits = e.decimalDigits ?? 0;
+        final isSuffix = isSuffixUnit(sym);
         final amountText = formatAmount(e.amount, decimalDigits: digits);
         final signedAmount = e.type == MoneyEntryTypes.increase
-            ? '+$sym$amountText'
-            : '-$sym$amountText';
+            ? (isSuffix ? '+$amountText $sym' : '+$sym$amountText')
+            : (isSuffix ? '-$amountText $sym' : '-$sym$amountText');
         text.writeln('${formatDate(e.date)} ${e.memo}  $signedAmount');
       }
     } else {
@@ -995,14 +1008,18 @@ class _PeriodPageState extends State<PeriodPage> {
             final inc = formatAmount(s.increase, decimalDigits: s.decimalDigits);
             final dec = formatAmount(s.decrease, decimalDigits: s.decimalDigits);
 
+            final isSuffix = isSuffixUnit(s.symbol);
+            final incText = isSuffix ? '+$inc ${s.symbol}' : '+${s.symbol}$inc';
+            final decText = isSuffix ? '-$dec ${s.symbol}' : '-${s.symbol}$dec';
+
             if (s.increase > 0 && s.decrease > 0) {
-              text.writeln('$monthName +${s.symbol}$inc / -${s.symbol}$dec');
+              text.writeln('$monthName $incText / $decText');
               hasValues = true;
             } else if (s.increase > 0) {
-              text.writeln('$monthName +${s.symbol}$inc');
+              text.writeln('$monthName $incText');
               hasValues = true;
             } else if (s.decrease > 0) {
-              text.writeln('$monthName -${s.symbol}$dec');
+              text.writeln('$monthName $decText');
               hasValues = true;
             }
           }

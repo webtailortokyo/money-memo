@@ -2,6 +2,8 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import '../app_state.dart';
 
+import '../utils/format_utils.dart';
+
 part 'money_entry.g.dart';
 
 @HiveType(typeId: 0)
@@ -53,15 +55,18 @@ class MoneyEntry extends HiveObject {
     );
     final formattedAmount = formatter.format(amount).trim();
 
+    // サフィックス（後ろに付ける）単位かどうかを判定
+    final isSuffix = isSuffixUnit(symbol);
+
     switch (type) {
       case 'decrease':
-        return '-$symbol$formattedAmount';
+        return isSuffix ? '-$formattedAmount $symbol' : '-$symbol$formattedAmount';
       case 'increase':
-        return '+$symbol$formattedAmount';
+        return isSuffix ? '+$formattedAmount $symbol' : '+$symbol$formattedAmount';
       case 'memo':
         return 'メモ';
       default:
-        return '$symbol$formattedAmount';
+        return isSuffix ? '$formattedAmount $symbol' : '$symbol$formattedAmount';
     }
   }
 }

@@ -92,7 +92,16 @@ class AppStrings {
       'setupNext': 'つぎへ',
       'setupFinalTitle': '準備完了！',
       'setupFinalMessage': '準備ができたよ！\nさっそく使ってみよう',
-      'setupTitleExample': '例：おこづかいちょう、ランチ代の記録、光熱費のメモ、など',
+      'setupTitleExample': '例：おこづかいちょう、ランチ代の記録、光熱費のメモ、体重の記録 など',
+      'otherUnits': 'お金以外の単位を選ぶ',
+      'nonMoneyUnits': '単位',
+      'customUnit': 'カスタム（自由入力）',
+      'unitKg': 'kg',
+      'unitKm': 'km',
+      'unitCount': '回',
+      'unitStep': '歩',
+      'unitMinute': '分',
+      'unitHour': '時間',
       'exportLabel': 'エクスポート (CSV)',
       'exportSubtitle': '記録データを保存・共有します',
       'importLabel': 'インポート (CSV)',
@@ -197,12 +206,21 @@ class AppStrings {
       'setupLanguage': 'Choose your language',
       'setupCurrency': 'Choose your currency',
       'setupTitle': 'Choose app title',
-      'setupTitleHint': 'Money Memo',
+      'setupTitleHint': 'What to track?',
       'setupStart': 'Get Started',
       'setupNext': 'Next',
       'setupFinalTitle': 'Ready!',
       'setupFinalMessage': "You're all set!\nLet's get started",
-      'setupTitleExample': 'e.g., Money Memo, My Expenses, Utility Bills, etc.',
+      'setupTitleExample': 'e.g., Pocket money, Lunch, Utility bills, Weight, etc.',
+      'otherUnits': 'Choose non-money units',
+      'nonMoneyUnits': 'Unit',
+      'customUnit': 'Custom (manual entry)',
+      'unitKg': 'kg',
+      'unitKm': 'km',
+      'unitCount': 'times',
+      'unitStep': 'steps',
+      'unitMinute': 'min',
+      'unitHour': 'hours',
       'exportLabel': 'Export (CSV)',
       'exportSubtitle': 'Save and share recorded data',
       'importLabel': 'Import (CSV)',
@@ -341,6 +359,15 @@ class AppStrings {
   static String get setupFinalTitle => _get('setupFinalTitle');
   static String get setupFinalMessage => _get('setupFinalMessage');
   static String get setupTitleExample => _get('setupTitleExample');
+  static String get otherUnits => _get('otherUnits');
+  static String get nonMoneyUnits => _get('nonMoneyUnits');
+  static String get customUnit => _get('customUnit');
+  static String get unitKg => _get('unitKg');
+  static String get unitKm => _get('unitKm');
+  static String get unitCount => _get('unitCount');
+  static String get unitStep => _get('unitStep');
+  static String get unitMinute => _get('unitMinute');
+  static String get unitHour => _get('unitHour');
   static String get exportLabel => _get('exportLabel');
   static String get exportSubtitle => _get('exportSubtitle');
   static String get importLabel => _get('importLabel');
@@ -422,6 +449,7 @@ class HiveConstants {
   static const String keyLanguage = 'language';
   static const String keyThemeMode = 'themeMode';
   static const String keyOnboardingCompleted = 'onboardingCompleted';
+  static const String keyCustomUnits = 'customUnits';
 
   // Periodic notification keys
   static const String keyPeriodicNotificationEnabled = 'periodicNotificationEnabled';

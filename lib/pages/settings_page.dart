@@ -19,6 +19,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final _titleController = TextEditingController();
+  final _customUnitController = TextEditingController();
 
   @override
   void initState() {
@@ -29,6 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void dispose() {
     _titleController.dispose();
+    _customUnitController.dispose();
     super.dispose();
   }
 
@@ -66,6 +68,124 @@ class _SettingsPageState extends State<SettingsPage> {
       settingsBox.put(HiveConstants.keyAppTitle, trimTitle);
       appTitleNotifier.value = trimTitle;
     }
+    setState(() {});
+  }
+
+  void _showUnitPicker() {
+    final otherUnits = [
+      AppStrings.unitKg,
+      AppStrings.unitKm,
+      AppStrings.unitCount,
+      AppStrings.unitStep,
+      AppStrings.unitMinute,
+      AppStrings.unitHour,
+      'pts',
+      AppStrings.customUnit,
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppStrings.otherUnits),
+        content: ValueListenableBuilder<List<String>>(
+          valueListenable: customUnitsNotifier,
+          builder: (context, customUnits, child) {
+            final allUnits = [
+              ...otherUnits.where((u) => u != AppStrings.customUnit),
+              ...customUnits,
+              AppStrings.customUnit,
+            ];
+
+            return SingleChildScrollView(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: allUnits.map((unit) {
+                  final isCustomTrigger = unit == AppStrings.customUnit;
+                  final isSelected = currencyNotifier.value == unit;
+
+                  return ChoiceChip(
+                    label: Text(unit),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      if (selected) {
+                        if (isCustomTrigger) {
+                          _showCustomUnitDialog();
+                        } else {
+                          Navigator.pop(context);
+                          _updateUnit(unit, 0);
+                        }
+                      }
+                    },
+                  );
+                }).toList(),
+              ),
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.closeButtonText),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCustomUnitDialog() {
+    _customUnitController.clear();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppStrings.customUnit),
+        content: TextField(
+          controller: _customUnitController,
+          decoration: InputDecoration(hintText: AppStrings.nonMoneyUnits),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppStrings.cancelButtonText),
+          ),
+          TextButton(
+            onPressed: () {
+              final val = _customUnitController.text.trim();
+              if (val.isNotEmpty) {
+                // リストにまだなければ追加
+                if (!customUnitsNotifier.value.contains(val)) {
+                  final newList = [...customUnitsNotifier.value, val];
+                  customUnitsNotifier.value = newList;
+                  
+                  // Hiveに保存
+                  Hive.box(HiveConstants.settingsBoxName).put(HiveConstants.keyCustomUnits, newList);
+                }
+                
+                // ダイアログを2つ（カスタム入力とピッカー）閉じる
+                Navigator.pop(context); 
+                Navigator.pop(context);
+                
+                _updateUnit(val, 0);
+              } else {
+                Navigator.pop(context);
+              }
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _updateUnit(String unit, int digits) {
+    currencyNotifier.value = unit;
+    decimalDigitsNotifier.value = digits;
+    final box = Hive.box(HiveConstants.settingsBoxName);
+    box.put(HiveConstants.keyCurrency, unit);
+    box.put(HiveConstants.keyDecimalDigits, digits);
     setState(() {});
   }
 
@@ -230,6 +350,20 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   );
                 },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextButton(
+                onPressed: _showUnitPicker,
+                style: TextButton.styleFrom(
+                  foregroundColor: context.appColors.accent.withValues(alpha: 0.7),
+                  visualDensity: VisualDensity.compact,
+                ),
+                child: Text(
+                  AppStrings.otherUnits,
+                  style: const TextStyle(fontSize: 13, decoration: TextDecoration.underline),
+                ),
               ),
             ),
   

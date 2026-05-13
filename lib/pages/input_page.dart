@@ -16,7 +16,6 @@ import '../constants.dart';
 import '../utils/input_formatter.dart';
 import '../utils/format_utils.dart';
 import '../utils/milestone_manager.dart';
-import '../utils/notification_manager.dart';
 import '../app_state.dart';
 
 class InputPage extends StatefulWidget {
@@ -124,7 +123,8 @@ class _InputPageState extends State<InputPage> {
     final cleanedAmount = amountText.replaceAll(',', '');
 
     // 繝｡繝｢縺ｮ縺ｿ縺ｮ蝣ｴ蜷医・驥鷹｡堺ｸ崎ｦ・
-    if (memo.isEmpty || (selectedType != MoneyType.memo && amountText.isEmpty)) {
+    final amountRequired = selectedType != MoneyType.memo;
+    if ((amountRequired && amountText.isEmpty) || (!amountRequired && memo.isEmpty)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.inputErrorSnackbarMessage)),
       );
@@ -512,25 +512,45 @@ class _InputPageState extends State<InputPage> {
                             horizontal: AppNumbers.defaultPadding,
                             vertical: AppNumbers.defaultPadding,
                           ),
-                          prefix: Padding(
-                            padding: const EdgeInsets.only(right: 4),
-                            child: ValueListenableBuilder<String>(
-                              valueListenable: currencyNotifier,
-                              builder: (context, symbol, child) {
-                                final displaySymbol = isEdit ? (widget.entry!.currency ?? symbol) : symbol;
-                                return Text(
+                          prefix: ValueListenableBuilder<String>(
+                            valueListenable: currencyNotifier,
+                            builder: (context, symbol, child) {
+                              final displaySymbol = isEdit ? (widget.entry!.currency ?? symbol) : symbol;
+                              if (isSuffixUnit(displaySymbol)) return const SizedBox.shrink();
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: Text(
                                   displaySymbol,
                                   style: TextStyle(
                                     color: selectedType == MoneyType.memo ? Colors.grey : context.appColors.mainText,
                                   ),
-                                );
-                              },
-                            ),
+                                ),
+                              );
+                            },
+                          ),
+                          suffix: ValueListenableBuilder<String>(
+                            valueListenable: currencyNotifier,
+                            builder: (context, symbol, child) {
+                              final displaySymbol = isEdit ? (widget.entry!.currency ?? symbol) : symbol;
+                              if (!isSuffixUnit(displaySymbol)) return const SizedBox.shrink();
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Text(
+                                  displaySymbol,
+                                  style: TextStyle(
+                                    color: selectedType == MoneyType.memo ? Colors.grey : context.appColors.mainText,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                         ),
+                        textAlign: isSuffixUnit(isEdit ? (widget.entry!.currency ?? currencyNotifier.value) : currencyNotifier.value)
+                            ? TextAlign.right
+                            : TextAlign.left,
                       ),
                     ),
       
