@@ -343,7 +343,7 @@ class _SetupPageState extends State<SetupPage> {
       AppStrings.unitStep,
       AppStrings.unitMinute,
       AppStrings.unitHour,
-      'pts',
+      AppStrings.unitPt,
     ];
 
     return Column(

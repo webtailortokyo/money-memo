@@ -79,7 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
       AppStrings.unitStep,
       AppStrings.unitMinute,
       AppStrings.unitHour,
-      'pts',
+      AppStrings.unitPt,
       AppStrings.customUnit,
     ];
 

@@ -102,6 +102,7 @@ class AppStrings {
       'unitStep': '歩',
       'unitMinute': '分',
       'unitHour': '時間',
+      'unitPt': 'pt',
       'exportLabel': 'エクスポート (CSV)',
       'exportSubtitle': '記録データを保存・共有します',
       'importLabel': 'インポート (CSV)',
@@ -221,6 +222,7 @@ class AppStrings {
       'unitStep': 'steps',
       'unitMinute': 'min',
       'unitHour': 'hours',
+      'unitPt': 'pt',
       'exportLabel': 'Export (CSV)',
       'exportSubtitle': 'Save and share recorded data',
       'importLabel': 'Import (CSV)',
@@ -368,6 +370,7 @@ class AppStrings {
   static String get unitStep => _get('unitStep');
   static String get unitMinute => _get('unitMinute');
   static String get unitHour => _get('unitHour');
+  static String get unitPt => _get('unitPt');
   static String get exportLabel => _get('exportLabel');
   static String get exportSubtitle => _get('exportSubtitle');
   static String get importLabel => _get('importLabel');
