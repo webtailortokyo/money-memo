@@ -392,10 +392,8 @@ class _InputPageState extends State<InputPage> {
                       ),
                     ),
       
-                    SizedBox(height: AppNumbers.smallSpacing),
-                    Text(AppStrings.typeSelectionTitle, style: TextStyle(fontWeight: FontWeight.bold, fontSize: AppNumbers.sectionTitleFontSize)),
-      
                     SizedBox(height: AppNumbers.defaultPadding),
+
       
                     LayoutBuilder(
                       builder: (context, constraints) {

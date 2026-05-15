@@ -28,7 +28,6 @@ class AppStrings {
       'memoHintIncrease': '例：おこづかい、プレゼント',
       'memoLabelMemo': '内容は？',
       'memoHintMemo': '例：なんでもメモ',
-      'typeSelectionTitle': '減った？ 増えた？ メモ？',
       'amountLabel': 'いくら？',
       'amountHint': '0',
       'updateButtonText': '更新する',
@@ -148,7 +147,6 @@ class AppStrings {
       'memoHintIncrease': 'e.g., Pocket money, Gift',
       'memoLabelMemo': 'What content?',
       'memoHintMemo': 'e.g., Any notes',
-      'typeSelectionTitle': 'Income? Expense? Memo?',
       'amountLabel': 'How much?',
       'amountHint': '0',
       'updateButtonText': 'Update',
@@ -296,7 +294,6 @@ class AppStrings {
   static String get memoHintIncrease => _get('memoHintIncrease');
   static String get memoLabelMemo => _get('memoLabelMemo');
   static String get memoHintMemo => _get('memoHintMemo');
-  static String get typeSelectionTitle => _get('typeSelectionTitle');
   static String get amountLabel => _get('amountLabel');
   static String get amountHint => _get('amountHint');
   static String get updateButtonText => _get('updateButtonText');
