@@ -86,6 +86,12 @@ class _SetupPageState extends State<SetupPage> {
   }
 
   void _previousPage() {
+    if (_isOtherUnitMode && _currentPage == 2) {
+      setState(() {
+        _isOtherUnitMode = false;
+      });
+      return;
+    }
     if (_currentPage > 0) {
       _pageController.previousPage(
         duration: const Duration(milliseconds: 300),
@@ -252,6 +258,7 @@ class _SetupPageState extends State<SetupPage> {
 
   Widget _buildCurrencyStep() {
     return _buildStepContainer(
+      key: const ValueKey('currencyStep'),
       titleWidget: Text(
         _isOtherUnitMode ? AppStrings.nonMoneyUnits : AppStrings.currencySettingTitle,
         style: TextStyle(
